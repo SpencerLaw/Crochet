@@ -689,7 +689,7 @@ const Admin = () => {
 
 // 5. CONTACT (Replaces Login/Profile)
 const Contact = () => {
-  const wechatId = "dongdong_crochet"; // Mock ID
+  const wechatId = "Lucky_archer9"; // Updated ID
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
