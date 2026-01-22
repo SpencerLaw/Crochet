@@ -1,30 +1,16 @@
 
 import React, { useState } from 'react';
 import { useStore } from '../store';
-import { Category } from '../types';
+import { Category, Product } from '../types';
 import { CATEGORIES } from '../constants';
 import { uploadImage } from '../services/imageService';
 import { toast } from 'react-hot-toast';
 import {
   ShoppingBag, LogOut, Plus, Search, Menu, X,
-  Trash2, Edit, Upload, Filter, MoreHorizontal
+  Trash2, Edit, Upload, Filter, MoreHorizontal, LayoutGrid
 } from 'lucide-react';
 
 // --- COMPONENTS ---
-
-const SidebarItem = ({ icon: Icon, label, active, onClick }: any) => (
-  <button
-    onClick={onClick}
-    className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-all relative group ${active
-        ? 'text-white bg-slate-800'
-        : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-      }`}
-  >
-    {active && <div className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 rounded-r-full" />}
-    <Icon className={`w-5 h-5 transition-colors ${active ? 'text-indigo-400' : 'text-slate-500 group-hover:text-slate-300'}`} />
-    <span>{label}</span>
-  </button>
-);
 
 const Modal = ({ isOpen, onClose, title, children }: any) => {
   if (!isOpen) return null;
@@ -58,22 +44,47 @@ const InputGroup = ({ label, required, children }: any) => (
 
 export default function Admin() {
   const { products, fetchProducts } = useStore();
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
   // Modal & Upload State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   // Form State
-  const [formData, setFormData] = useState({
+  const initialForm = {
     title: '', price: '', category: Category.PLUSHIES, description: '',
     images: [] as string[], is_featured: false, is_banner: false, banner_text: '',
     colors: '', sizes: '', tags: ''
-  });
+  };
+  const [formData, setFormData] = useState(initialForm);
 
   // --- HANDLERS ---
+
+  const handleEdit = (product: Product) => {
+    setEditingId(product.id);
+    setFormData({
+      title: product.title,
+      price: product.price.toString(),
+      category: product.category as Category,
+      description: product.description,
+      images: product.images && product.images.length > 0 ? product.images : [product.image],
+      is_featured: product.is_featured || false,
+      is_banner: product.is_banner || false,
+      banner_text: product.banner_text || '',
+      colors: product.colors?.join(', ') || '',
+      sizes: product.sizes?.join(', ') || '',
+      tags: product.tags?.join(', ') || ''
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleCreateNew = () => {
+    setEditingId(null);
+    setFormData(initialForm);
+    setIsModalOpen(true);
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -104,9 +115,10 @@ export default function Admin() {
     e.preventDefault();
     if (formData.images.length === 0) return toast.error('请至少上传一张图片');
 
-    const newProduct = {
+    const productPayload = {
       ...formData,
-      image: formData.images[0],
+      image: formData.images[0], // Main image
+      images: formData.images,   // All images
       colors: formData.colors.split(',').map(s => s.trim()).filter(Boolean),
       sizes: formData.sizes.split(',').map(s => s.trim()).filter(Boolean),
       tags: formData.tags.split(',').map(s => s.trim()).filter(Boolean),
@@ -115,20 +127,23 @@ export default function Admin() {
 
     try {
       const adminPass = localStorage.getItem('admin_pass') || '';
+      const method = editingId ? 'PUT' : 'POST';
+      const body = editingId ? { ...productPayload, id: editingId } : productPayload;
+
       const res = await fetch('/api/products', {
-        method: 'POST',
+        method,
         headers: { 'Content-Type': 'application/json', 'Authorization': adminPass },
-        body: JSON.stringify(newProduct)
+        body: JSON.stringify(body)
       });
 
       if (res.ok) {
         await fetchProducts();
-        resetForm();
+        handleCreateNew(); // Reset
         setIsModalOpen(false);
-        toast.success('商品发布成功');
+        toast.success(editingId ? '商品更新成功' : '商品发布成功');
       } else {
         const data = await res.json();
-        toast.error(`发布失败: ${data.error} - ${data.message || ''}`);
+        toast.error(`${editingId ? '更新' : '发布'}失败: ${data.error} - ${data.message || ''}`);
       }
     } catch (err: any) {
       toast.error(`网络错误: ${err.message}`);
@@ -145,159 +160,185 @@ export default function Admin() {
     } catch (err: any) { toast.error('删除请求异常'); }
   };
 
-  const resetForm = () => {
-    setFormData({ title: '', price: '', category: Category.PLUSHIES, description: '', images: [], is_featured: false, is_banner: false, banner_text: '', colors: '', sizes: '', tags: '' });
-  };
-
   const filteredProducts = products.filter(p =>
     p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 flex">
-      {/* --- SIDEBAR --- */}
-      <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 text-slate-300 transform transition-transform duration-300 md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="h-20 flex items-center px-6 border-b border-slate-800/50">
-          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold mr-3 shadow-lg shadow-indigo-500/30">H</div>
-          <span className="font-bold text-lg tracking-wide text-white">Hook Admin</span>
+    <div className="min-h-screen bg-slate-50/50 font-sans text-slate-900">
+
+      {/* --- TOP NAVBAR (Replacing Sidebar) --- */}
+      <header className="h-16 bg-white border-b border-slate-200 px-6 lg:px-10 flex items-center justify-between sticky top-0 z-40 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold shadow-md shadow-indigo-500/20">H</div>
+          <span className="font-bold text-xl tracking-tight text-slate-800">Hook Admin</span>
+          <div className="h-6 w-px bg-slate-200 mx-2"></div>
+          <span className="text-sm font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">Products</span>
         </div>
 
-        <nav className="mt-8 px-2 space-y-1">
-          <div className="px-4 pb-2 text-xs font-bold text-slate-600 uppercase tracking-wider">Store</div>
-          <SidebarItem icon={ShoppingBag} label="Products" active={true} onClick={() => { }} />
-        </nav>
-
-        <div className="absolute bottom-0 inset-x-0 p-4 border-t border-slate-800/50">
-          <button onClick={() => window.location.href = '/admin/login'} className="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors w-full group">
-            <LogOut className="w-5 h-5 group-hover:text-red-400 transition-colors" />
-            <span className="font-medium text-sm">Sign Out</span>
+        <div className="flex items-center gap-4">
+          <div className="hidden md:flex items-center text-sm text-slate-500">
+            <span className="font-medium text-slate-700">{filteredProducts.length}</span>
+            <span className="mx-1">items found</span>
+          </div>
+          <button onClick={() => window.location.href = '/admin/login'} className="flex items-center gap-2 px-3 py-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors text-sm font-medium group">
+            <LogOut className="w-4 h-4" />
+            <span>退出</span>
           </button>
         </div>
-      </aside>
+      </header>
 
-      {/* --- MAIN CONTENT --- */}
-      <main className={`flex-1 transition-all duration-300 flex flex-col min-h-screen bg-white ${isSidebarOpen ? 'md:ml-64' : 'ml-0'}`}>
-
-        {/* TOP TOOLBAR */}
-        <div className="h-20 border-b border-slate-100 flex items-center justify-between px-8 sticky top-0 bg-white/80 backdrop-blur-md z-30">
-          <div className="flex items-center gap-4">
-            <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="text-slate-500 hover:bg-slate-100 p-2 rounded-lg md:hidden">
-              <Menu className="w-5 h-5" />
-            </button>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">商品管理</h1>
-            <span className="bg-slate-100 text-slate-500 text-xs font-semibold px-2.5 py-0.5 rounded-full">{filteredProducts.length} items</span>
+      {/* --- CONTROL BAR --- */}
+      <div className="px-6 lg:px-10 py-8 max-w-[1600px] mx-auto">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">商品管理</h1>
+            <p className="text-slate-500">管理您的所有商品库存、价格和推荐状态。</p>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="relative group">
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <div className="relative flex-1 md:w-80 group">
               <input
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="w-72 bg-slate-50 border border-slate-200 rounded-full pl-10 pr-4 py-2.5 text-sm focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all placeholder:text-slate-400"
-                placeholder="搜索商品名称..."
+                className="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all shadow-sm"
+                placeholder="搜索商品名称、描述..."
               />
-              <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+              <Search className="absolute left-4 top-3.5 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
             </div>
 
             <button
-              onClick={() => setIsModalOpen(true)}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-full text-sm font-semibold shadow-lg shadow-indigo-500/30 transition-all hover:-translate-y-0.5 hover:shadow-indigo-500/40 flex items-center gap-2"
+              onClick={handleCreateNew}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-indigo-500/30 transition-all hover:-translate-y-0.5 hover:shadow-indigo-500/40 flex items-center gap-2 whitespace-nowrap"
             >
-              <Plus className="w-4 h-4 text-indigo-200" />
-              <span>添加商品</span>
+              <Plus className="w-5 h-5" />
+              <span>发布商品</span>
             </button>
           </div>
         </div>
 
-        {/* TABLE CONTENT */}
-        <div className="flex-1 overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-50/50 border-b border-slate-100">
-                <th className="px-8 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider w-24">预览</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">商品信息</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">状态</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">价格</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">库存</th>
-                <th className="px-8 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">操作</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filteredProducts.map(p => (
-                <tr key={p.id} className="group hover:bg-slate-50/80 transition-colors">
-                  <td className="px-8 py-4">
-                    <div className="relative w-14 h-14">
-                      <div className="w-14 h-14 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden shadow-sm cursor-zoom-in">
-                        <img src={p.image} className="w-full h-full object-cover" />
-                      </div>
-                      {/* Enhanced Hover Zoom */}
-                      <div className="absolute left-16 top-0 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all duration-300 z-50 origin-top-left scale-95 group-hover:scale-100">
-                        <div className="w-64 h-64 bg-white p-1.5 rounded-2xl shadow-2xl border border-slate-100 relative">
-                          <img src={p.image} className="w-full h-full object-cover rounded-xl" />
-                          <div className="absolute top-4 left-0 -ml-2 w-4 h-4 bg-white transform rotate-45 border-l border-b border-slate-100"></div>
+        {/* --- MAIN TABLE --- */}
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-100">
+                  <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider w-24">预览</th>
+                  <th className="px-6 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider">商品信息</th>
+                  <th className="px-6 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider">展示标签</th>
+                  <th className="px-6 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider">价格</th>
+                  <th className="px-6 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider">库存</th>
+                  <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">操作</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {filteredProducts.map(p => (
+                  <tr key={p.id} className="group hover:bg-slate-50/50 transition-colors">
+                    <td className="px-8 py-4">
+                      {/* ZOOM IMAGE CONTAINER */}
+                      <div className="relative w-16 h-16">
+                        <div className="w-16 h-16 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden shadow-sm cursor-zoom-in group-hover:shadow-md transition-all">
+                          <img src={p.image} className="w-full h-full object-cover" />
+                        </div>
+                        {/* POPUP */}
+                        <div className="absolute left-14 top-0 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all duration-200 z-[999] origin-top-left scale-95 group-hover:scale-100 translate-x-4">
+                          <div className="w-72 h-72 bg-white p-2 rounded-2xl shadow-2xl border border-slate-100 ring-4 ring-black/5 relative">
+                            <img src={p.image} className="w-full h-full object-cover rounded-xl" />
+                            <div className="absolute top-6 left-0 -ml-2 w-4 h-4 bg-white transform rotate-45 border-l border-b border-slate-100"></div>
+                            <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-md rounded-lg p-2 text-white text-xs">
+                              <p className="font-bold truncate">{p.title}</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="max-w-[240px]">
-                      <h4 className="font-semibold text-slate-900 mb-1 truncate">{p.title}</h4>
-                      <p className="text-slate-500 text-xs truncate leading-relaxed">{p.description}</p>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex flex-col items-start gap-2">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
-                        {p.category}
-                      </span>
-                      <div className="flex gap-1.5">
-                        {p.is_featured && <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 uppercase tracking-wide border border-amber-100">Hot</span>}
-                        {p.is_banner && <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 uppercase tracking-wide border border-indigo-100">Banner</span>}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="max-w-[300px]">
+                        <h4 className="font-bold text-slate-900 text-sm mb-1 truncate">{p.title}</h4>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                            {p.category}
+                          </span>
+                        </div>
+                        <p className="text-slate-400 text-xs truncate max-w-[250px]">{p.description}</p>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="font-bold text-slate-900 tracking-tight">${p.price.toFixed(2)}</span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${p.stock > 0 ? 'bg-emerald-500' : 'bg-red-500'}`}></span>
-                      <span className="text-sm text-slate-600 font-medium">{p.stock > 0 ? `${p.stock} in stock` : 'Out of stock'}</span>
-                    </div>
-                  </td>
-                  <td className="px-8 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="p-2 bg-white border border-slate-200 text-slate-500 hover:text-indigo-600 hover:border-indigo-200 rounded-lg transition-all shadow-sm">
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button onClick={() => handleDelete(p.id)} className="p-2 bg-white border border-slate-200 text-slate-500 hover:text-red-600 hover:border-red-200 rounded-lg transition-all shadow-sm">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {filteredProducts.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="px-6 py-24 text-center">
-                    <div className="flex flex-col items-center justify-center text-slate-400">
-                      <ShoppingBag className="w-12 h-12 mb-3 text-slate-200" />
-                      <p className="text-sm font-medium">暂无商品数据</p>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col gap-1.5 items-start">
+                        {p.is_featured ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-100">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Featured
+                          </span>
+                        ) : (
+                          <span className="text-xs text-slate-300 font-medium px-2">Normal</span>
+                        )}
+                        {p.is_banner && (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-100">
+                            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> Banner
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="font-bold text-slate-900 tracking-tight text-base font-mono">${p.price.toFixed(2)}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${p.stock > 0 ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
+                        <span className={`text-sm font-medium ${p.stock > 0 ? 'text-slate-600' : 'text-red-500'}`}>
+                          {p.stock > 0 ? p.stock : '无货'}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-8 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={() => handleEdit(p)}
+                          className="p-2 bg-white border border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-300 rounded-lg transition-all shadow-sm hover:shadow" title="编辑"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => handleDelete(p.id)} className="p-2 bg-white border border-slate-200 text-slate-400 hover:text-red-600 hover:border-red-300 rounded-lg transition-all shadow-sm hover:shadow" title="删除">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {filteredProducts.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-32 text-center">
+                      <div className="flex flex-col items-center justify-center text-slate-400">
+                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                          <ShoppingBag className="w-8 h-8 text-slate-300" />
+                        </div>
+                        <p className="text-lg font-bold text-slate-600">暂无商品数据</p>
+                        <p className="text-sm mt-1">点击右上角“发布商品”添加您的第一个商品</p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+          <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-200 flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+              Total {filteredProducts.length} Products
+            </span>
+            <div className="flex gap-2">
+              <button disabled className="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium text-slate-400 disabled:opacity-50">Prev</button>
+              <button disabled className="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium text-slate-400 disabled:opacity-50">Next</button>
+            </div>
+          </div>
         </div>
-      </main>
+      </div>
 
-      {/* --- ADD PRODUCT MODAL --- */}
+      {/* --- ADD/EDIT PRODUCT MODAL --- */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="发布新商品"
+        title={editingId ? "编辑商品" : "发布新商品"}
       >
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
@@ -433,7 +474,7 @@ export default function Admin() {
               className="px-6 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/40 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
-              <span>Publish Product</span>
+              <span>{editingId ? 'Save Changes' : 'Publish Product'}</span>
             </button>
           </div>
         </form>

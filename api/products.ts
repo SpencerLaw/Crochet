@@ -26,19 +26,19 @@ export default async function handler(req: any, res: any) {
       case 'GET':
         const { type, category } = req.query;
         let query = supabase.from('products').select('*');
-        
+
         if (type === 'banner') {
           query = query.eq('is_banner', true);
         } else if (type === 'featured') {
           query = query.eq('is_featured', true);
         }
-        
+
         if (category && category !== '全部') {
           query = query.eq('category', category);
         }
 
         const { data: products, error: getError } = await query.order('created_at', { ascending: false });
-        
+
         if (getError) throw getError;
         return res.status(200).json(products);
 
@@ -47,9 +47,20 @@ export default async function handler(req: any, res: any) {
           .from('products')
           .insert([req.body])
           .select();
-        
+
         if (postError) throw postError;
         return res.status(201).json(newProduct[0]);
+
+      case 'PUT':
+        const { id: updateId, ...updates } = req.body;
+        const { data: updatedProduct, error: putError } = await supabase
+          .from('products')
+          .update(updates)
+          .eq('id', updateId)
+          .select();
+
+        if (putError) throw putError;
+        return res.status(200).json(updatedProduct[0]);
 
       case 'DELETE':
         const { id } = req.query;
@@ -57,7 +68,7 @@ export default async function handler(req: any, res: any) {
           .from('products')
           .delete()
           .eq('id', id);
-        
+
         if (delError) throw delError;
         return res.status(200).json({ message: 'Deleted successfully' });
 
