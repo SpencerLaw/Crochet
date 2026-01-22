@@ -2,6 +2,10 @@ import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Link, useNavigate, useLocation, useParams, Outlet, Navigate } from 'react-router-dom';
 import { ShoppingBag, Search, Menu, X, MessageCircle, LogOut, Package, Sparkles, Image as ImageIcon, Trash2, ArrowRight, Home as HomeIcon, Store, Heart, ChevronLeft, ChevronRight, Copy, Check, LayoutDashboard, PlusCircle, LogOut as LogoutIcon, Globe } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
+import { useStore } from './store';
+import { Category, Product } from './types';
+import { CATEGORIES } from './constants';
+import { Button, ProductCard, CategoryBadge } from './components/Components';
 
 // Lazy load Admin to keep bundle small
 const Admin = lazy(() => import('./pages/Admin'));
