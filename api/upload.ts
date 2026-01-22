@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: '4mb',
+      sizeLimit: '10mb',
     },
   },
 };
@@ -30,19 +30,23 @@ export default async function handler(req: any, res: any) {
   try {
     const { image, fileName, contentType } = req.body; // Base64 image from client
     
-    // 将 Base64 转换为 Buffer
-    const buffer = Buffer.from(image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
+    // 增强的 Base64 处理逻辑
+    const base64Data = image.includes('base64,') ? image.split('base64,')[1] : image;
+    const buffer = Buffer.from(base64Data, 'base64');
 
-    // 上传到 Supabase Storage (设置缓存控制)
+    // 上传到 Supabase Storage
     const { data, error } = await supabase.storage
       .from('product-images')
       .upload(`public/${fileName}`, buffer, {
         contentType: contentType,
-        cacheControl: '31536000', // 1 year cache
+        cacheControl: '31536000',
         upsert: true
       });
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase Storage Error:', error);
+      return res.status(500).json({ error: `Storage Error: ${error.message}`, details: error });
+    }
 
     // 获取公开 URL
     const { data: { publicUrl } } = supabase.storage
