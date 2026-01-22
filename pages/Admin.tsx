@@ -1,79 +1,80 @@
 
 import React, { useState } from 'react';
 import { useStore } from '../store';
-import { Category, Product } from '../types';
+import { Category } from '../types';
 import { CATEGORIES } from '../constants';
 import { uploadImage } from '../services/imageService';
 import { toast } from 'react-hot-toast';
 import {
-  Plus, Trash2, ChevronLeft, ChevronRight, Search,
-  Image as ImageIcon, Sparkles, Check, UploadCloud
+  LayoutDashboard, ShoppingBag, Settings, LogOut,
+  Plus, Search, Bell, Menu, X, ChevronRight, Upload,
+  MoreVertical, Trash2, Edit, Image as ImageIcon
 } from 'lucide-react';
 
-// --- iOS Components ---
+// --- COMPONENTS ---
 
-const IOSCard = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <div className={`bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden ${className}`}>
+const SidebarItem = ({ icon: Icon, label, active, onClick }: any) => (
+  <button
+    onClick={onClick}
+    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors mb-1 ${active
+        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200'
+        : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
+      }`}
+  >
+    <Icon className="w-5 h-5" />
+    <span className="font-medium">{label}</span>
+  </button>
+);
+
+const Modal = ({ isOpen, onClose, title, children }: any) => {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100">
+          <h3 className="text-lg font-bold text-slate-800">{title}</h3>
+          <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400 hover:text-slate-600">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="p-6 max-h-[80vh] overflow-y-auto">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const InputGroup = ({ label, required, children }: any) => (
+  <div className="space-y-1.5">
+    <label className="block text-sm font-semibold text-slate-700">
+      {label} {required && <span className="text-red-500">*</span>}
+    </label>
     {children}
   </div>
 );
 
-const IOSInput = ({ label, value, onChange, placeholder, type = "text", required = false }: any) => (
-  <div className="flex items-center justify-between py-4 border-b border-slate-100 last:border-0 pl-4 pr-4 bg-white hover:bg-[#F9F9F9] transition-colors group">
-    <label className="text-[17px] font-medium text-slate-900 w-24 shrink-0">{label}</label>
-    <input
-      type={type}
-      required={required}
-      className={`bg-transparent text-right text-[17px] text-slate-500 placeholder:text-slate-300 outline-none flex-1 font-normal`}
-      placeholder={placeholder || "Optional"}
-      value={value}
-      onChange={onChange}
-    />
-  </div>
-);
-
-const IOSSelect = ({ label, value, onChange, options }: any) => (
-  <div className="flex items-center justify-between py-4 border-b border-slate-100 last:border-0 pl-4 pr-4 bg-white hover:bg-[#F9F9F9] transition-colors">
-    <label className="text-[17px] font-medium text-slate-900 w-24 shrink-0">{label}</label>
-    <select
-      className="bg-transparent text-right text-[17px] text-[#007AFF] outline-none flex-1 appearance-none cursor-pointer font-normal"
-      value={value}
-      onChange={onChange}
-    >
-      {options.map((opt: string) => <option key={opt} value={opt}>{opt}</option>)}
-    </select>
-    <ChevronRight className="w-4 h-4 text-slate-300 ml-2" />
-  </div>
-);
-
-const IOSSwitch = ({ label, checked, onChange, icon: Icon, activeColor = "bg-[#34C759]" }: any) => (
-  <div className="flex items-center justify-between py-3.5 border-b border-slate-100 last:border-0 pl-4 pr-4 bg-white hover:bg-[#F9F9F9] transition-colors cursor-pointer" onClick={() => onChange(!checked)}>
-    <div className="flex items-center gap-3">
-      {Icon && (
-        <div className={`w-7 h-7 rounded-md flex items-center justify-center text-white ${checked ? activeColor : 'bg-slate-400'}`}>
-          <Icon className="w-4 h-4" />
-        </div>
-      )}
-      <span className="text-[17px] font-medium text-slate-900">{label}</span>
-    </div>
-    <div className={`w-[51px] h-[31px] rounded-full p-0.5 transition-colors duration-300 ${checked ? activeColor : 'bg-[#E9E9EA]'}`}>
-      <div className={`w-[27px] h-[27px] bg-white rounded-full shadow-sm transition-transform duration-300 ${checked ? 'translate-x-[20px]' : 'translate-x-0'}`} />
-    </div>
-  </div>
-);
+// --- MAIN ADMIN COMPONENT ---
 
 export default function Admin() {
   const { products, fetchProducts } = useStore();
-  const [isAdding, setIsAdding] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [isUploading, setIsUploading] = useState(false);
+  const [activeTab, setActiveTab] = useState('products');
+  const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  // Form State
   const [formData, setFormData] = useState({
     title: '', price: '', category: Category.PLUSHIES, description: '',
     images: [] as string[], is_featured: false, is_banner: false, banner_text: '',
     colors: '', sizes: '', tags: ''
   });
+
+  // --- HANDLERS ---
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -81,15 +82,21 @@ export default function Admin() {
     setIsUploading(true);
     setUploadProgress(0);
     const uploadedUrls: string[] = [...formData.images];
+
     try {
       for (let i = 0; i < files.length; i++) {
+        // Updated service now returns object, ensure key matches or service is updated
+        // Assuming service returns string URL directly or we handle it. 
+        // Checking previous service code: uploadImage returns string (url).
         const url = await uploadImage(files[i], (p) => setUploadProgress(Math.round(((i / files.length) * 100) + (p / files.length))));
         uploadedUrls.push(url);
       }
       setFormData(prev => ({ ...prev, images: uploadedUrls }));
-      toast.success('Image Uploaded');
+      toast.success('图片上传成功');
     } catch (err: any) {
-      toast.error('Upload Failed');
+      console.error(err);
+      const msg = err.response?.data?.error || err.message || '上传未知错误';
+      toast.error(`上传失败: ${msg}`);
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
@@ -98,7 +105,7 @@ export default function Admin() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.images.length === 0) return toast.error('Please upload at least one image');
+    if (formData.images.length === 0) return toast.error('请至少上传一张图片');
 
     const newProduct = {
       ...formData,
@@ -116,22 +123,33 @@ export default function Admin() {
         headers: { 'Content-Type': 'application/json', 'Authorization': adminPass },
         body: JSON.stringify(newProduct)
       });
+
       if (res.ok) {
         await fetchProducts();
-        setFormData({ title: '', price: '', category: Category.PLUSHIES, description: '', images: [], is_featured: false, is_banner: false, banner_text: '', colors: '', sizes: '', tags: '' });
-        setIsAdding(false);
-        toast.success('Published Successfully');
+        resetForm();
+        setIsModalOpen(false);
+        toast.success('商品发布成功');
+      } else {
+        const data = await res.json();
+        toast.error(`发布失败: ${data.error || res.statusText}`);
       }
-    } catch (err: any) { toast.error('Network Error'); }
+    } catch (err: any) {
+      toast.error(`网络错误: ${err.message}`);
+    }
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Delete this item?')) return;
+    if (!window.confirm('确定要删除该商品吗？')) return;
     try {
       const adminPass = localStorage.getItem('admin_pass') || '';
       const res = await fetch(`/api/products?id=${id}`, { method: 'DELETE', headers: { 'Authorization': adminPass } });
-      if (res.ok) { await fetchProducts(); toast.success('Deleted'); }
-    } catch (err: any) { toast.error('Error'); }
+      if (res.ok) { await fetchProducts(); toast.success('商品已删除'); }
+      else { toast.error('删除失败'); }
+    } catch (err: any) { toast.error('删除请求异常'); }
+  };
+
+  const resetForm = () => {
+    setFormData({ title: '', price: '', category: Category.PLUSHIES, description: '', images: [], is_featured: false, is_banner: false, banner_text: '', colors: '', sizes: '', tags: '' });
   };
 
   const filteredProducts = products.filter(p =>
@@ -139,199 +157,322 @@ export default function Admin() {
     p.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // --- iOS ADD ITEM VIEW ---
-  if (isAdding) {
-    return (
-      <div className="bg-[#F2F2F7] min-h-screen pb-20 font-sans">
-        {/* iOS Navigation Bar */}
-        <div className="sticky top-0 z-50 bg-[#F2F2F7]/80 backdrop-blur-xl border-b border-slate-200/50">
-          <div className="max-w-2xl mx-auto px-4 h-[44px] flex items-center justify-between">
-            <button
-              onClick={() => setIsAdding(false)}
-              className="text-[#007AFF] text-[17px] flex items-center gap-1 hover:opacity-70 transition-opacity"
-            >
-              <ChevronLeft className="w-6 h-6 -ml-2" /> Back
-            </button>
-            <span className="font-semibold text-[17px] text-black">New Product</span>
-            <button
-              type="submit"
-              form="ios-form"
-              disabled={isUploading || formData.images.length === 0}
-              className="text-[#007AFF] text-[17px] font-semibold disabled:opacity-30 hover:opacity-70 transition-opacity"
-            >
-              Done
-            </button>
-          </div>
-        </div>
-
-        <div className="max-w-2xl mx-auto px-5 pt-6 animate-in slide-in-from-bottom-8 duration-500">
-          <form id="ios-form" onSubmit={handleSubmit} className="space-y-8">
-
-            {/* Section 1: Image Upload (Prominent, like Photos app) */}
-            <div className="flex justify-center">
-              <div className="relative">
-                <input type="file" id="up" accept="image/*" multiple className="hidden" onChange={handleFileChange} disabled={isUploading} />
-                <label htmlFor="up" className="block w-32 h-32 rounded-full overflow-hidden bg-white shadow-lg border-4 border-white cursor-pointer active:scale-95 transition-transform relative group">
-                  {isUploading ? (
-                    <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm z-20">
-                      <span className="text-xs font-bold text-slate-500">{uploadProgress}%</span>
-                    </div>
-                  ) : formData.images.length > 0 ? (
-                    <img src={formData.images[0]} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center text-slate-300 group-hover:bg-[#F9F9F9] transition-colors">
-                      <div className="bg-[#F2F2F7] p-3 rounded-full mb-1">
-                        <ImageIcon className="w-6 h-6 text-slate-400" />
-                      </div>
-                      <span className="text-[10px] uppercase font-bold text-slate-400">Add Photo</span>
-                    </div>
-                  )}
-                  {formData.images.length > 0 && <div className="absolute bottom-0 inset-x-0 bg-black/40 text-white text-[9px] font-bold text-center py-1 backdrop-blur-md">EDIT</div>}
-                </label>
-                {formData.images.length > 1 && (
-                  <div className="absolute -bottom-2 -right-2 bg-slate-900 text-white text-xs font-bold px-2 py-0.5 rounded-full border-2 border-[#F2F2F7]">
-                    +{formData.images.length - 1}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Section 2: Basic Info (Inset Grouped) */}
-            <div>
-              <div className="pl-4 mb-2 text-[13px] uppercase text-slate-500 tracking-wide font-normal">Details</div>
-              <IOSCard>
-                <IOSInput label="Title" placeholder="Product Name" value={formData.title} onChange={(e: any) => setFormData({ ...formData, title: e.target.value })} required />
-                <IOSInput label="Price" placeholder="$0.00" type="number" value={formData.price} onChange={(e: any) => setFormData({ ...formData, price: e.target.value })} required />
-                <IOSSelect label="Category" options={CATEGORIES.filter(c => c !== Category.ALL)} value={formData.category} onChange={(e: any) => setFormData({ ...formData, category: e.target.value as Category })} />
-              </IOSCard>
-            </div>
-
-            {/* Section 3: Description */}
-            <div>
-              <div className="pl-4 mb-2 text-[13px] uppercase text-slate-500 tracking-wide font-normal">Description</div>
-              <IOSCard>
-                <textarea
-                  className="w-full p-4 text-[17px] text-slate-900 min-h-[120px] outline-none resize-none font-normal leading-relaxed"
-                  placeholder="Tell us about this creation..."
-                  value={formData.description}
-                  onChange={e => setFormData({ ...formData, description: e.target.value })}
-                />
-              </IOSCard>
-            </div>
-
-            {/* Section 4: Specifications */}
-            <div>
-              <div className="pl-4 mb-2 text-[13px] uppercase text-slate-500 tracking-wide font-normal">Specs</div>
-              <IOSCard>
-                <IOSInput label="Colors" placeholder="e.g. Red, Blue" value={formData.colors} onChange={(e: any) => setFormData({ ...formData, colors: e.target.value })} />
-                <IOSInput label="Sizes" placeholder="e.g. 15cm" value={formData.sizes} onChange={(e: any) => setFormData({ ...formData, sizes: e.target.value })} />
-              </IOSCard>
-            </div>
-
-            {/* Section 5: Visibility */}
-            <div>
-              <div className="pl-4 mb-2 text-[13px] uppercase text-slate-500 tracking-wide font-normal">Visibility</div>
-              <IOSCard>
-                <IOSSwitch label="Featured Product" checked={formData.is_featured} onChange={(v: boolean) => setFormData({ ...formData, is_featured: v })} icon={Sparkles} activeColor="bg-[#FF9500]" />
-                <IOSSwitch label="Home Banner" checked={formData.is_banner} onChange={(v: boolean) => setFormData({ ...formData, is_banner: v })} icon={ImageIcon} activeColor="bg-[#5E5CE6]" />
-                {formData.is_banner && (
-                  <IOSInput label="Banner Text" placeholder="Headline for banner" value={formData.banner_text} onChange={(e: any) => setFormData({ ...formData, banner_text: e.target.value })} />
-                )}
-              </IOSCard>
-            </div>
-
-          </form>
-        </div>
-      </div>
-    );
-  }
-
-  // --- iOS LIST VIEW ---
   return (
-    <div className="bg-[#F2F2F7] min-h-screen font-sans">
-      {/* iOS Large Header */}
-      <div className="sticky top-0 z-40 bg-[#F2F2F7]/90 backdrop-blur-xl border-b border-slate-300">
-        <div className="max-w-4xl mx-auto px-5 pt-12 pb-2">
-          <div className="flex justify-between items-end mb-2">
-            <h1 className="text-[34px] font-bold text-black tracking-tight leading-none">Inventory</h1>
-            <button
-              onClick={() => setIsAdding(true)}
-              className="w-9 h-9 bg-[#E5E5EA] rounded-full flex items-center justify-center text-[#007AFF] hover:bg-[#D1D1D6] transition-colors active:scale-90"
-            >
-              <Plus className="w-6 h-6" />
-            </button>
-          </div>
-
-          {/* iOS Search Bar */}
-          <div className="relative mt-2 mb-2">
-            <Search className="absolute left-3 top-2.5 text-slate-400 w-4 h-4" />
-            <input
-              type="text"
-              placeholder="Search"
-              className="w-full bg-[#E3E3E8] rounded-xl pl-9 pr-4 py-2 text-[17px] text-slate-900 placeholder:text-slate-500 outline-none focus:bg-[#DCDCDE] transition-colors"
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-            />
-          </div>
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 flex">
+      {/* --- SIDEBAR --- */}
+      <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-slate-200 transform transition-transform duration-300 md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="h-16 flex items-center px-6 border-b border-slate-100">
+          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold mr-3">H</div>
+          <span className="font-bold text-xl tracking-tight">Hook Admin</span>
         </div>
-      </div>
 
-      <div className="max-w-4xl mx-auto px-5 py-6 pb-20">
-        {/* iOS List Group */}
-        <div className="pl-4 mb-2 text-[13px] uppercase text-slate-500 tracking-wide font-normal">All Products • {products.length}</div>
+        <nav className="p-4 space-y-1">
+          <div className="px-4 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Main</div>
+          <SidebarItem icon={LayoutDashboard} label="概览" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
+          <SidebarItem icon={ShoppingBag} label="商品管理" active={activeTab === 'products'} onClick={() => setActiveTab('products')} />
 
-        <div className="bg-white rounded-[20px] shadow-sm overflow-hidden">
-          {filteredProducts.map((p, index) => (
-            <div
-              key={p.id}
-              className="flex items-center gap-4 p-4 border-b border-slate-100 last:border-0 hover:bg-[#F9F9F9] transition-colors cursor-default group h-[88px]"
-            >
-              {/* Product Thumbnail (iOS rounded rect) */}
-              <div className="w-[56px] h-[56px] rounded-[10px] bg-slate-100 border border-slate-200 overflow-hidden shrink-0 relative">
-                <img src={p.image} className="w-full h-full object-cover" />
+          <div className="px-4 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider mt-6">System</div>
+          <SidebarItem icon={Settings} label="系统设置" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
+        </nav>
 
-                {/* 1s Hover Enlarge Logic */}
-                <div className="absolute top-0 left-0 w-full h-full opacity-0 group-hover:opacity-100 group-hover:delay-1000 transition-opacity z-10 cursor-zoom-in">
-                  <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white rounded-2xl shadow-2xl p-1 z-50 border border-slate-200 animate-in zoom-in-50 duration-200">
-                    <img src={p.image} className="w-full h-full object-cover rounded-xl" />
-                  </div>
+        <div className="absolute bottom-0 inset-x-0 p-4 border-t border-slate-100">
+          <button onClick={() => window.location.href = '/admin/login'} className="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg w-full transition-colors">
+            <LogOut className="w-5 h-5" />
+            <span className="font-medium">退出登录</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* --- CONTENT --- */}
+      <main className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'md:ml-64' : 'ml-0'}`}>
+
+        {/* HEADER */}
+        <header className="h-16 bg-white border-b border-slate-200 sticky top-0 z-30 px-6 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 md:hidden">
+              <Menu className="w-5 h-5" />
+            </button>
+            <h2 className="text-lg font-bold text-slate-700">
+              {activeTab === 'dashboard' ? '仪表盘' : activeTab === 'products' ? '商品列表' : '设置'}
+            </h2>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="relative hidden md:block">
+              <input
+                className="bg-slate-100 border-none rounded-full pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none w-64 transition-all"
+                placeholder="搜索全站..."
+              />
+              <Search className="absolute left-3.5 top-2.5 w-4 h-4 text-slate-400" />
+            </div>
+            <button className="relative p-2 text-slate-400 hover:bg-slate-100 rounded-full">
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+            </button>
+            <div className="w-8 h-8 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-700 font-bold text-sm">
+              A
+            </div>
+          </div>
+        </header>
+
+        {/* PAGE CONTENT */}
+        <div className="p-6 md:p-8 max-w-7xl mx-auto">
+
+          {activeTab === 'products' ? (
+            <div className="space-y-6">
+              {/* Toolbar */}
+              <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
+                <div className="relative flex-1 max-w-md">
+                  <input
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                    className="w-full bg-white border border-slate-300 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none shadow-sm"
+                    placeholder="搜索商品名称、分类..."
+                  />
+                  <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" />
                 </div>
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-medium flex items-center justify-center gap-2 shadow-sm transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>发布商品</span>
+                </button>
               </div>
 
-              {/* Info */}
-              <div className="flex-1 min-w-0 flex flex-col justify-center h-full space-y-1">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-[17px] font-semibold text-black truncate">{p.title}</h3>
-                  <span className="text-[15px] text-slate-400 font-normal">{new Date(p.created_at || Date.now()).toLocaleDateString()}</span>
+              {/* Data Table */}
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                        <th className="px-6 py-4 w-20">图片</th>
+                        <th className="px-6 py-4">商品名称</th>
+                        <th className="px-6 py-4">分类/标签</th>
+                        <th className="px-6 py-4">价格</th>
+                        <th className="px-6 py-4">库存</th>
+                        <th className="px-6 py-4 text-right">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-sm">
+                      {filteredProducts.map(p => (
+                        <tr key={p.id} className="hover:bg-slate-50/80 transition-colors group">
+                          <td className="px-6 py-3">
+                            <div className="w-12 h-12 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden cursor-zoom-in relative">
+                              <img src={p.image} className="w-full h-full object-cover" />
+                            </div>
+                          </td>
+                          <td className="px-6 py-3">
+                            <p className="font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">{p.title}</p>
+                            <p className="text-slate-400 text-xs mt-0.5 truncate max-w-[200px]">{p.description.substring(0, 30)}...</p>
+                          </td>
+                          <td className="px-6 py-3">
+                            <div className="flex flex-col items-start gap-1.5">
+                              <span className="px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                                {p.category}
+                              </span>
+                              <div className="flex gap-1">
+                                {p.is_featured && <span className="bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase">Featured</span>}
+                                {p.is_banner && <span className="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase">Banner</span>}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-3 font-medium text-slate-900">
+                            ${p.price.toFixed(2)}
+                          </td>
+                          <td className="px-6 py-3 text-slate-500">
+                            {p.stock}
+                          </td>
+                          <td className="px-6 py-3 text-right">
+                            <div className="flex items-center justify-end gap-2 text-slate-400">
+                              <button className="p-2 hover:bg-slate-100 hover:text-indigo-600 rounded-lg transition-colors">
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button onClick={() => handleDelete(p.id)} className="p-2 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors">
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {filteredProducts.length === 0 && (
+                        <tr>
+                          <td colSpan={6} className="px-6 py-12 text-center text-slate-400">
+                            没有找到相关商品
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </div>
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[15px] text-slate-500">{p.category}</span>
-                    {p.is_banner && <span className="px-1.5 py-0.5 bg-[#5E5CE6] text-white text-[10px] font-bold rounded-md">BANNER</span>}
-                    {p.is_featured && <span className="px-1.5 py-0.5 bg-[#FF9500] text-white text-[10px] font-bold rounded-md">FEATURED</span>}
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <span className="text-[17px] font-normal text-black">${p.price}</span>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleDelete(p.id); }}
-                      className="text-[#FF3B30] opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-red-50 rounded-full"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                    <ChevronRight className="w-4 h-4 text-slate-300" />
+                <div className="bg-slate-50 px-6 py-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+                  <span>显示 {filteredProducts.length} 个商品</span>
+                  <div className="flex gap-2">
+                    <button className="px-3 py-1 bg-white border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-50" disabled>上一页</button>
+                    <button className="px-3 py-1 bg-white border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-50" disabled>下一页</button>
                   </div>
                 </div>
               </div>
             </div>
-          ))}
-
-          {filteredProducts.length === 0 && (
-            <div className="p-8 text-center text-slate-400">
-              No Items
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+              <Settings className="w-16 h-16 mb-4 opacity-20" />
+              <p className="text-lg font-medium">该模块正在开发中</p>
             </div>
           )}
+
         </div>
-      </div>
+      </main>
+
+      {/* --- ADD PRODUCT MODAL --- */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="发布新商品"
+      >
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-2 gap-6">
+            <InputGroup label="商品名称" required>
+              <input
+                required
+                className="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                placeholder="输入商品名称"
+                value={formData.title}
+                onChange={e => setFormData({ ...formData, title: e.target.value })}
+              />
+            </InputGroup>
+            <InputGroup label="价格 ($)" required>
+              <input
+                required
+                type="number"
+                className="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                placeholder="0.00"
+                value={formData.price}
+                onChange={e => setFormData({ ...formData, price: e.target.value })}
+              />
+            </InputGroup>
+          </div>
+
+          <div className="grid grid-cols-2 gap-6">
+            <InputGroup label="商品分类">
+              <select
+                className="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-white"
+                value={formData.category}
+                onChange={e => setFormData({ ...formData, category: e.target.value as Category })}
+              >
+                {CATEGORIES.filter(c => c !== Category.ALL).map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </InputGroup>
+            <div className="grid grid-cols-2 gap-4">
+              <InputGroup label="颜色 (逗号隔开)">
+                <input
+                  className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-indigo-500"
+                  placeholder="红, 蓝, 白"
+                  value={formData.colors}
+                  onChange={e => setFormData({ ...formData, colors: e.target.value })}
+                />
+              </InputGroup>
+              <InputGroup label="尺寸">
+                <input
+                  className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-indigo-500"
+                  placeholder="15cm"
+                  value={formData.sizes}
+                  onChange={e => setFormData({ ...formData, sizes: e.target.value })}
+                />
+              </InputGroup>
+            </div>
+          </div>
+
+          <InputGroup label="商品描述" required>
+            <textarea
+              required
+              className="w-full border border-slate-300 rounded-lg px-4 py-3 h-24 resize-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+              placeholder="详细描述..."
+              value={formData.description}
+              onChange={e => setFormData({ ...formData, description: e.target.value })}
+            />
+          </InputGroup>
+
+          <InputGroup label="商品图片" required>
+            <div className="border-2 border-dashed border-slate-300 rounded-xl p-6 bg-slate-50 hover:bg-indigo-50/50 hover:border-indigo-300 transition-all text-center group cursor-pointer relative">
+              <input type="file" multiple accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={handleFileChange} disabled={isUploading} />
+              {isUploading ? (
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-500 rounded-full animate-spin"></div>
+                  <span className="text-sm font-medium text-indigo-600">正在上传... {uploadProgress}%</span>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-2 text-slate-400 group-hover:text-indigo-500">
+                  <UploadCloudIcon className="w-8 h-8" />
+                  <span className="text-sm font-medium">点击或拖拽上传图片</span>
+                </div>
+              )}
+            </div>
+            {formData.images.length > 0 && (
+              <div className="flex gap-3 mt-3 overflow-x-auto pb-2">
+                {formData.images.map((url, i) => (
+                  <div key={url} className="w-16 h-16 rounded-lg border border-slate-200 overflow-hidden relative shrink-0 group">
+                    <img src={url} className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => setFormData(p => ({ ...p, images: p.images.filter((_, idx) => idx !== i) }))}
+                      className="absolute inset-0 bg-red-500/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all font-bold"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </InputGroup>
+
+          <div className="flex gap-6 border-t border-slate-100 pt-6">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input type="checkbox" className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500" checked={formData.is_featured} onChange={e => setFormData({ ...formData, is_featured: e.target.checked })} />
+              <span className="text-sm font-medium text-slate-700">设为推荐商品</span>
+            </label>
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input type="checkbox" className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500" checked={formData.is_banner} onChange={e => setFormData({ ...formData, is_banner: e.target.checked })} />
+              <span className="text-sm font-medium text-slate-700">设为首页横幅</span>
+            </label>
+          </div>
+
+          {formData.is_banner && (
+            <InputGroup label="横幅文案">
+              <input
+                className="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
+                placeholder="展示在首页的大标题"
+                value={formData.banner_text}
+                onChange={e => setFormData({ ...formData, banner_text: e.target.value })}
+              />
+            </InputGroup>
+          )}
+
+          <div className="flex justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(false)}
+              className="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 font-medium transition-colors"
+            >
+              取消
+            </button>
+            <button
+              type="submit"
+              disabled={isUploading || formData.images.length === 0}
+              className="px-5 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              <Upload className="w-4 h-4" />
+              发布商品
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }
+
+const UploadCloudIcon = ({ className }: any) => (
+  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+  </svg>
+);
