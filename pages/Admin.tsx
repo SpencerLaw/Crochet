@@ -89,6 +89,15 @@ export default function Admin() {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
+
+    // Check Limits
+    const limit = formData.is_banner ? 1 : 6;
+    const currentCount = formData.images.length;
+    if (currentCount + files.length > limit) {
+      toast.error(formData.is_banner ? '首页横幅只能上传 1 张图片' : '普通商品最多上传 6 张图片');
+      return;
+    }
+
     setIsUploading(true);
     setUploadProgress(0);
     const uploadedUrls: string[] = [...formData.images];
@@ -111,9 +120,29 @@ export default function Admin() {
     }
   };
 
+  // Handle Banner Check Logic
+  const handleBannerCheck = (checked: boolean) => {
+    if (checked && formData.images.length > 1) {
+      // If checking banner but has > 1 images, trim to 1
+      if (window.confirm("设为首页横幅只能保留 1 张图片。是否自动只保留第一张？")) {
+        setFormData(prev => ({ ...prev, is_banner: true, images: prev.images.slice(0, 1) }));
+      } else {
+        // User cancelled, do not check
+        return;
+      }
+    } else {
+      setFormData(prev => ({ ...prev, is_banner: checked }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.images.length === 0) return toast.error('请至少上传一张图片');
+
+    // Double check limit before submit
+    if (formData.is_banner && formData.images.length > 1) {
+      return toast.error('首页横幅只能有一张图片，请删除多余图片');
+    }
 
     const productPayload = {
       ...formData,
@@ -168,23 +197,23 @@ export default function Admin() {
   return (
     <div className="min-h-screen bg-slate-50/50 font-sans text-slate-900">
 
-      {/* --- TOP NAVBAR (Replacing Sidebar) --- */}
+      {/* --- TOP NAVBAR --- */}
       <header className="h-16 bg-white border-b border-slate-200 px-6 lg:px-10 flex items-center justify-between sticky top-0 z-40 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold shadow-md shadow-indigo-500/20">H</div>
-          <span className="font-bold text-xl tracking-tight text-slate-800">Hook Admin</span>
+          <span className="font-bold text-xl tracking-tight text-slate-800">Hook 后台管理</span>
           <div className="h-6 w-px bg-slate-200 mx-2"></div>
-          <span className="text-sm font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">Products</span>
+          <span className="text-sm font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">商品管理</span>
         </div>
 
         <div className="flex items-center gap-4">
           <div className="hidden md:flex items-center text-sm text-slate-500">
             <span className="font-medium text-slate-700">{filteredProducts.length}</span>
-            <span className="mx-1">items found</span>
+            <span className="mx-1">个商品</span>
           </div>
           <button onClick={() => window.location.href = '/admin/login'} className="flex items-center gap-2 px-3 py-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors text-sm font-medium group">
             <LogOut className="w-4 h-4" />
-            <span>退出</span>
+            <span>退出登录</span>
           </button>
         </div>
       </header>
@@ -193,8 +222,8 @@ export default function Admin() {
       <div className="px-6 lg:px-10 py-8 max-w-[1600px] mx-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
           <div className="space-y-1">
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">商品管理</h1>
-            <p className="text-slate-500">管理您的所有商品库存、价格和推荐状态。</p>
+            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">商品列表</h1>
+            <p className="text-slate-500">在此管理您的所有商品、价格及库存信息。</p>
           </div>
 
           <div className="flex items-center gap-3 w-full md:w-auto">
@@ -203,7 +232,7 @@ export default function Admin() {
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
                 className="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all shadow-sm"
-                placeholder="搜索商品名称、描述..."
+                placeholder="搜索商品名称..."
               />
               <Search className="absolute left-4 top-3.5 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
             </div>
@@ -224,9 +253,9 @@ export default function Admin() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100">
-                  <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider w-24">预览</th>
+                  <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider w-24">图片</th>
                   <th className="px-6 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider">商品信息</th>
-                  <th className="px-6 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider">展示标签</th>
+                  <th className="px-6 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider">状态标签</th>
                   <th className="px-6 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider">价格</th>
                   <th className="px-6 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider">库存</th>
                   <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">操作</th>
@@ -236,21 +265,9 @@ export default function Admin() {
                 {filteredProducts.map(p => (
                   <tr key={p.id} className="group hover:bg-slate-50/50 transition-colors">
                     <td className="px-8 py-4">
-                      {/* ZOOM IMAGE CONTAINER */}
-                      <div className="relative w-16 h-16">
-                        <div className="w-16 h-16 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden shadow-sm cursor-zoom-in group-hover:shadow-md transition-all">
-                          <img src={p.image} className="w-full h-full object-cover" />
-                        </div>
-                        {/* POPUP */}
-                        <div className="absolute left-14 top-0 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all duration-200 z-[999] origin-top-left scale-95 group-hover:scale-100 translate-x-4">
-                          <div className="w-72 h-72 bg-white p-2 rounded-2xl shadow-2xl border border-slate-100 ring-4 ring-black/5 relative">
-                            <img src={p.image} className="w-full h-full object-cover rounded-xl" />
-                            <div className="absolute top-6 left-0 -ml-2 w-4 h-4 bg-white transform rotate-45 border-l border-b border-slate-100"></div>
-                            <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-md rounded-lg p-2 text-white text-xs">
-                              <p className="font-bold truncate">{p.title}</p>
-                            </div>
-                          </div>
-                        </div>
+                      {/* SIMPLE IMAGE - NO HOVER POPUP */}
+                      <div className="w-16 h-16 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden shadow-sm">
+                        <img src={p.image} className="w-full h-full object-cover" />
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -268,14 +285,14 @@ export default function Admin() {
                       <div className="flex flex-col gap-1.5 items-start">
                         {p.is_featured ? (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-100">
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Featured
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> 推荐
                           </span>
                         ) : (
-                          <span className="text-xs text-slate-300 font-medium px-2">Normal</span>
+                          <span className="text-xs text-slate-300 font-medium px-2">普通</span>
                         )}
                         {p.is_banner && (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-100">
-                            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> Banner
+                            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> 首页横幅
                           </span>
                         )}
                       </div>
@@ -324,11 +341,11 @@ export default function Admin() {
           </div>
           <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-200 flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-              Total {filteredProducts.length} Products
+              共 {filteredProducts.length} 个商品
             </span>
             <div className="flex gap-2">
-              <button disabled className="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium text-slate-400 disabled:opacity-50">Prev</button>
-              <button disabled className="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium text-slate-400 disabled:opacity-50">Next</button>
+              <button disabled className="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium text-slate-400 disabled:opacity-50">上一页</button>
+              <button disabled className="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium text-slate-400 disabled:opacity-50">下一页</button>
             </div>
           </div>
         </div>
@@ -403,14 +420,14 @@ export default function Admin() {
             />
           </InputGroup>
 
-          <InputGroup label="商品图片" required>
+          <InputGroup label={`商品图片 (最多 ${formData.is_banner ? 1 : 6} 张)`} required>
             <div className="border-2 border-dashed border-slate-200 rounded-xl p-8 bg-slate-50 hover:bg-white hover:border-indigo-400 hover:shadow-lg transition-all text-center cursor-pointer relative group">
               <input type="file" multiple accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer z-10" onChange={handleFileChange} disabled={isUploading} />
 
               {isUploading ? (
                 <div className="flex flex-col items-center gap-2">
                   <div className="w-8 h-8 border-4 border-slate-200 border-t-indigo-600 rounded-full animate-spin" />
-                  <span className="text-indigo-600 text-xs font-bold uppercase tracking-wide">Uploading {uploadProgress}%</span>
+                  <span className="text-indigo-600 text-xs font-bold uppercase tracking-wide">上传中 {uploadProgress}%</span>
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-3 transition-transform group-hover:-translate-y-1">
@@ -450,13 +467,19 @@ export default function Admin() {
               <div className="relative flex items-center">
                 <input type="checkbox" className="peer w-5 h-5 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer transition-all" checked={formData.is_featured} onChange={e => setFormData({ ...formData, is_featured: e.target.checked })} />
               </div>
-              <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition-colors">Featured Product</span>
+              <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition-colors">推荐到首页</span>
             </label>
             <label className="flex items-center gap-3 cursor-pointer group">
               <div className="relative flex items-center">
-                <input type="checkbox" className="peer w-5 h-5 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer transition-all" checked={formData.is_banner} onChange={e => setFormData({ ...formData, is_banner: e.target.checked })} />
+                <input type="checkbox" className="peer w-5 h-5 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer transition-all"
+                  checked={formData.is_banner}
+                  onChange={e => handleBannerCheck(e.target.checked)}
+                />
               </div>
-              <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition-colors">Homepage Banner</span>
+              <div className="flex flex-col">
+                <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition-colors">设为首页横幅</span>
+                <span className="text-xs text-slate-400">选中限制上传 1 张图片</span>
+              </div>
             </label>
           </div>
 
@@ -466,7 +489,7 @@ export default function Admin() {
               onClick={() => setIsModalOpen(false)}
               className="px-5 py-2.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 text-sm font-medium transition-all"
             >
-              Cancel
+              取消
             </button>
             <button
               type="submit"
@@ -474,7 +497,7 @@ export default function Admin() {
               className="px-6 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/40 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
-              <span>{editingId ? 'Save Changes' : 'Publish Product'}</span>
+              <span>{editingId ? '保存修改' : '发布商品'}</span>
             </button>
           </div>
         </form>
