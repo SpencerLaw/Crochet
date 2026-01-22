@@ -29,7 +29,7 @@ export const processImageForUpload = (file: File): Promise<{ base64: string; fil
         ctx.drawImage(img, 0, 0, width, height);
         const base64 = canvas.toDataURL('image/webp', 0.8);
         const fileName = `${Date.now()}-${file.name.replace(/\.[^/.]+$/, "")}.webp`;
-        resolve({ base64, fileName, contentType: 'image/webp' });
+        resolve({ image: base64, fileName, contentType: 'image/webp' });
       };
     };
   });
