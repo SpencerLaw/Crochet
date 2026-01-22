@@ -6,11 +6,12 @@ import { CATEGORIES } from '../constants';
 import { uploadImage } from '../services/imageService';
 import { Button } from '../components/Components';
 import { Toaster, toast } from 'react-hot-toast';
-import { Image as ImageIcon, PlusCircle, Trash2, X, Loader2 } from 'lucide-react';
+import { Image as ImageIcon, PlusCircle, Trash2, X, Loader2, Package, Tag, Layers, DollarSign, LayoutGrid, List } from 'lucide-react';
 
 export default function Admin() {
   const { products, fetchProducts } = useStore();
   const [isAdding, setIsAdding] = useState(false);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [formData, setFormData] = useState({
@@ -18,6 +19,10 @@ export default function Admin() {
     images: [] as string[], is_featured: false, is_banner: false, banner_text: '',
     colors: '', sizes: '', tags: ''
   });
+
+  // Stats logic
+  const totalValue = products.reduce((acc, p) => acc + p.price, 0).toFixed(2);
+  const bannerCount = products.filter(p => p.is_banner).length;
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -36,7 +41,8 @@ export default function Admin() {
       setFormData(prev => ({ ...prev, images: uploadedUrls }));
       toast.success(`上传成功`);
     } catch (err: any) {
-      toast.error('失败: ' + err.message);
+      console.error(err);
+      toast.error(err.response?.data?.message || '上传失败，请检查数据库权限');
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
@@ -58,10 +64,7 @@ export default function Admin() {
       const adminPass = localStorage.getItem('admin_pass') || '';
       const res = await fetch('/api/products', {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': adminPass
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': adminPass },
         body: JSON.stringify(newProduct)
       });
       if (res.ok) {
@@ -70,186 +73,236 @@ export default function Admin() {
         setIsAdding(false);
         toast.success('商品已发布！');
       }
-    } catch (err: any) {
-      toast.error(err.message);
-    }
+    } catch (err: any) { toast.error(err.message); }
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('确定要删除吗？')) return;
+    if (!window.confirm('确定要删除这个精美的作品吗？')) return;
     try {
       const adminPass = localStorage.getItem('admin_pass') || '';
-      const res = await fetch(`/api/products?id=${id}`, { 
-        method: 'DELETE',
-        headers: { 'Authorization': adminPass }
-      });
-      if (res.ok) { await fetchProducts(); toast.success('删除成功'); }
-    } catch (err: any) { toast.error('删除失败'); }
+      const res = await fetch(`/api/products?id=${id}`, { method: 'DELETE', headers: { 'Authorization': adminPass } });
+      if (res.ok) { await fetchProducts(); toast.success('已从货架移除'); }
+    } catch (err: any) { toast.error('操作失败'); }
   };
 
   return (
-    <div className="pb-20">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900">商品管理</h1>
-          <p className="text-sm text-slate-500 mt-1">管理你的钩织作品和首页展示</p>
+    <div className="pb-32 animate-in fade-in duration-700">
+      {/* 顶部统计卡片 */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        <div className="bg-white p-6 rounded-[24px] shadow-sm border border-slate-100 flex items-center gap-4">
+          <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600"><Package className="w-6 h-6" /></div>
+          <div><p className="text-xs text-slate-400 font-bold uppercase">商品总数</p><p className="text-2xl font-black text-slate-800">{products.length}</p></div>
         </div>
-        <button 
-          onClick={() => setIsAdding(!isAdding)}
-          className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-indigo-200 transition-all active:scale-95"
-        >
-          {isAdding ? <X className="w-5 h-5" /> : <PlusCircle className="w-5 h-5" />}
-          {isAdding ? '取消添加' : '发布新商品'}
-        </button>
+        <div className="bg-white p-6 rounded-[24px] shadow-sm border border-slate-100 flex items-center gap-4">
+          <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600"><DollarSign className="w-6 h-6" /></div>
+          <div><p className="text-xs text-slate-400 font-bold uppercase">总价值</p><p className="text-2xl font-black text-slate-800">${totalValue}</p></div>
+        </div>
+        <div className="bg-white p-6 rounded-[24px] shadow-sm border border-slate-100 flex items-center gap-4">
+          <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600"><Layers className="w-6 h-6" /></div>
+          <div><p className="text-xs text-slate-400 font-bold uppercase">轮播位</p><p className="text-2xl font-black text-slate-800">{bannerCount}/5</p></div>
+        </div>
+        <div className="bg-white p-6 rounded-[24px] shadow-sm border border-slate-100 flex items-center gap-4">
+          <div className="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600"><Tag className="w-6 h-6" /></div>
+          <div><p className="text-xs text-slate-400 font-bold uppercase">分类数</p><p className="text-2xl font-black text-slate-800">{CATEGORIES.length - 1}</p></div>
+        </div>
+      </div>
+
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
+        <div>
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight">作品管理中心</h1>
+          <p className="text-slate-500 font-medium">让每一件手工钩织都能被温暖展示</p>
+        </div>
+        
+        <div className="flex w-full md:w-auto gap-3">
+          <div className="bg-white p-1 rounded-xl border border-slate-200 flex shadow-sm">
+            <button onClick={() => setViewMode('grid')} className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-slate-100 text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}><LayoutGrid className="w-5 h-5" /></button>
+            <button onClick={() => setViewMode('list')} className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-slate-100 text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}><List className="w-5 h-5" /></button>
+          </div>
+          <button 
+            onClick={() => setIsAdding(!isAdding)}
+            className="flex-1 md:flex-none bg-slate-900 hover:bg-black text-white px-8 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-xl transition-all active:scale-95"
+          >
+            {isAdding ? <X className="w-5 h-5" /> : <PlusCircle className="w-5 h-5" />}
+            {isAdding ? '取消操作' : '上架新品'}
+          </button>
+        </div>
       </div>
 
       {isAdding && (
-        <div className="bg-white p-5 md:p-8 rounded-[24px] md:rounded-[32px] shadow-sm border border-slate-100 mb-10 animate-in slide-in-from-top-4">
-          <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 ml-1 uppercase tracking-wider">商品名称</label>
-                <input required className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-indigo-500" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
+        <div className="bg-white/80 backdrop-blur-xl p-6 md:p-10 rounded-[32px] shadow-2xl border border-white mb-12 animate-in zoom-in-95 duration-300">
+          <h2 className="text-xl font-black text-slate-800 mb-8 flex items-center gap-2">
+            <div className="w-2 h-8 bg-indigo-500 rounded-full"></div> 填写作品详情
+          </h2>
+          <form onSubmit={handleSubmit} className="space-y-8 max-w-5xl">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+              <div className="md:col-span-8 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">作品名称</label>
+                    <input required className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-indigo-500/20 focus:bg-white transition-all outline-none" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} placeholder="例如: 治愈系小熊挂件" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">定价 ($)</label>
+                    <input required type="number" className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-indigo-500/20 focus:bg-white transition-all outline-none font-mono" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} placeholder="0.00" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">分类目录</label>
+                  <div className="flex flex-wrap gap-2">
+                    {CATEGORIES.filter(c => c !== Category.ALL).map(c => (
+                      <button key={c} type="button" onClick={() => setFormData({...formData, category: c as Category})} className={`px-6 py-2 rounded-xl text-sm font-bold transition-all border-2 ${formData.category === c ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-white border-slate-100 text-slate-500 hover:border-slate-200'}`}>
+                        {c}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">作品描述</label>
+                  <textarea required className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-indigo-500/20 focus:bg-white transition-all outline-none h-40 resize-none" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} placeholder="讲讲这个作品背后的故事..." />
+                </div>
               </div>
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 ml-1 uppercase tracking-wider">价格 ($)</label>
-                <input required type="number" className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-indigo-500" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} />
+
+              <div className="md:col-span-4 space-y-6">
+                <div className="p-6 bg-slate-50 rounded-[24px] space-y-4">
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">展示配置</label>
+                  <div className="space-y-3">
+                    <label className="flex items-center justify-between p-3 bg-white rounded-xl cursor-pointer border border-transparent hover:border-indigo-100 transition-all">
+                      <span className="text-sm font-bold text-slate-700">新品推荐</span>
+                      <input type="checkbox" checked={formData.is_featured} onChange={e => setFormData({...formData, is_featured: e.target.checked})} className="w-5 h-5 accent-indigo-600" />
+                    </label>
+                    <label className="flex items-center justify-between p-3 bg-white rounded-xl cursor-pointer border border-transparent hover:border-indigo-100 transition-all">
+                      <span className="text-sm font-bold text-slate-700">首页轮播</span>
+                      <input type="checkbox" checked={formData.is_banner} onChange={e => setFormData({...formData, is_banner: e.target.checked})} className="w-5 h-5 accent-indigo-600" />
+                    </label>
+                  </div>
+                  {formData.is_banner && (
+                    <input className="w-full p-3 bg-white rounded-xl text-sm border border-indigo-100 outline-none focus:ring-2 ring-indigo-500/20" value={formData.banner_text} onChange={e => setFormData({...formData, banner_text: e.target.value})} placeholder="轮播图短语..." />
+                  )}
+                </div>
+
+                <div className="p-6 bg-slate-50 rounded-[24px] space-y-4">
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">属性标签</label>
+                  <div className="space-y-3">
+                    <input className="w-full p-3 bg-white rounded-xl text-sm border-none outline-none" value={formData.colors} onChange={e => setFormData({...formData, colors: e.target.value})} placeholder="颜色 (英文逗号隔开)" />
+                    <input className="w-full p-3 bg-white rounded-xl text-sm border-none outline-none" value={formData.sizes} onChange={e => setFormData({...formData, sizes: e.target.value})} placeholder="尺寸 (如: 15cm)" />
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 ml-1 uppercase tracking-wider">分类</label>
-              <select className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-indigo-500" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value as Category})}>
-                {CATEGORIES.filter(c => c !== Category.ALL).map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 ml-1 uppercase tracking-wider">详细描述</label>
-              <textarea required className="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-indigo-500 h-32 md:h-48" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-               <div className="space-y-1">
-                 <label className="text-[10px] font-bold text-slate-400 ml-1">颜色 (逗号分隔)</label>
-                 <input placeholder="如: 粉色, 白色" className="w-full p-4 bg-slate-50 rounded-2xl border-none" value={formData.colors} onChange={e => setFormData({...formData, colors: e.target.value})} />
-               </div>
-               <div className="space-y-1">
-                 <label className="text-[10px] font-bold text-slate-400 ml-1">尺寸</label>
-                 <input placeholder="如: 20cm" className="w-full p-4 bg-slate-50 rounded-2xl border-none" value={formData.sizes} onChange={e => setFormData({...formData, sizes: e.target.value})} />
-               </div>
-               <div className="space-y-1">
-                 <label className="text-[10px] font-bold text-slate-400 ml-1">标签</label>
-                 <input placeholder="如: 爆款" className="w-full p-4 bg-slate-50 rounded-2xl border-none" value={formData.tags} onChange={e => setFormData({...formData, tags: e.target.value})} />
-               </div>
-            </div>
-
-            <div className="flex flex-wrap gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-              <label className="flex items-center gap-2 cursor-pointer bg-white px-4 py-2 rounded-xl border border-slate-200">
-                <input type="checkbox" checked={formData.is_featured} onChange={e => setFormData({...formData, is_featured: e.target.checked})} className="w-5 h-5 accent-indigo-600 rounded" />
-                <span className="font-bold text-sm text-slate-700">新品推荐</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer bg-white px-4 py-2 rounded-xl border border-slate-200">
-                <input type="checkbox" checked={formData.is_banner} onChange={e => setFormData({...formData, is_banner: e.target.checked})} className="w-5 h-5 accent-indigo-600 rounded" />
-                <span className="font-bold text-sm text-slate-700">首页轮播</span>
-              </label>
-            </div>
-
-            {formData.is_banner && (
-              <input 
-                placeholder="轮播图大标题 (如: 为秋冬做好准备)" 
-                className="w-full p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 text-indigo-900 font-bold"
-                value={formData.banner_text} onChange={e => setFormData({...formData, banner_text: e.target.value})}
-              />
-            )}
-
-            <div className="relative">
-              <input type="file" id="admin-upload" accept="image/*" multiple className="hidden" onChange={handleFileChange} disabled={isUploading} />
-              <label htmlFor="admin-upload" className="border-2 border-dashed border-slate-200 rounded-3xl p-6 md:p-10 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 transition-colors">
-                {isUploading ? (
-                  <div className="w-full max-w-xs text-center">
-                    <div className="h-2 bg-slate-100 rounded-full overflow-hidden mb-4">
-                      <div className="h-full bg-indigo-600 transition-all duration-300" style={{ width: `${uploadProgress}%` }}></div>
+            <div className="space-y-4">
+              <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">媒体图片 (最多上传 10 张)</label>
+              <div className="relative">
+                <input type="file" id="admin-upload" accept="image/*" multiple className="hidden" onChange={handleFileChange} disabled={isUploading} />
+                <label htmlFor="admin-upload" className="border-4 border-dashed border-slate-100 rounded-[32px] p-12 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 hover:border-indigo-100 transition-all group">
+                  {isUploading ? (
+                    <div className="w-full max-w-md text-center">
+                      <div className="h-3 bg-slate-100 rounded-full overflow-hidden mb-4">
+                        <div className="h-full bg-indigo-600 transition-all duration-500 ease-out" style={{ width: `${uploadProgress}%` }}></div>
+                      </div>
+                      <span className="text-indigo-600 font-black animate-pulse text-lg">正在极速压缩上传... {uploadProgress}%</span>
                     </div>
-                    <span className="text-indigo-600 font-bold">处理并上传... {uploadProgress}%</span>
-                  </div>
-                ) : (
-                  <>
-                    <ImageIcon className="w-10 h-10 text-slate-300 mb-2" />
-                    <span className="text-slate-500 font-bold text-center">点击或拖拽上传 (多图)</span>
-                    <span className="text-[10px] text-slate-400 mt-1 uppercase font-bold">建议最大宽 1200px</span>
-                  </>
-                )}
-              </label>
+                  ) : (
+                    <>
+                      <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-slate-300 group-hover:scale-110 transition-transform mb-4 border border-slate-50"><ImageIcon className="w-8 h-8" /></div>
+                      <span className="text-slate-600 font-black text-xl">将图片拖到这里或点击上传</span>
+                      <p className="text-slate-400 text-sm mt-2 font-medium">支持多选，系统将自动进行 WebP 极致压缩</p>
+                    </>
+                  )}
+                </label>
+              </div>
+
+              {formData.images.length > 0 && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+                  {formData.images.map((url, idx) => (
+                    <div key={idx} className="relative group rounded-2xl overflow-hidden aspect-square ring-2 ring-transparent hover:ring-indigo-500 transition-all">
+                      <img src={url} className="w-full h-full object-cover" />
+                      <button type="button" onClick={() => setFormData(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== idx) }))} className="absolute inset-0 bg-red-500/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Trash2 className="text-white w-6 h-6" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {formData.images.length > 0 && (
-              <div className="grid grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
-                {formData.images.map((url, idx) => (
-                  <div key={idx} className="relative group rounded-2xl overflow-hidden shadow-sm aspect-square">
-                    <img src={url} className="w-full h-full object-cover" />
-                    <button type="button" onClick={() => setFormData(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== idx) }))} className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                      <Trash2 className="text-white w-5 h-5 md:w-6 md:h-6" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <button disabled={isUploading || formData.images.length === 0} className="w-full bg-indigo-600 text-white p-5 rounded-2xl font-bold text-lg disabled:bg-slate-200 transition-colors shadow-xl shadow-indigo-100">
-              立即发布
+            <button disabled={isUploading || formData.images.length === 0} className="w-full bg-slate-900 hover:bg-black text-white py-6 rounded-[24px] font-black text-xl disabled:bg-slate-200 transition-all shadow-2xl shadow-indigo-200 active:scale-[0.98]">
+              确认上架此作品
             </button>
           </form>
         </div>
       )}
 
-      {/* Responsive Table / Card List */}
-      <div className="bg-white rounded-[24px] md:rounded-[32px] shadow-sm border border-slate-100 overflow-hidden">
-        {/* Desktop Header */}
-        <div className="hidden md:grid grid-cols-12 bg-slate-50 p-6 text-slate-400 font-bold uppercase text-[10px] tracking-widest">
-          <div className="col-span-6">商品信息</div>
-          <div className="col-span-2">分类</div>
-          <div className="col-span-2">价格</div>
-          <div className="col-span-2 text-right">操作</div>
-        </div>
-
-        <div className="divide-y divide-slate-50">
+      {/* 作品展示区 */}
+      {viewMode === 'grid' ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {products.map(p => (
-            <div key={p.id} className="grid grid-cols-1 md:grid-cols-12 p-4 md:p-6 items-center gap-4 hover:bg-slate-50/50 transition-colors">
-              {/* Product Info */}
-              <div className="col-span-1 md:col-span-6 flex items-center gap-4">
-                <img src={p.image} className="w-16 h-16 md:w-12 md:h-12 rounded-xl object-cover shadow-sm flex-shrink-0" />
-                <div className="min-w-0">
-                  <p className="font-bold text-slate-900 truncate">{p.title}</p>
-                  <div className="flex flex-wrap gap-2 mt-1">
-                    {p.is_banner && <span className="text-[9px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded uppercase font-bold">Banner</span>}
-                    {p.is_featured && <span className="text-[9px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded uppercase font-bold">Featured</span>}
-                  </div>
+            <div key={p.id} className="bg-white rounded-[28px] border border-slate-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 group">
+              <div className="relative aspect-[4/5] overflow-hidden">
+                <img src={p.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                <div className="absolute top-4 left-4 flex gap-2">
+                  {p.is_banner && <span className="bg-amber-400/90 backdrop-blur-md text-white px-3 py-1 rounded-full text-[10px] font-black uppercase">Banner</span>}
+                  {p.is_featured && <span className="bg-emerald-400/90 backdrop-blur-md text-white px-3 py-1 rounded-full text-[10px] font-black uppercase">Featured</span>}
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+                   <button onClick={() => handleDelete(p.id)} className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all transform translate-y-4 group-hover:translate-y-0">
+                     <Trash2 className="w-4 h-4" /> 移除商品
+                   </button>
                 </div>
               </div>
-
-              {/* Mobile View: Category & Price side by side */}
-              <div className="col-span-1 md:col-span-2 flex items-center justify-between md:block">
-                <span className="md:hidden text-xs text-slate-400 font-bold">分类</span>
-                <span className="text-sm font-medium text-slate-600 bg-slate-100 px-3 py-1 rounded-full">{p.category}</span>
-              </div>
-
-              <div className="col-span-1 md:col-span-2 flex items-center justify-between md:block">
-                <span className="md:hidden text-xs text-slate-400 font-bold">单价</span>
-                <span className="font-bold text-slate-900">${p.price}</span>
-              </div>
-
-              {/* Action */}
-              <div className="col-span-1 md:col-span-2 flex justify-end">
-                <button onClick={() => handleDelete(p.id)} className="w-full md:w-auto flex items-center justify-center gap-2 md:block bg-red-50 md:bg-transparent text-red-500 p-3 md:p-2 rounded-xl transition-colors font-bold md:font-normal">
-                  <Trash2 className="w-5 h-5" />
-                  <span className="md:hidden text-sm">删除商品</span>
-                </button>
+              <div className="p-6">
+                <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">{p.category}</span>
+                <h3 className="font-bold text-slate-800 text-lg truncate mt-1">{p.title}</h3>
+                <div className="flex items-center justify-between mt-4">
+                  <span className="text-2xl font-black text-slate-900">${p.price}</span>
+                  <span className="text-xs font-bold text-slate-400">库存: {p.stock}</span>
+                </div>
               </div>
             </div>
           ))}
         </div>
-      </div>
+      ) : (
+        <div className="bg-white rounded-[32px] border border-slate-100 overflow-hidden shadow-sm">
+          <table className="w-full text-left">
+            <thead className="bg-slate-50/50 border-b border-slate-50">
+              <tr className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                <th className="p-6">基本信息</th>
+                <th className="p-6">分类与属性</th>
+                <th className="p-6">价格状态</th>
+                <th className="p-6 text-right">管理操作</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {products.map(p => (
+                <tr key={p.id} className="hover:bg-slate-50/30 transition-colors">
+                  <td className="p-6">
+                    <div className="flex items-center gap-4">
+                      <img src={p.image} className="w-14 h-14 rounded-2xl object-cover shadow-sm" />
+                      <div>
+                        <p className="font-black text-slate-800">{p.title}</p>
+                        <p className="text-xs text-slate-400 mt-1 line-clamp-1 max-w-[200px]">{p.description}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="p-6">
+                    <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">{p.category}</span>
+                    <div className="flex gap-1 mt-2">
+                      {p.colors?.map(c => <span key={c} className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded uppercase">{c}</span>)}
+                    </div>
+                  </td>
+                  <td className="p-6 font-mono font-black text-slate-900 text-lg">${p.price}</td>
+                  <td className="p-6 text-right">
+                    <button onClick={() => handleDelete(p.id)} className="text-slate-300 hover:text-red-500 transition-colors p-2"><Trash2 className="w-6 h-6" /></button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
+}
 }

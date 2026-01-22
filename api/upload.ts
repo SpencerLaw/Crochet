@@ -30,28 +30,30 @@ export default async function handler(req: any, res: any) {
   try {
     const { image, fileName, contentType } = req.body; // Base64 image from client
     
-    // 增强的 Base64 处理逻辑
     const base64Data = image.includes('base64,') ? image.split('base64,')[1] : image;
     const buffer = Buffer.from(base64Data, 'base64');
 
-    // 上传到 Supabase Storage
+    // 简化上传路径，直接使用文件名，并增加详细错误捕捉
     const { data, error } = await supabase.storage
       .from('product-images')
-      .upload(`public/${fileName}`, buffer, {
-        contentType: contentType,
+      .upload(fileName, buffer, {
+        contentType: contentType || 'image/webp',
         cacheControl: '31536000',
         upsert: true
       });
 
     if (error) {
-      console.error('Supabase Storage Error:', error);
-      return res.status(500).json({ error: `Storage Error: ${error.message}`, details: error });
+      console.error('Supabase Detail Error:', error);
+      return res.status(500).json({ 
+        error: 'Storage Failure', 
+        message: error.message,
+        details: error 
+      });
     }
 
-    // 获取公开 URL
     const { data: { publicUrl } } = supabase.storage
       .from('product-images')
-      .getPublicUrl(`public/${fileName}`);
+      .getPublicUrl(fileName);
 
     return res.status(200).json({ url: publicUrl });
   } catch (error: any) {
