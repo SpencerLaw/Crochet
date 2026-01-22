@@ -15,6 +15,7 @@ export interface Product {
   colors?: string[];
   sizes?: string[];
   materials?: string[];
+  created_at?: string;
 }
 
 export interface CartItem extends Product {
