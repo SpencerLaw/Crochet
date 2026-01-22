@@ -151,7 +151,7 @@ export default function Admin() {
       colors: formData.colors.split(',').map(s => s.trim()).filter(Boolean),
       sizes: formData.sizes.split(',').map(s => s.trim()).filter(Boolean),
       tags: formData.tags.split(',').map(s => s.trim()).filter(Boolean),
-      stock: 10
+      stock: 999 // Default high stock as requested to ignore inventory
     };
 
     try {
@@ -223,7 +223,7 @@ export default function Admin() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
           <div className="space-y-1">
             <h1 className="text-3xl font-bold text-slate-900 tracking-tight">商品列表</h1>
-            <p className="text-slate-500">在此管理您的所有商品、价格及库存信息。</p>
+            <p className="text-slate-500">在此管理您的所有商品、价格及展示状态。</p>
           </div>
 
           <div className="flex items-center gap-3 w-full md:w-auto">
@@ -257,7 +257,6 @@ export default function Admin() {
                   <th className="px-6 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider">商品信息</th>
                   <th className="px-6 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider">状态标签</th>
                   <th className="px-6 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider">价格</th>
-                  <th className="px-6 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider">库存</th>
                   <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">操作</th>
                 </tr>
               </thead>
@@ -300,14 +299,6 @@ export default function Admin() {
                     <td className="px-6 py-4">
                       <span className="font-bold text-slate-900 tracking-tight text-base font-mono">${p.price.toFixed(2)}</span>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <div className={`w-2 h-2 rounded-full ${p.stock > 0 ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
-                        <span className={`text-sm font-medium ${p.stock > 0 ? 'text-slate-600' : 'text-red-500'}`}>
-                          {p.stock > 0 ? p.stock : '无货'}
-                        </span>
-                      </div>
-                    </td>
                     <td className="px-8 py-4 text-right">
                       <div className="flex items-center justify-end gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
                         <button
@@ -325,7 +316,7 @@ export default function Admin() {
                 ))}
                 {filteredProducts.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-6 py-32 text-center">
+                    <td colSpan={5} className="px-6 py-32 text-center">
                       <div className="flex flex-col items-center justify-center text-slate-400">
                         <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
                           <ShoppingBag className="w-8 h-8 text-slate-300" />
