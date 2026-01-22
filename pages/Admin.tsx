@@ -238,63 +238,75 @@ export default function Admin() {
         </div>
       )}
 
-      {/* 作品展示区 (仅保留列表模式) */}
-      <div className="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-visible">
-        <div className="overflow-x-auto overflow-y-visible">
-          <table className="w-full text-left border-collapse min-w-[800px]">
-            <thead className="bg-slate-50/80 border-b border-slate-100">
-              <tr className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                <th className="p-6 pl-10">作品信息 (鼠标悬浮图片)</th>
-                <th className="p-6">目录分类</th>
-                <th className="p-6 text-center">状态指示</th>
-                <th className="p-6">定价</th>
-                <th className="p-6 text-right pr-10">管理</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {products.map(p => (
-                <tr key={p.id} className="group hover:bg-slate-50/50 transition-all duration-300">
-                  <td className="p-4 pl-10">
-                    <div className="flex items-center gap-6">
-                      {/* 强化的缩略图预览：解决 z-index 和父容器截断问题 */}
-                      <div className="relative w-14 h-14 flex-shrink-0">
-                        <img 
-                          src={p.image} 
-                          className="w-full h-full rounded-2xl object-cover shadow-sm transition-all duration-500 hover:scale-[4] hover:z-[9999] hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:rounded-xl cursor-zoom-in relative z-10" 
-                        />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="font-black text-slate-800 text-base">{p.title}</p>
-                        <p className="text-[11px] text-slate-400 font-bold truncate max-w-[250px] uppercase tracking-tighter">{p.description}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <span className="text-[11px] font-black text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full uppercase">{p.category}</span>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex justify-center items-center gap-3">
-                      {p.is_banner && <div className="flex flex-col items-center gap-1"><div className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_#fbbf24]" /><span className="text-[8px] font-black text-amber-600 uppercase">Banner</span></div>}
-                      {p.is_featured && <div className="flex flex-col items-center gap-1"><div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" /><span className="text-[8px] font-black text-emerald-600 uppercase">Featured</span></div>}
-                      {!p.is_banner && !p.is_featured && <div className="w-2 h-2 rounded-full bg-slate-200" />}
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <p className="font-black text-slate-900 text-lg tracking-tighter">${p.price}</p>
-                  </td>
-                  <td className="p-4 text-right pr-10">
-                    <button 
-                      onClick={() => handleDelete(p.id)} 
-                      className="p-3 rounded-2xl text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all active:scale-90 group/del"
-                    >
-                      <Trash2 className="w-6 h-6" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      {/* 作品展示区 - 极简行卡片布局 */}
+      <div className="space-y-3">
+        {products.map(p => (
+          <div 
+            key={p.id} 
+            className="group relative bg-white hover:bg-indigo-50/30 p-3 pl-5 pr-6 rounded-[24px] border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 flex items-center gap-6"
+          >
+            {/* 左侧：极小缩略图 + 悬浮放大镜效果 */}
+            <div className="relative w-14 h-14 flex-shrink-0 flex items-center justify-center">
+              <img 
+                src={p.image} 
+                className="w-full h-full rounded-2xl object-cover shadow-sm ring-2 ring-slate-50 transition-all duration-500 cursor-zoom-in
+                  group-hover:scale-[5] group-hover:z-[100] group-hover:shadow-2xl group-hover:rounded-lg
+                  absolute left-0 top-0" 
+              />
+            </div>
+
+            {/* 中间：核心信息 */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3">
+                <h3 className="font-black text-slate-800 text-lg truncate">{p.title}</h3>
+                <span className="text-[10px] font-black text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full uppercase tracking-wider">{p.category}</span>
+              </div>
+              <p className="text-[11px] text-slate-400 font-bold mt-0.5 line-clamp-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                {p.description || '暂无详细描述'}
+              </p>
+            </div>
+
+            {/* 状态标志：Banner/Featured */}
+            <div className="hidden md:flex items-center gap-4">
+              {p.is_banner && (
+                <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 rounded-full border border-amber-100">
+                  <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                  <span className="text-[10px] font-black text-amber-700 uppercase">Banner</span>
+                </div>
+              )}
+              {p.is_featured && (
+                <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 rounded-full border border-emerald-100">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-[10px] font-black text-emerald-700 uppercase">Featured</span>
+                </div>
+              )}
+            </div>
+
+            {/* 价格 */}
+            <div className="text-right ml-4">
+              <p className="text-xl font-black text-slate-900 tracking-tighter">${p.price}</p>
+              <p className="text-[10px] text-slate-400 font-bold uppercase">Price</p>
+            </div>
+
+            {/* 管理按钮 */}
+            <div className="flex items-center ml-6 border-l border-slate-100 pl-6">
+              <button 
+                onClick={() => handleDelete(p.id)} 
+                className="p-3 rounded-2xl text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all active:scale-90"
+                title="移除商品"
+              >
+                <Trash2 className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        ))}
+
+        {products.length === 0 && (
+          <div className="bg-white/50 border-2 border-dashed border-slate-200 rounded-[40px] p-20 text-center">
+            <Package className="w-16 h-16 text-slate-200 mx-auto mb-4" />
+            <p className="text-slate-400 font-bold">暂无上架作品，点击上方按钮开始发布吧</p>
+          </div>
+        )}
       </div>
     </div>
   );
