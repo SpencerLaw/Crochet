@@ -536,6 +536,7 @@ const Admin = () => {
               <input 
                 type="text" 
                 placeholder="管理员账号" 
+                autocomplete="username"
                 className="w-full p-3 rounded-xl bg-gray-50 font-bold outline-none focus:ring-2 focus:ring-wooly-pink-300"
                 value={loginData.username}
                 onChange={e => setLoginData({...loginData, username: e.target.value})}
@@ -543,6 +544,7 @@ const Admin = () => {
               <input 
                 type="password" 
                 placeholder="管理员密码" 
+                autocomplete="current-password"
                 className="w-full p-3 rounded-xl bg-gray-50 font-bold outline-none focus:ring-2 focus:ring-wooly-pink-300"
                 value={loginData.password}
                 onChange={e => setLoginData({...loginData, password: e.target.value})}

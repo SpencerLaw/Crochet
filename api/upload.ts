@@ -1,19 +1,23 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
-
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: '4mb', // 限制上传大小
+      sizeLimit: '4mb',
     },
   },
 };
 
 export default async function handler(req: any, res: any) {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return res.status(500).json({ error: 'Missing Supabase environment variables.' });
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseKey);
   if (req.method !== 'POST') return res.status(405).end();
 
   try {
