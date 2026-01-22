@@ -89,46 +89,41 @@ export default function Admin() {
     <div className="pb-32 animate-in fade-in duration-700">
       {/* 顶部统计卡片 */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-        <div className="bg-white p-6 rounded-[24px] shadow-sm border border-slate-100 flex items-center gap-4">
+        <div className="bg-white p-6 rounded-[32px] shadow-sm border border-slate-100 flex items-center gap-4">
           <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600"><Package className="w-6 h-6" /></div>
-          <div><p className="text-xs text-slate-400 font-bold uppercase">商品总数</p><p className="text-2xl font-black text-slate-800">{products.length}</p></div>
+          <div><p className="text-[10px] text-slate-400 font-black uppercase tracking-tighter">商品总数</p><p className="text-2xl font-black text-slate-800">{products.length}</p></div>
         </div>
-        <div className="bg-white p-6 rounded-[24px] shadow-sm border border-slate-100 flex items-center gap-4">
+        <div className="bg-white p-6 rounded-[32px] shadow-sm border border-slate-100 flex items-center gap-4">
           <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600"><DollarSign className="w-6 h-6" /></div>
-          <div><p className="text-xs text-slate-400 font-bold uppercase">总价值</p><p className="text-2xl font-black text-slate-800">${totalValue}</p></div>
+          <div><p className="text-[10px] text-slate-400 font-black uppercase tracking-tighter">总价值</p><p className="text-2xl font-black text-slate-800">${totalValue}</p></div>
         </div>
-        <div className="bg-white p-6 rounded-[24px] shadow-sm border border-slate-100 flex items-center gap-4">
+        <div className="bg-white p-6 rounded-[32px] shadow-sm border border-slate-100 flex items-center gap-4">
           <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600"><Layers className="w-6 h-6" /></div>
-          <div><p className="text-xs text-slate-400 font-bold uppercase">轮播位</p><p className="text-2xl font-black text-slate-800">{bannerCount}/5</p></div>
+          <div><p className="text-[10px] text-slate-400 font-black uppercase tracking-tighter">轮播位</p><p className="text-2xl font-black text-slate-800">{bannerCount}/5</p></div>
         </div>
-        <div className="bg-white p-6 rounded-[24px] shadow-sm border border-slate-100 flex items-center gap-4">
+        <div className="bg-white p-6 rounded-[32px] shadow-sm border border-slate-100 flex items-center gap-4">
           <div className="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600"><Tag className="w-6 h-6" /></div>
-          <div><p className="text-xs text-slate-400 font-bold uppercase">分类数</p><p className="text-2xl font-black text-slate-800">{CATEGORIES.length - 1}</p></div>
+          <div><p className="text-[10px] text-slate-400 font-black uppercase tracking-tighter">分类数</p><p className="text-2xl font-black text-slate-800">{CATEGORIES.length - 1}</p></div>
         </div>
       </div>
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
         <div>
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">作品管理中心</h1>
-          <p className="text-slate-500 font-medium">让每一件手工钩织都能被温暖展示</p>
+          <p className="text-slate-500 font-medium">极简列表视图 · 鼠标悬浮预览图</p>
         </div>
         
-        <div className="flex w-full md:w-auto gap-3">
-          <div className="bg-white p-1 rounded-xl border border-slate-200 flex shadow-sm">
-            <button onClick={() => setViewMode('grid')} className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-slate-100 text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}><LayoutGrid className="w-5 h-5" /></button>
-            <button onClick={() => setViewMode('list')} className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-slate-100 text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}><List className="w-5 h-5" /></button>
-          </div>
-          <button 
-            onClick={() => setIsAdding(!isAdding)}
-            className="flex-1 md:flex-none bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3.5 rounded-2xl font-black flex items-center justify-center gap-2 shadow-xl shadow-indigo-100 transition-all active:scale-95"
-          >
-            {isAdding ? <X className="w-5 h-5" /> : <PlusCircle className="w-5 h-5" />}
-            {isAdding ? '取消操作' : '上架新品'}
-          </button>
-        </div>
+        <button 
+          onClick={() => setIsAdding(!isAdding)}
+          className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3.5 rounded-2xl font-black flex items-center justify-center gap-2 shadow-xl shadow-indigo-100 transition-all active:scale-95"
+        >
+          {isAdding ? <X className="w-5 h-5" /> : <PlusCircle className="w-5 h-5" />}
+          {isAdding ? '取消操作' : '上架新品'}
+        </button>
       </div>
 
       {isAdding && (
+        // ... (keep the existing elegant form)
         <div className="bg-white/80 backdrop-blur-xl p-6 md:p-10 rounded-[32px] shadow-2xl border border-white mb-12 animate-in zoom-in-95 duration-300">
           <h2 className="text-xl font-black text-slate-800 mb-8 flex items-center gap-2">
             <div className="w-2 h-8 bg-indigo-500 rounded-full"></div> 填写作品详情
@@ -243,86 +238,56 @@ export default function Admin() {
         </div>
       )}
 
-      {/* 作品展示区 */}
-      {viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {products.map(p => (
-            <div key={p.id} className="bg-white rounded-[40px] border border-slate-100 overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 group">
-              <div className="relative aspect-[4/5] overflow-hidden">
-                <img src={p.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                <div className="absolute top-4 left-4 flex gap-2">
-                  {p.is_banner && <span className="bg-amber-400/90 backdrop-blur-md text-white px-3 py-1 rounded-full text-[10px] font-black uppercase">Banner</span>}
-                  {p.is_featured && <span className="bg-emerald-400/90 backdrop-blur-md text-white px-3 py-1 rounded-full text-[10px] font-black uppercase">Featured</span>}
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
-                   <button onClick={() => handleDelete(p.id)} className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all transform translate-y-4 group-hover:translate-y-0">
-                     <Trash2 className="w-4 h-4" /> 移除商品
-                   </button>
-                </div>
-              </div>
-              <div className="p-6">
-                <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">{p.category}</span>
-                <h3 className="font-bold text-slate-800 text-lg truncate mt-1">{p.title}</h3>
-                <div className="flex items-center justify-between mt-4">
-                  <span className="text-2xl font-black text-slate-900">${p.price}</span>
-                  <span className="text-xs font-bold text-slate-400">库存: {p.stock}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="bg-white rounded-[40px] border border-slate-100 overflow-hidden shadow-sm">
-          <table className="w-full text-left border-collapse">
+      {/* 作品展示区 (仅保留列表模式) */}
+      <div className="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-visible">
+        <div className="overflow-x-auto overflow-y-visible">
+          <table className="w-full text-left border-collapse min-w-[800px]">
             <thead className="bg-slate-50/80 border-b border-slate-100">
               <tr className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                <th className="p-6 pl-8">作品详情 (悬浮预览图)</th>
-                <th className="p-6">分类</th>
-                <th className="p-6 text-center">状态</th>
-                <th className="p-6">单价</th>
-                <th className="p-6 text-right pr-8">管理</th>
+                <th className="p-6 pl-10">作品信息 (鼠标悬浮图片)</th>
+                <th className="p-6">目录分类</th>
+                <th className="p-6 text-center">状态指示</th>
+                <th className="p-6">定价</th>
+                <th className="p-6 text-right pr-10">管理</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
               {products.map(p => (
-                <tr key={p.id} className="group hover:bg-slate-50/80 transition-all duration-300">
-                  <td className="p-4 pl-8">
+                <tr key={p.id} className="group hover:bg-slate-50/50 transition-all duration-300">
+                  <td className="p-4 pl-10">
                     <div className="flex items-center gap-6">
-                      {/* 缩略图：默认极小，悬浮放大 */}
-                      <div className="relative w-12 h-12 flex-shrink-0">
+                      {/* 强化的缩略图预览：解决 z-index 和父容器截断问题 */}
+                      <div className="relative w-14 h-14 flex-shrink-0">
                         <img 
                           src={p.image} 
-                          className="w-full h-full rounded-xl object-cover shadow-sm transition-all duration-500 group-hover:scale-[3.5] group-hover:z-50 group-hover:shadow-2xl group-hover:rounded-2xl ring-2 ring-white" 
+                          className="w-full h-full rounded-2xl object-cover shadow-sm transition-all duration-500 hover:scale-[4] hover:z-[9999] hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:rounded-xl cursor-zoom-in relative z-10" 
                         />
                       </div>
                       <div className="min-w-0">
-                        <p className="font-bold text-slate-800 text-base group-hover:text-indigo-600 transition-colors">{p.title}</p>
-                        <p className="text-[11px] text-slate-400 font-medium truncate max-w-[300px]">{p.description}</p>
+                        <p className="font-black text-slate-800 text-base">{p.title}</p>
+                        <p className="text-[11px] text-slate-400 font-bold truncate max-w-[250px] uppercase tracking-tighter">{p.description}</p>
                       </div>
                     </div>
                   </td>
                   <td className="p-4">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-[10px] font-black text-indigo-400/80 uppercase tracking-tighter">Category</span>
-                      <span className="text-xs font-bold text-slate-600">{p.category}</span>
-                    </div>
+                    <span className="text-[11px] font-black text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full uppercase">{p.category}</span>
                   </td>
-                  <td className="p-4 text-center">
-                    <div className="flex justify-center gap-1">
-                      {p.is_banner && <div className="w-2 h-2 rounded-full bg-amber-400" title="Banner" />}
-                      {p.is_featured && <div className="w-2 h-2 rounded-full bg-emerald-400" title="Featured" />}
+                  <td className="p-4">
+                    <div className="flex justify-center items-center gap-3">
+                      {p.is_banner && <div className="flex flex-col items-center gap-1"><div className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_#fbbf24]" /><span className="text-[8px] font-black text-amber-600 uppercase">Banner</span></div>}
+                      {p.is_featured && <div className="flex flex-col items-center gap-1"><div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" /><span className="text-[8px] font-black text-emerald-600 uppercase">Featured</span></div>}
                       {!p.is_banner && !p.is_featured && <div className="w-2 h-2 rounded-full bg-slate-200" />}
                     </div>
                   </td>
                   <td className="p-4">
-                    <p className="font-mono font-black text-slate-900 text-lg">${p.price}</p>
+                    <p className="font-black text-slate-900 text-lg tracking-tighter">${p.price}</p>
                   </td>
-                  <td className="p-4 text-right pr-8">
+                  <td className="p-4 text-right pr-10">
                     <button 
                       onClick={() => handleDelete(p.id)} 
-                      className="p-3 rounded-xl text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all active:scale-90"
+                      className="p-3 rounded-2xl text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all active:scale-90 group/del"
                     >
-                      <Trash2 className="w-5 h-5" />
+                      <Trash2 className="w-6 h-6" />
                     </button>
                   </td>
                 </tr>
@@ -330,7 +295,7 @@ export default function Admin() {
             </tbody>
           </table>
         </div>
-      )}
+      </div>
     </div>
   );
 }
