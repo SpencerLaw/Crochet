@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { ShoppingCart, Heart, Sparkles, Plus, Loader2 } from 'lucide-react';
 import { Product } from '../types';
 
@@ -37,7 +38,7 @@ interface ProductCardProps {
 export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
   return (
     <div className="group bg-white rounded-[32px] p-4 shadow-soft hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-transparent hover:border-wooly-pink-100 flex flex-col h-full">
-      <div className="relative overflow-hidden rounded-[24px] aspect-square mb-4">
+      <Link to={`/product/${product.id}`} className="relative overflow-hidden rounded-[24px] aspect-square mb-4">
         <img 
           src={product.image} 
           alt={product.title} 
@@ -46,11 +47,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
         <div className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
           <Heart className="w-5 h-5 text-wooly-pink-500" />
         </div>
-      </div>
+      </Link>
       
       <div className="flex flex-col flex-grow">
         <span className="text-xs font-bold text-wooly-pink-400 uppercase tracking-wider mb-1">{product.category}</span>
-        <h3 className="font-hand text-xl font-bold text-wooly-brown mb-2 leading-tight">{product.title}</h3>
+        <Link to={`/product/${product.id}`} className="hover:text-wooly-pink-500 transition-colors">
+          <h3 className="font-hand text-xl font-bold text-wooly-brown mb-2 leading-tight">{product.title}</h3>
+        </Link>
         
         <div className="mt-auto flex items-center justify-between">
           <span className="text-2xl font-bold text-wooly-pink-500">${product.price.toFixed(2)}</span>

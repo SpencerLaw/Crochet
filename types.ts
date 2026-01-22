@@ -3,10 +3,18 @@ export interface Product {
   title: string;
   price: number;
   image: string;
+  images: string[];
   category: string;
   description: string;
   stock: number;
   tags: string[];
+  is_featured: boolean;
+  is_banner: boolean;
+  banner_text?: string;
+  // New precision attributes
+  colors?: string[];
+  sizes?: string[];
+  materials?: string[];
 }
 
 export interface CartItem extends Product {

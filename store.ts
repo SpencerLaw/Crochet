@@ -6,6 +6,8 @@ import { MOCK_PRODUCTS } from './constants';
 interface AppState {
   cart: CartItem[];
   products: Product[];
+  isLoading: boolean;
+  fetchProducts: () => Promise<void>;
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
@@ -18,7 +20,24 @@ export const useStore = create<AppState>()(
   persist(
     (set) => ({
       cart: [],
-      products: MOCK_PRODUCTS,
+      products: [], // Start with empty, fetch later
+      isLoading: false,
+
+      fetchProducts: async () => {
+        set({ isLoading: true });
+        try {
+          const res = await fetch('/api/products');
+          if (res.ok) {
+            const data = await res.json();
+            set({ products: data.length > 0 ? data : MOCK_PRODUCTS });
+          }
+        } catch (err) {
+          console.error('Fetch error:', err);
+          set({ products: MOCK_PRODUCTS }); // Fallback
+        } finally {
+          set({ isLoading: false });
+        }
+      },
 
       addToCart: (product) =>
         set((state) => {

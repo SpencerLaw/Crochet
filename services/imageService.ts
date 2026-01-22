@@ -1,0 +1,51 @@
+
+import axios from 'axios';
+
+export type UploadProgressCallback = (progress: number) => void;
+
+export const processImageForUpload = (file: File): Promise<{ base64: string; fileName: string; contentType: string }> => {
+  // ... (previous logic remains same, but wrapping for clarity)
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 1200;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > MAX_WIDTH) {
+          height = Math.round((height * MAX_WIDTH) / width);
+          width = MAX_WIDTH;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return reject(new Error('Failed context'));
+        ctx.drawImage(img, 0, 0, width, height);
+        const base64 = canvas.toDataURL('image/webp', 0.8);
+        const fileName = `${Date.now()}-${file.name.replace(/\.[^/.]+$/, "")}.webp`;
+        resolve({ base64, fileName, contentType: 'image/webp' });
+      };
+    };
+  });
+};
+
+export const uploadImage = async (file: File, onProgress?: UploadProgressCallback): Promise<string> => {
+  const processed = await processImageForUpload(file);
+  
+  const response = await axios.post('/api/upload', processed, {
+    onUploadProgress: (progressEvent) => {
+      if (onProgress && progressEvent.total) {
+        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+        onProgress(percentCompleted);
+      }
+    }
+  });
+
+  return response.data.url;
+};
