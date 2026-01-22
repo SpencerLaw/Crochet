@@ -28,8 +28,16 @@ export const processImageForUpload = (file: File): Promise<{ image: string; file
         if (!ctx) return reject(new Error('Failed context'));
         ctx.drawImage(img, 0, 0, width, height);
         const base64 = canvas.toDataURL('image/webp', 0.8);
-        const fileName = `${Date.now()}-${file.name.replace(/\.[^/.]+$/, "")}.webp`;
-        resolve({ image: base64, fileName, contentType: 'image/webp' });
+        // 6. Return standard format
+        const timestamp = Date.now();
+        const randomStr = Math.random().toString(36).substring(2, 8);
+        const safeName = `img_${timestamp}_${randomStr}.webp`;
+
+        resolve({
+          image: base64, // The API expects 'image'
+          fileName: safeName,
+          contentType: 'image/webp'
+        });
       };
     };
   });
