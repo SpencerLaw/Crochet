@@ -20,6 +20,13 @@ export default async function handler(req: any, res: any) {
   const supabase = createClient(supabaseUrl, supabaseKey);
   if (req.method !== 'POST') return res.status(405).end();
 
+  // Role check
+  const authHeader = req.headers.authorization;
+  const adminPass = process.env.ADMIN_PASSWORD || 'spencer';
+  if (authHeader !== adminPass) {
+    return res.status(401).json({ error: 'Unauthorized: Admin role required.' });
+  }
+
   try {
     const { image, fileName, contentType } = req.body; // Base64 image from client
     

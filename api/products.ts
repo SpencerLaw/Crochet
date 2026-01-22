@@ -12,6 +12,15 @@ export default async function handler(req: any, res: any) {
   const supabase = createClient(supabaseUrl, supabaseKey);
   const { method } = req;
 
+  // Role check for sensitive operations
+  if (method === 'POST' || method === 'DELETE') {
+    const authHeader = req.headers.authorization;
+    const adminPass = process.env.ADMIN_PASSWORD || 'spencer';
+    if (authHeader !== adminPass) {
+      return res.status(401).json({ error: 'Unauthorized: Admin role required.' });
+    }
+  }
+
   try {
     switch (method) {
       case 'GET':
