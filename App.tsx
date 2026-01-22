@@ -441,7 +441,31 @@ const Admin = () => {
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    // ... rest of the component
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+    setUploadProgress(0);
+    
+    const uploadedUrls: string[] = [...formData.images];
+    
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const url = await uploadImage(files[i], (p) => {
+          const overall = Math.round(((i / files.length) * 100) + (p / files.length));
+          setUploadProgress(overall);
+        });
+        uploadedUrls.push(url);
+      }
+      setFormData(prev => ({ ...prev, images: uploadedUrls }));
+      toast.success(`成功上传 ${files.length} 张图片`);
+    } catch (err: any) {
+      toast.error('上传失败: ' + err.message);
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
+  };
 
 
   const handleSubmit = async (e: React.FormEvent) => {
