@@ -90,7 +90,9 @@ export default function Admin() {
       toast.success('图片上传成功');
     } catch (err: any) {
       console.error(err);
-      const msg = err.response?.data?.error || err.message || '上传未知错误';
+      const data = err.response?.data;
+      // Extract detailed message or fall back to error code
+      const msg = data?.message || data?.error || err.message || '上传未知错误';
       toast.error(`上传失败: ${msg}`);
     } finally {
       setIsUploading(false);
@@ -187,13 +189,12 @@ export default function Admin() {
               商品列表
             </h2>
           </div>
-          {/* Right side header removed as requested */}
           <div></div>
         </header>
 
-        {/* PAGE CONTENT WRAPPER - Centered */}
-        <div className="flex-1 p-8 bg-slate-50 flex justify-center">
-          <div className="w-full max-w-6xl">  {/* Ensure w-full to fill width up to max-w */}
+        {/* PAGE CONTENT WRAPPER - Fluid Layout for minimal gap */}
+        <div className="flex-1 p-6 md:p-8 bg-slate-50">
+          <div className="w-full">
 
             <div className="space-y-6">
               {/* Toolbar */}
