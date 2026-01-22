@@ -38,7 +38,7 @@ const AdminLayout = ({ isAuthenticated, onLogout }: { isAuthenticated: boolean; 
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row font-sans text-slate-800">
+    <div className="min-h-screen bg-[#F1F5F9] flex flex-col md:flex-row font-sans text-slate-800">
       {/* Mobile Header */}
       <div className="md:hidden bg-white border-b border-slate-200 p-4 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center gap-2">

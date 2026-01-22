@@ -239,7 +239,7 @@ export default function Admin() {
       {viewMode === 'grid' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {products.map(p => (
-            <div key={p.id} className="bg-white rounded-[28px] border border-slate-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 group">
+            <div key={p.id} className="bg-white rounded-[40px] border border-slate-100 overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 group">
               <div className="relative aspect-[4/5] overflow-hidden">
                 <img src={p.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                 <div className="absolute top-4 left-4 flex gap-2">
@@ -264,37 +264,58 @@ export default function Admin() {
           ))}
         </div>
       ) : (
-        <div className="bg-white rounded-[32px] border border-slate-100 overflow-hidden shadow-sm">
-          <table className="w-full text-left">
-            <thead className="bg-slate-50/50 border-b border-slate-50">
-              <tr className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
-                <th className="p-6">基本信息</th>
-                <th className="p-6">分类与属性</th>
-                <th className="p-6">价格状态</th>
-                <th className="p-6 text-right">管理操作</th>
+        <div className="bg-white rounded-[40px] border border-slate-100 overflow-hidden shadow-sm">
+          <table className="w-full text-left border-collapse">
+            <thead className="bg-slate-50/80 border-b border-slate-100">
+              <tr className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                <th className="p-6 pl-8">作品详情 (悬浮预览图)</th>
+                <th className="p-6">分类</th>
+                <th className="p-6 text-center">状态</th>
+                <th className="p-6">单价</th>
+                <th className="p-6 text-right pr-8">管理</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
               {products.map(p => (
-                <tr key={p.id} className="hover:bg-slate-50/30 transition-colors">
-                  <td className="p-6">
-                    <div className="flex items-center gap-4">
-                      <img src={p.image} className="w-14 h-14 rounded-2xl object-cover shadow-sm" />
-                      <div>
-                        <p className="font-black text-slate-800">{p.title}</p>
-                        <p className="text-xs text-slate-400 mt-1 line-clamp-1 max-w-[200px]">{p.description}</p>
+                <tr key={p.id} className="group hover:bg-slate-50/80 transition-all duration-300">
+                  <td className="p-4 pl-8">
+                    <div className="flex items-center gap-6">
+                      {/* 缩略图：默认极小，悬浮放大 */}
+                      <div className="relative w-12 h-12 flex-shrink-0">
+                        <img 
+                          src={p.image} 
+                          className="w-full h-full rounded-xl object-cover shadow-sm transition-all duration-500 group-hover:scale-[3.5] group-hover:z-50 group-hover:shadow-2xl group-hover:rounded-2xl ring-2 ring-white" 
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-bold text-slate-800 text-base group-hover:text-indigo-600 transition-colors">{p.title}</p>
+                        <p className="text-[11px] text-slate-400 font-medium truncate max-w-[300px]">{p.description}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="p-6">
-                    <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">{p.category}</span>
-                    <div className="flex gap-1 mt-2">
-                      {p.colors?.map(c => <span key={c} className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded uppercase">{c}</span>)}
+                  <td className="p-4">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[10px] font-black text-indigo-400/80 uppercase tracking-tighter">Category</span>
+                      <span className="text-xs font-bold text-slate-600">{p.category}</span>
                     </div>
                   </td>
-                  <td className="p-6 font-mono font-black text-slate-900 text-lg">${p.price}</td>
-                  <td className="p-6 text-right">
-                    <button onClick={() => handleDelete(p.id)} className="text-slate-300 hover:text-red-500 transition-colors p-2"><Trash2 className="w-6 h-6" /></button>
+                  <td className="p-4 text-center">
+                    <div className="flex justify-center gap-1">
+                      {p.is_banner && <div className="w-2 h-2 rounded-full bg-amber-400" title="Banner" />}
+                      {p.is_featured && <div className="w-2 h-2 rounded-full bg-emerald-400" title="Featured" />}
+                      {!p.is_banner && !p.is_featured && <div className="w-2 h-2 rounded-full bg-slate-200" />}
+                    </div>
+                  </td>
+                  <td className="p-4">
+                    <p className="font-mono font-black text-slate-900 text-lg">${p.price}</p>
+                  </td>
+                  <td className="p-4 text-right pr-8">
+                    <button 
+                      onClick={() => handleDelete(p.id)} 
+                      className="p-3 rounded-xl text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all active:scale-90"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
                   </td>
                 </tr>
               ))}
