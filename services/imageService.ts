@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export type UploadProgressCallback = (progress: number) => void;
 
-export const processImageForUpload = (file: File): Promise<{ base64: string; fileName: string; contentType: string }> => {
+export const processImageForUpload = (file: File): Promise<{ image: string; fileName: string; contentType: string }> => {
   // ... (previous logic remains same, but wrapping for clarity)
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -38,7 +38,7 @@ export const processImageForUpload = (file: File): Promise<{ base64: string; fil
 export const uploadImage = async (file: File, onProgress?: UploadProgressCallback): Promise<string> => {
   const processed = await processImageForUpload(file);
   const adminPass = localStorage.getItem('admin_pass') || '';
-  
+
   const response = await axios.post('/api/upload', processed, {
     headers: { 'Authorization': adminPass },
     onUploadProgress: (progressEvent) => {
