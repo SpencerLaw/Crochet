@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { HashRouter, Routes, Route, Link, useNavigate, useLocation, useParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, useNavigate, useLocation, useParams } from 'react-router-dom';
 import { ShoppingBag, Search, Menu, X, MessageCircle, LogOut, Package, Sparkles, Image as ImageIcon, Trash2, ArrowRight, Home as HomeIcon, Store, Heart, ChevronLeft, ChevronRight, Copy, Check } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 import { useStore } from './store';
@@ -758,7 +758,7 @@ export default function App() {
   }, [fetchProducts]);
 
   return (
-    <HashRouter>
+    <BrowserRouter>
       <div className="min-h-screen font-sans text-wooly-brown selection:bg-wooly-pink-200">
         <Toaster 
           position="bottom-center"
@@ -793,6 +793,6 @@ export default function App() {
           <p className="font-hand text-lg">© 2024 董董手作. 用爱手工钩织 ❤️</p>
         </footer>
       </div>
-    </HashRouter>
+    </BrowserRouter>
   );
 }
