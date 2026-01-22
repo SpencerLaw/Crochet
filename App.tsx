@@ -567,9 +567,53 @@ const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
 
 
 
-// ... (keep Contact and Main App)
+// 5. CONTACT (Replaces Login/Profile)
+const Contact = () => {
+  const wechatId = "Lucky_archer9"; // Updated ID
+  const [copied, setCopied] = useState(false);
 
+  const handleCopy = () => {
+    navigator.clipboard.writeText(wechatId);
+    setCopied(true);
+    toast.success("微信号已复制！");
+    setTimeout(() => setCopied(false), 2000);
+  };
 
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4 pb-32">
+      <div className="bg-white rounded-[40px] shadow-cute p-8 max-w-sm w-full text-center relative overflow-hidden group">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-8 bg-wooly-pink-100/50 rotate-2 backdrop-blur-sm z-10 border-l border-r border-white/50"></div>
+        <div className="w-24 h-24 bg-wooly-peach rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-white shadow-soft relative z-0">
+          <span className="text-4xl">👩‍🎨</span>
+          <div className="absolute -bottom-2 bg-wooly-brown text-white text-xs px-2 py-1 rounded-full font-bold">店主董董</div>
+        </div>
+        <h1 className="font-hand text-3xl font-bold text-wooly-brown mb-2">联系我</h1>
+        <p className="text-gray-500 mb-6 text-sm px-4">
+          每一件手作都是独一无二的。<br/>
+          截图你的【选购清单】发给我，<br/>
+          我们一起聊聊颜色和细节吧！
+        </p>
+        <div className="w-48 h-48 bg-wooly-cream mx-auto rounded-2xl mb-6 p-4 flex items-center justify-center border-2 border-dashed border-wooly-pink-300 relative group-hover:scale-105 transition-transform duration-300">
+           <div className="w-full h-full bg-wooly-brown/10 rounded-lg flex items-center justify-center text-wooly-brown/30">
+              <span className="text-xs">二维码区域</span>
+           </div>
+           <div className="absolute -bottom-3 -right-3 bg-white p-2 rounded-full shadow-md">
+             <MessageCircle className="w-6 h-6 text-green-500 fill-green-100" />
+           </div>
+        </div>
+        <button onClick={handleCopy} className="w-full bg-gray-50 hover:bg-wooly-pink-50 p-4 rounded-2xl flex items-center justify-between group/btn transition-colors border border-transparent hover:border-wooly-pink-200">
+          <div className="text-left">
+            <p className="text-xs text-gray-400">微信号</p>
+            <p className="font-bold text-wooly-brown font-mono text-lg">{wechatId}</p>
+          </div>
+          <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-400 group-hover/btn:text-wooly-pink-500 group-hover/btn:scale-110 transition-all">
+             {copied ? <Check className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5" />}
+          </div>
+        </button>
+      </div>
+    </div>
+  );
+};
 
 // --- MAIN APP COMPONENT ---
 
