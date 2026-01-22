@@ -120,7 +120,7 @@ export default function Admin() {
           </div>
           <button 
             onClick={() => setIsAdding(!isAdding)}
-            className="flex-1 md:flex-none bg-slate-900 hover:bg-black text-white px-8 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-xl transition-all active:scale-95"
+            className="flex-1 md:flex-none bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3.5 rounded-2xl font-black flex items-center justify-center gap-2 shadow-xl shadow-indigo-100 transition-all active:scale-95"
           >
             {isAdding ? <X className="w-5 h-5" /> : <PlusCircle className="w-5 h-5" />}
             {isAdding ? '取消操作' : '上架新品'}
@@ -193,22 +193,30 @@ export default function Admin() {
             </div>
 
             <div className="space-y-4">
-              <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">媒体图片 (最多上传 10 张)</label>
+              <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">媒体图片 (建议最大宽 1200px)</label>
               <div className="relative">
                 <input type="file" id="admin-upload" accept="image/*" multiple className="hidden" onChange={handleFileChange} disabled={isUploading} />
-                <label htmlFor="admin-upload" className="border-4 border-dashed border-slate-100 rounded-[32px] p-12 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 hover:border-indigo-100 transition-all group">
+                <label 
+                  htmlFor="admin-upload" 
+                  className={`
+                    border-4 border-dashed rounded-[32px] p-12 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 group
+                    ${isUploading ? 'bg-slate-50 border-indigo-200' : 'bg-slate-50/50 border-slate-200 hover:bg-white hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-50'}
+                  `}
+                >
                   {isUploading ? (
                     <div className="w-full max-w-md text-center">
-                      <div className="h-3 bg-slate-100 rounded-full overflow-hidden mb-4">
-                        <div className="h-full bg-indigo-600 transition-all duration-500 ease-out" style={{ width: `${uploadProgress}%` }}></div>
+                      <div className="h-3 bg-white rounded-full overflow-hidden mb-4 shadow-inner">
+                        <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500 ease-out" style={{ width: `${uploadProgress}%` }}></div>
                       </div>
-                      <span className="text-indigo-600 font-black animate-pulse text-lg">正在极速压缩上传... {uploadProgress}%</span>
+                      <span className="text-indigo-600 font-black animate-pulse text-lg tracking-tight">极速处理中... {uploadProgress}%</span>
                     </div>
                   ) : (
                     <>
-                      <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-slate-300 group-hover:scale-110 transition-transform mb-4 border border-slate-50"><ImageIcon className="w-8 h-8" /></div>
-                      <span className="text-slate-600 font-black text-xl">将图片拖到这里或点击上传</span>
-                      <p className="text-slate-400 text-sm mt-2 font-medium">支持多选，系统将自动进行 WebP 极致压缩</p>
+                      <div className="w-20 h-20 bg-white rounded-[24px] shadow-lg flex items-center justify-center text-indigo-500 group-hover:scale-110 group-hover:rotate-3 transition-all mb-6 border border-slate-100"><ImageIcon className="w-10 h-10" /></div>
+                      <span className="text-slate-800 font-black text-2xl tracking-tight">点此上传精彩作品</span>
+                      <p className="text-slate-400 text-sm mt-3 font-bold flex items-center gap-2">
+                        <PlusCircle className="w-4 h-4 text-indigo-400" /> 支持一次选择多张图片
+                      </p>
                     </>
                   )}
                 </label>
@@ -228,8 +236,8 @@ export default function Admin() {
               )}
             </div>
 
-            <button disabled={isUploading || formData.images.length === 0} className="w-full bg-slate-900 hover:bg-black text-white py-6 rounded-[24px] font-black text-xl disabled:bg-slate-200 transition-all shadow-2xl shadow-indigo-200 active:scale-[0.98]">
-              确认上架此作品
+            <button disabled={isUploading || formData.images.length === 0} className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-6 rounded-[24px] font-black text-xl disabled:from-slate-200 disabled:to-slate-200 disabled:text-slate-400 disabled:shadow-none transition-all shadow-2xl shadow-indigo-200 active:scale-[0.98]">
+              {isUploading ? '正在努力上传中...' : formData.images.length > 0 ? `确认上架 ${formData.images.length} 件作品` : '请先上传作品图片'}
             </button>
           </form>
         </div>
