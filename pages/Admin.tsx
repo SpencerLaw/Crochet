@@ -8,7 +8,8 @@ import { toast } from 'react-hot-toast';
 import { 
   Image as ImageIcon, Plus, Trash2, X, ChevronLeft, 
   Package, LayoutGrid, Tag, DollarSign, Type, FileText, 
-  Palette, Maximize2, Layers, CheckCircle2, CloudUpload
+  Palette, Maximize2, Layers, CheckCircle2, CloudUpload,
+  Sparkles
 } from 'lucide-react';
 
 export default function Admin() {
