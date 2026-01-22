@@ -8,12 +8,12 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
 }
 
-export const Button: React.FC<ButtonProps> = ({ 
-  children, 
-  variant = 'primary', 
-  className = '', 
+export const Button: React.FC<ButtonProps> = ({
+  children,
+  variant = 'primary',
+  className = '',
   isLoading = false,
-  ...props 
+  ...props
 }) => {
   const baseStyle = "font-hand font-bold text-lg px-6 py-2 rounded-full transition-all transform active:scale-95 flex items-center justify-center gap-2";
   const variants = {
@@ -38,26 +38,27 @@ interface ProductCardProps {
 export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
   return (
     <div className="group bg-white rounded-[32px] p-4 shadow-soft hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-transparent hover:border-wooly-pink-100 flex flex-col h-full">
-      <Link to={`/product/${product.id}`} className="relative overflow-hidden rounded-[24px] aspect-square mb-4">
-        <img 
-          src={product.image} 
-          alt={product.title} 
-          className="object-cover w-full h-full transform group-hover:scale-110 transition-transform duration-500"
+      <Link to={`/product/${product.id}`} className="block relative overflow-hidden rounded-[24px] aspect-square mb-4 bg-gray-100 isolate">
+        <img
+          src={product.image}
+          alt={product.title}
+          loading="lazy"
+          className="object-cover w-full h-full rounded-[24px] transform-gpu group-hover:scale-110 transition-transform duration-500 will-change-transform"
         />
         <div className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
           <Heart className="w-5 h-5 text-wooly-pink-500" />
         </div>
       </Link>
-      
+
       <div className="flex flex-col flex-grow">
         <span className="text-xs font-bold text-wooly-pink-400 uppercase tracking-wider mb-1">{product.category}</span>
         <Link to={`/product/${product.id}`} className="hover:text-wooly-pink-500 transition-colors">
           <h3 className="font-hand text-xl font-bold text-wooly-brown mb-2 leading-tight">{product.title}</h3>
         </Link>
-        
+
         <div className="mt-auto flex items-center justify-between">
           <span className="text-2xl font-bold text-wooly-pink-500">${product.price.toFixed(2)}</span>
-          <button 
+          <button
             onClick={() => onAddToCart(product)}
             className="bg-wooly-sage hover:bg-purple-200 text-wooly-brown p-3 rounded-full transition-colors shadow-sm group-hover:shadow-md"
           >
@@ -78,11 +79,10 @@ interface CategoryBadgeProps {
 export const CategoryBadge: React.FC<CategoryBadgeProps> = ({ active, label, onClick }) => (
   <button
     onClick={onClick}
-    className={`px-6 py-2 rounded-full font-hand text-lg transition-all ${
-      active 
-        ? 'bg-wooly-pink-300 text-white shadow-cute transform -translate-y-1' 
+    className={`px-6 py-2 rounded-full font-hand text-lg transition-all ${active
+        ? 'bg-wooly-pink-300 text-white shadow-cute transform -translate-y-1'
         : 'bg-white text-wooly-brown hover:bg-wooly-pink-100'
-    }`}
+      }`}
   >
     {label}
   </button>
