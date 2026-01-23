@@ -44,7 +44,7 @@ export const MOCK_PRODUCTS: Product[] = [
     id: '4',
     title: '向日葵车载摆件',
     price: 25.00,
-    category: Category.CAR_DECOR,
+    category: Category.DECOR_MIXED,
     image: 'https://picsum.photos/id/106/500/500',
     images: ['https://picsum.photos/id/106/500/500'],
     description: '点亮你的出行时光。耐热棉线材质。',
@@ -84,8 +84,7 @@ export const MOCK_PRODUCTS: Product[] = [
 export const CATEGORIES = [
   '全部',
   '挂件',
-  '摆件',
-  '车载',
+  '挂件、摆件、车载',
   '包包',
   '发箍',
   '宠物（帽子、围脖）',
