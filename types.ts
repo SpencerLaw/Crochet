@@ -31,5 +31,5 @@ export enum Category {
   PETS = '宠物（帽子、围脖）',
   HAIR_CLIP = '发夹',
   HAIR_TIE = '发绳',
-  PHONE_STRAP = '手机绳(链)'
+  PHONE_STRAP = '手机小挂件'
 }
