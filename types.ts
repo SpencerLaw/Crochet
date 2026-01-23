@@ -27,5 +27,8 @@ export enum Category {
   PLUSHIES = '毛绒玩偶',
   WEARABLES = '穿戴服饰',
   ACCESSORIES = '可爱配饰',
-  DECOR = '家居装饰'
+  DECOR = '家居装饰',
+  HAIR_CLIP = '发夹',
+  HAIR_TIE = '发绳',
+  PHONE_STRAP = '手机绳(链)'
 }
