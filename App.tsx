@@ -10,6 +10,16 @@ import { Button, ProductCard, CategoryBadge } from './components/Components';
 // Lazy load Admin to keep bundle small
 const Admin = lazy(() => import('./pages/Admin'));
 
+// --- COMPONENTS ---
+
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+};
+
 // --- LAYOUTS ---
 
 const UserLayout = () => {
@@ -276,8 +286,8 @@ const Home = () => {
                 key={idx}
                 onClick={() => setCurrentSlide(idx)}
                 className={`h-2 rounded-full transition-all duration-500 ease-out shadow-sm ${currentSlide === idx
-                    ? 'w-8 bg-wooly-pink-500 shadow-wooly-pink-300/40'
-                    : 'w-2 bg-white/40 hover:bg-white/60'
+                  ? 'w-8 bg-wooly-pink-500 shadow-wooly-pink-300/40'
+                  : 'w-2 bg-white/40 hover:bg-white/60'
                   }`}
               />
             ))}
@@ -752,7 +762,7 @@ export default function App() {
   return (
 
     <BrowserRouter>
-
+      <ScrollToTop />
       <Toaster position="bottom-center" />
 
       <Routes>
