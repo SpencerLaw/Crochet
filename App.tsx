@@ -645,33 +645,38 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 pb-32">
-      <div className="bg-white rounded-[40px] shadow-cute p-8 max-w-sm w-full text-center relative overflow-hidden group">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-8 bg-wooly-pink-100/50 rotate-2 backdrop-blur-sm z-10 border-l border-r border-white/50"></div>
-        <div className="w-24 h-24 bg-wooly-peach rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-white shadow-soft relative z-0">
-          <span className="text-4xl">👩‍🎨</span>
-          <div className="absolute -bottom-2 bg-wooly-brown text-white text-xs px-2 py-1 rounded-full font-bold">店主董董</div>
+      <div className="bg-white rounded-[40px] shadow-cute p-10 max-w-[460px] w-full text-center relative overflow-hidden group">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-8 bg-wooly-pink-100/50 rotate-2 backdrop-blur-sm z-10 border-l border-r border-white/50"></div>
+
+        {/* Avatar Area - Increased Size & Real Image */}
+        <div className="w-28 h-28 bg-wooly-peach rounded-full flex items-center justify-center mx-auto mb-8 border-4 border-white shadow-soft relative z-0 overflow-hidden">
+          <img src="/headwx.jpg" alt="店主董董" className="w-full h-full object-cover" />
+          <div className="absolute -bottom-1 left-0 right-0 bg-wooly-brown/80 backdrop-blur-sm text-white text-[10px] py-1 font-bold">店主董董</div>
         </div>
-        <h1 className="font-hand text-3xl font-bold text-wooly-brown mb-2">联系我</h1>
-        <p className="text-gray-500 mb-6 text-sm px-4">
+
+        <h1 className="font-hand text-4xl font-bold text-wooly-brown mb-3">联系我</h1>
+        <p className="text-gray-500 mb-8 text-base px-4 leading-relaxed">
           每一件手作都是独一无二的。<br />
           截图你的【选购清单】发给我，<br />
           我们一起聊聊颜色和细节吧！
         </p>
-        <div className="w-48 h-48 bg-wooly-cream mx-auto rounded-2xl mb-6 p-4 flex items-center justify-center border-2 border-dashed border-wooly-pink-300 relative group-hover:scale-105 transition-transform duration-300">
-          <div className="w-full h-full bg-wooly-brown/10 rounded-lg flex items-center justify-center text-wooly-brown/30">
-            <span className="text-xs">二维码区域</span>
-          </div>
-          <div className="absolute -bottom-3 -right-3 bg-white p-2 rounded-full shadow-md">
-            <MessageCircle className="w-6 h-6 text-green-500 fill-green-100" />
+
+        {/* QR Code Area - Increased Size & Real Image */}
+        <div className="w-60 h-60 bg-white mx-auto rounded-3xl mb-8 p-3 flex items-center justify-center border-2 border-dashed border-wooly-pink-300 relative group-hover:scale-105 transition-transform duration-500 shadow-inner">
+          <img src="/qrcode.jpg" alt="微信二维码" className="w-full h-full rounded-2xl object-cover shadow-sm" />
+          <div className="absolute -bottom-3 -right-3 bg-white p-2.5 rounded-full shadow-lg ring-4 ring-wooly-cream">
+            <MessageCircle className="w-7 h-7 text-green-500 fill-green-100" />
           </div>
         </div>
-        <button onClick={handleCopy} className="w-full bg-gray-50 hover:bg-wooly-pink-50 p-4 rounded-2xl flex items-center justify-between group/btn transition-colors border border-transparent hover:border-wooly-pink-200">
+
+        {/* WeChat ID Button - Increased Padding & Font */}
+        <button onClick={handleCopy} className="w-full bg-gray-50 hover:bg-wooly-pink-50 p-5 rounded-2xl flex items-center justify-between group/btn transition-all duration-300 border border-transparent hover:border-wooly-pink-200 hover:shadow-md">
           <div className="text-left">
-            <p className="text-xs text-gray-400">微信号</p>
-            <p className="font-bold text-wooly-brown font-mono text-lg">{wechatId}</p>
+            <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">微信号</p>
+            <p className="font-bold text-wooly-brown font-mono text-xl">{wechatId}</p>
           </div>
-          <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-400 group-hover/btn:text-wooly-pink-500 group-hover/btn:scale-110 transition-all">
-            {copied ? <Check className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5" />}
+          <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-400 group-hover/btn:text-wooly-pink-500 group-hover/btn:scale-110 transition-all">
+            {copied ? <Check className="w-6 h-6 text-green-500" /> : <Copy className="w-6 h-6" />}
           </div>
         </button>
       </div>
