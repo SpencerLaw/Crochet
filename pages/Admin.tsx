@@ -102,10 +102,10 @@ export default function Admin() {
     if (!files || files.length === 0) return;
 
     // Check Limits
-    const limit = formData.is_banner ? 1 : 6;
+    const limit = 6;
     const currentCount = formData.images.length;
     if (currentCount + files.length > limit) {
-      toast.error(formData.is_banner ? '首页横幅只能上传 1 张图片' : '普通商品最多上传 6 张图片');
+      toast.error('单类商品最多上传 6 张图片');
       return;
     }
 
@@ -133,28 +133,13 @@ export default function Admin() {
 
   // Handle Banner Check Logic
   const handleBannerCheck = (checked: boolean) => {
-    if (checked && formData.images.length > 1) {
-      // If checking banner but has > 1 images, trim to 1
-      if (window.confirm("设为首页横幅只能保留 1 张图片。是否自动只保留第一张？")) {
-        setFormData(prev => ({ ...prev, is_banner: true, images: prev.images.slice(0, 1) }));
-      } else {
-        // User cancelled, do not check
-        return;
-      }
-    } else {
-      setFormData(prev => ({ ...prev, is_banner: checked }));
-    }
+    setFormData(prev => ({ ...prev, is_banner: checked }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.category) return toast.error('请选择商品分类');
     if (formData.images.length === 0) return toast.error('请至少上传一张图片');
-
-    // Double check limit before submit
-    if (formData.is_banner && formData.images.length > 1) {
-      return toast.error('首页横幅只能有一张图片，请删除多余图片');
-    }
 
     const productPayload = {
       ...formData,
@@ -472,7 +457,7 @@ export default function Admin() {
             />
           </InputGroup>
 
-          <InputGroup label={`商品图片 (最多 ${formData.is_banner ? 1 : 6} 张)`} required>
+          <InputGroup label="商品图片 (最多 6 张)" required>
             <div className="border-2 border-dashed border-slate-200 rounded-xl p-6 md:p-8 bg-slate-50 hover:bg-white hover:border-indigo-400 hover:shadow-lg transition-all text-center cursor-pointer relative group">
               <input type="file" multiple accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer z-10" onChange={handleFileChange} disabled={isUploading} />
 
