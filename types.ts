@@ -24,10 +24,12 @@ export interface CartItem extends Product {
 
 export enum Category {
   ALL = '全部',
-  PLUSHIES = '毛绒玩偶',
-  WEARABLES = '穿戴服饰',
-  ACCESSORIES = '可爱配饰',
-  DECOR = '家居装饰',
+  PENDANTS = '挂件',
+  ORNAMENTS = '摆件',
+  CAR_DECOR = '车载',
+  BAGS = '包包',
+  HEADBANDS = '发箍',
+  PETS = '宠物（帽子、围脖）',
   HAIR_CLIP = '发夹',
   HAIR_TIE = '发绳',
   PHONE_STRAP = '手机绳(链)'
