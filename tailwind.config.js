@@ -23,8 +23,8 @@ export default {
         'wooly-sage': '#D8BFD8',
       },
       fontFamily: {
-        sans: ['Nunito', 'sans-serif'],
-        hand: ['Patrick Hand', 'cursive'],
+        sans: ['Fredoka', 'ZCOOL KuaiLe', 'sans-serif'],
+        hand: ['ZCOOL KuaiLe', 'cursive'],
       },
       boxShadow: {
         'soft': '0 4px 20px -2px rgba(255, 182, 193, 0.4)',
