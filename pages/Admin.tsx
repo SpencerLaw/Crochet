@@ -40,6 +40,22 @@ const InputGroup = ({ label, required, children }: any) => (
   </div>
 );
 
+// --- CONSTANTS ---
+
+const INITIAL_FORM = {
+  title: '',
+  price: '',
+  category: '挂件' as Category,
+  description: '',
+  images: [] as string[],
+  is_featured: false,
+  is_banner: false,
+  banner_text: '',
+  colors: '',
+  sizes: '',
+  tags: ''
+};
+
 // --- MAIN ADMIN COMPONENT ---
 
 export default function Admin() {
@@ -53,12 +69,7 @@ export default function Admin() {
   const [editingId, setEditingId] = useState<string | null>(null);
 
   // Form State
-  const initialForm = {
-    title: '', price: '', category: Category.PENDANTS, description: '',
-    images: [] as string[], is_featured: false, is_banner: false, banner_text: '',
-    colors: '', sizes: '', tags: ''
-  };
-  const [formData, setFormData] = useState(initialForm);
+  const [formData, setFormData] = useState(INITIAL_FORM);
 
   // --- HANDLERS ---
 
@@ -82,7 +93,7 @@ export default function Admin() {
 
   const handleCreateNew = () => {
     setEditingId(null);
-    setFormData(initialForm);
+    setFormData(INITIAL_FORM);
     setIsModalOpen(true);
   };
 
@@ -137,6 +148,7 @@ export default function Admin() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.category) return toast.error('请选择商品分类');
     if (formData.images.length === 0) return toast.error('请至少上传一张图片');
 
     // Double check limit before submit
@@ -167,7 +179,7 @@ export default function Admin() {
 
       if (res.ok) {
         await fetchProducts();
-        handleCreateNew(); // Reset
+        setFormData(INITIAL_FORM); // Clear
         setIsModalOpen(false);
         toast.success(editingId ? '商品更新成功' : '商品发布成功');
       } else {
