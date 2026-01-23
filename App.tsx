@@ -268,16 +268,16 @@ const Home = () => {
           </div>
         ))}
 
-        {/* Banner Indicators */}
+        {/* Banner Indicators - Cute Capsule Style */}
         {banners.length > 1 && (
-          <div className="absolute bottom-6 right-8 z-30 flex gap-2">
+          <div className="absolute bottom-6 right-8 z-30 flex gap-1.5 items-center">
             {banners.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentSlide(idx)}
-                className={`w-2.5 h-2.5 rounded-sm transition-all duration-300 ${currentSlide === idx
-                  ? 'bg-white scale-110 shadow-md'
-                  : 'bg-white/40 hover:bg-white/60'
+                className={`h-2 rounded-full transition-all duration-500 ease-out shadow-sm ${currentSlide === idx
+                    ? 'w-8 bg-wooly-pink-500 shadow-wooly-pink-300/40'
+                    : 'w-2 bg-white/40 hover:bg-white/60'
                   }`}
               />
             ))}
@@ -302,6 +302,7 @@ const Home = () => {
 // 1.5 PRODUCT DETAIL
 const ProductDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { products, addToCart } = useStore();
   const product = products.find(p => p.id === id);
   const [activeImg, setActiveImg] = useState(0);
@@ -311,7 +312,15 @@ const ProductDetail = () => {
   const allImages = [...new Set([product.image, ...(product.images || [])])].filter(Boolean);
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-10 pb-32">
+    <div className="max-w-7xl mx-auto px-6 py-10 pb-32 relative">
+      {/* Floating Back Button */}
+      <button
+        onClick={() => navigate(-1)}
+        className="fixed top-8 left-6 md:absolute md:top-0 md:-left-4 z-40 w-12 h-12 bg-white/60 backdrop-blur-xl rounded-full shadow-lg border border-white flex items-center justify-center text-wooly-pink-500 hover:scale-110 transition-all hover:bg-white animate-in fade-in slide-in-from-left-4 duration-500"
+      >
+        <ChevronLeft className="w-6 h-6 stroke-[3px]" />
+      </button>
+
       <div className="grid md:grid-cols-2 gap-12">
         <div className="space-y-4">
           <div className="aspect-square rounded-[40px] overflow-hidden shadow-soft">
