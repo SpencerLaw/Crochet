@@ -651,7 +651,6 @@ const Contact = () => {
   return (
     <div className="h-full flex items-center justify-center p-4">
       <div className="bg-white rounded-[40px] shadow-cute p-10 max-w-[460px] w-full text-center relative overflow-hidden group">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-8 bg-wooly-pink-100/50 rotate-2 backdrop-blur-sm z-10 border-l border-r border-white/50"></div>
 
         {/* Avatar Area - Increased Size & Real Image */}
         <div className="w-28 h-28 bg-wooly-peach rounded-full flex items-center justify-center mx-auto mb-8 border-4 border-white shadow-soft relative z-0 overflow-hidden">
