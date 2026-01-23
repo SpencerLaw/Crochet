@@ -23,17 +23,22 @@ const ScrollToTop = () => {
 // --- LAYOUTS ---
 
 const UserLayout = () => {
+  const location = useLocation();
+  const isContactPage = location.pathname === '/contact';
+
   return (
-    <div className="min-h-screen font-sans text-wooly-brown selection:bg-wooly-pink-200">
-      <Navbar />
-      <MobileHeader />
-      <main>
+    <div className={`min-h-screen font-sans text-wooly-brown selection:bg-wooly-pink-200 flex flex-col ${isContactPage ? 'h-screen overflow-hidden' : ''}`}>
+      {!isContactPage && <Navbar />}
+      {!isContactPage && <MobileHeader />}
+      <main className={`flex-1 ${isContactPage ? 'overflow-hidden' : ''}`}>
         <Outlet />
       </main>
       <MobileTabBar />
-      <footer className="mt-auto py-10 text-center text-wooly-brown/60 text-sm pb-32 md:pb-10">
-        <p className="font-hand text-lg">© 2024 董董手作. 用爱手工钩织 ❤️</p>
-      </footer>
+      {!isContactPage && (
+        <footer className="mt-auto py-10 text-center text-wooly-brown/60 text-sm pb-32 md:pb-10">
+          <p className="font-hand text-lg">© 2026 董董手作. 用爱手工钩织 ❤️</p>
+        </footer>
+      )}
     </div>
   );
 };
@@ -644,7 +649,7 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 pb-32">
+    <div className="h-full flex items-center justify-center p-4">
       <div className="bg-white rounded-[40px] shadow-cute p-10 max-w-[460px] w-full text-center relative overflow-hidden group">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-8 bg-wooly-pink-100/50 rotate-2 backdrop-blur-sm z-10 border-l border-r border-white/50"></div>
 
