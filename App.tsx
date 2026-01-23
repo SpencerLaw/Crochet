@@ -276,8 +276,8 @@ const Home = () => {
                 key={idx}
                 onClick={() => setCurrentSlide(idx)}
                 className={`w-2.5 h-2.5 rounded-sm transition-all duration-300 ${currentSlide === idx
-                    ? 'bg-white scale-110 shadow-md'
-                    : 'bg-white/40 hover:bg-white/60'
+                  ? 'bg-white scale-110 shadow-md'
+                  : 'bg-white/40 hover:bg-white/60'
                   }`}
               />
             ))}
@@ -308,7 +308,7 @@ const ProductDetail = () => {
 
   if (!product) return <div className="text-center py-20">商品加载中...</div>;
 
-  const allImages = [product.image, ...(product.images || [])].filter(Boolean);
+  const allImages = [...new Set([product.image, ...(product.images || [])])].filter(Boolean);
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10 pb-32">
