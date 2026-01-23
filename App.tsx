@@ -265,7 +265,7 @@ const Home = () => {
         <div className="absolute top-1/2 right-10 text-4xl opacity-20 animate-bounce">🧵</div>
       </div>
 
-      <div className="relative mt-4 md:mt-6 mx-4 rounded-[32px] overflow-hidden min-h-[260px] md:h-[380px] shadow-xl z-10 group">
+      <div className="relative mt-4 md:mt-6 mx-4 rounded-[32px] overflow-hidden min-h-[286px] md:h-[418px] shadow-xl z-10 group">
         {banners.map((banner, idx) => (
           <div key={banner.id} className={`absolute inset-0 transition-opacity duration-1000 ${currentSlide === idx ? 'opacity-100' : 'opacity-0'}`}>
             <img src={banner.image} className="w-full h-full object-cover" />
