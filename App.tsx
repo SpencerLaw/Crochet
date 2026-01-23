@@ -668,7 +668,7 @@ const Contact = () => {
 
         {/* QR Code Area - Increased Size & Real Image */}
         <div className="w-60 h-60 bg-white mx-auto rounded-3xl mb-8 p-3 flex items-center justify-center border-2 border-dashed border-wooly-pink-300 relative group-hover:scale-105 transition-transform duration-500 shadow-inner">
-          <img src="/qrcode.jpg" alt="微信二维码" className="w-full h-full rounded-2xl object-cover shadow-sm" />
+          <img src="/wechatqrcode.png" alt="微信二维码" className="w-full h-full rounded-2xl object-cover shadow-sm" />
           <div className="absolute -bottom-3 -right-3 bg-white p-2.5 rounded-full shadow-lg ring-4 ring-wooly-cream">
             <MessageCircle className="w-7 h-7 text-green-500 fill-green-100" />
           </div>
