@@ -31,7 +31,7 @@ const UserLayout = () => {
 const AdminLayout = ({ isAuthenticated, onLogout }: { isAuthenticated: boolean; onLogout: () => void }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   if (!isAuthenticated) return <Navigate to="/admin/login" replace />;
-  
+
   const navLinks = [
     { to: "/admin", icon: LayoutDashboard, label: "控制台" },
     { to: "/", icon: Globe, label: "返回前台" },
@@ -70,7 +70,7 @@ const AdminLayout = ({ isAuthenticated, onLogout }: { isAuthenticated: boolean; 
           <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">H</div>
           <span className="font-bold text-xl tracking-tight">Hook Admin</span>
         </div>
-        
+
         <nav className="flex flex-col gap-2">
           {navLinks.map(link => (
             <Link key={link.to} to={link.to} className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 text-slate-600 font-semibold transition-colors">
@@ -80,9 +80,9 @@ const AdminLayout = ({ isAuthenticated, onLogout }: { isAuthenticated: boolean; 
         </nav>
 
         <div className="mt-auto border-t pt-6">
-           <button onClick={onLogout} className="flex items-center gap-3 p-3 w-full text-slate-400 hover:text-red-500 transition-colors font-semibold">
-             <LogoutIcon className="w-5 h-5" /> 退出登录
-           </button>
+          <button onClick={onLogout} className="flex items-center gap-3 p-3 w-full text-slate-400 hover:text-red-500 transition-colors font-semibold">
+            <LogoutIcon className="w-5 h-5" /> 退出登录
+          </button>
         </div>
       </aside>
 
@@ -126,9 +126,8 @@ const MobileTabBar = () => {
             <button
               key={tab.id}
               onClick={() => navigate(tab.path)}
-              className={`relative flex flex-col items-center justify-center transition-all duration-500 ease-out ${
-                isActive ? 'text-wooly-pink-500 scale-110 drop-shadow-sm' : 'text-gray-400 hover:text-wooly-brown'
-              }`}
+              className={`relative flex flex-col items-center justify-center transition-all duration-500 ease-out ${isActive ? 'text-wooly-pink-500 scale-110 drop-shadow-sm' : 'text-gray-400 hover:text-wooly-brown'
+                }`}
             >
               <div className="relative">
                 <tab.icon
@@ -152,12 +151,12 @@ const MobileTabBar = () => {
 const MobileHeader = () => {
   return (
     <div className="md:hidden pt-8 px-6 pb-2 flex items-center justify-center animate-in fade-in slide-in-from-top-4 duration-700">
-       <div className="flex items-center gap-2 opacity-80">
-          <div className="w-8 h-8 bg-wooly-pink-300/50 rounded-full flex items-center justify-center text-lg backdrop-blur-sm shadow-sm text-white">
-            🧶
-          </div>
-          <span className="font-hand text-2xl font-bold text-wooly-brown/90 tracking-wide">董董手作</span>
-       </div>
+      <div className="flex items-center gap-2 opacity-80">
+        <div className="w-8 h-8 bg-wooly-pink-300/50 rounded-full flex items-center justify-center text-lg backdrop-blur-sm shadow-sm text-white">
+          🧶
+        </div>
+        <span className="font-hand text-2xl font-bold text-wooly-brown/90 tracking-wide">董董手作</span>
+      </div>
     </div>
   );
 };
@@ -200,11 +199,11 @@ const Navbar = () => {
               </span>
             )}
           </Link>
-          
+
           <Link to="/contact" className="hidden md:block">
-             <Button variant="secondary" className="!py-1.5 !px-5 text-sm flex items-center gap-2">
-               <MessageCircle className="w-4 h-4" /> 找董董
-             </Button>
+            <Button variant="secondary" className="!py-1.5 !px-5 text-sm flex items-center gap-2">
+              <MessageCircle className="w-4 h-4" /> 找董董
+            </Button>
           </Link>
         </div>
       </div>
@@ -218,7 +217,7 @@ const Navbar = () => {
 const Home = () => {
   const { products, addToCart } = useStore();
   const navigate = useNavigate();
-  
+
   // Dynamic Banners and Featured
   const bannersFromDB = products.filter(p => p.is_banner);
   const featuredProducts = products.filter(p => p.is_featured);
@@ -235,7 +234,7 @@ const Home = () => {
   ];
 
   const displayFeatured = featuredProducts.length > 0 ? featuredProducts : products.slice(0, 3);
-  
+
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
@@ -258,16 +257,32 @@ const Home = () => {
 
       <div className="relative mt-4 md:mt-6 mx-4 rounded-[32px] overflow-hidden min-h-[260px] md:h-[380px] shadow-xl z-10 group">
         {banners.map((banner, idx) => (
-           <div key={banner.id} className={`absolute inset-0 transition-opacity duration-1000 ${currentSlide === idx ? 'opacity-100' : 'opacity-0'}`}>
-              <img src={banner.image} className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent"></div>
-              <div className="absolute inset-0 p-8 md:p-12 z-20 flex flex-col justify-center items-start text-white">
-                <h1 className="font-hand text-4xl md:text-5xl font-bold leading-[1.1] whitespace-pre-line drop-shadow-lg">{banner.title}</h1>
-                <p className="text-lg md:text-xl text-white/90 font-medium max-w-lg mt-2">{banner.subtitle}</p>
-                <Button onClick={() => navigate(banner.id ? `/product/${banner.id}` : '/shop')} className="mt-6 !bg-white !text-wooly-brown">立即查看</Button>
-              </div>
-           </div>
+          <div key={banner.id} className={`absolute inset-0 transition-opacity duration-1000 ${currentSlide === idx ? 'opacity-100' : 'opacity-0'}`}>
+            <img src={banner.image} className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent"></div>
+            <div className="absolute inset-0 p-8 md:p-12 z-20 flex flex-col justify-center items-start text-white">
+              <h1 className="font-hand text-4xl md:text-5xl font-bold leading-[1.1] whitespace-pre-line drop-shadow-lg">{banner.title}</h1>
+              <p className="text-lg md:text-xl text-white/90 font-medium max-w-lg mt-2">{banner.subtitle}</p>
+              <Button onClick={() => navigate(banner.id ? `/product/${banner.id}` : '/shop')} className="mt-6 !bg-white !text-wooly-brown">立即查看</Button>
+            </div>
+          </div>
         ))}
+
+        {/* Banner Indicators */}
+        {banners.length > 1 && (
+          <div className="absolute bottom-6 right-8 z-30 flex gap-2">
+            {banners.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentSlide(idx)}
+                className={`w-2.5 h-2.5 rounded-sm transition-all duration-300 ${currentSlide === idx
+                    ? 'bg-white scale-110 shadow-md'
+                    : 'bg-white/40 hover:bg-white/60'
+                  }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 mt-12 md:mt-16">
@@ -315,7 +330,7 @@ const ProductDetail = () => {
           <span className="text-wooly-pink-500 font-bold tracking-widest uppercase text-sm mb-2">{product.category}</span>
           <h1 className="font-hand text-5xl font-bold text-wooly-brown mb-4">{product.title}</h1>
           <p className="text-3xl font-bold text-wooly-pink-500 mb-6">${product.price.toFixed(2)}</p>
-          
+
           <div className="flex flex-wrap gap-4 mb-8">
             {product.colors && product.colors.length > 0 && (
               <div className="flex flex-col gap-1">
@@ -339,8 +354,8 @@ const ProductDetail = () => {
             <p className="text-gray-600 leading-relaxed">{product.description}</p>
           </div>
           <div className="mt-auto space-y-4">
-             <Button onClick={() => { addToCart(product); toast.success('已加入清单'); }} className="w-full py-4 text-xl">加入选购清单</Button>
-             <p className="text-center text-gray-400 text-sm flex items-center justify-center gap-2"><Sparkles className="w-4 h-4"/> 每一件均为纯手工钩织，下单后约 7-10 天发出</p>
+            <Button onClick={() => { addToCart(product); toast.success('已加入清单'); }} className="w-full py-4 text-xl">加入选购清单</Button>
+            <p className="text-center text-gray-400 text-sm flex items-center justify-center gap-2"><Sparkles className="w-4 h-4" /> 每一件均为纯手工钩织，下单后约 7-10 天发出</p>
           </div>
         </div>
       </div>
@@ -356,9 +371,9 @@ const Shop = () => {
 
   const filteredProducts = products.filter(p => {
     const matchesCategory = activeCategory === Category.ALL || p.category === activeCategory;
-    
+
     const searchLower = searchTerm.toLowerCase();
-    const matchesSearch = 
+    const matchesSearch =
       p.title.toLowerCase().includes(searchLower) ||
       p.description.toLowerCase().includes(searchLower) ||
       p.category.toLowerCase().includes(searchLower) ||
@@ -373,12 +388,12 @@ const Shop = () => {
     <div className="max-w-7xl mx-auto px-6 py-10 min-h-screen pb-32">
       <div className="flex flex-col md:flex-row gap-8 items-start mb-10">
         <h1 className="font-hand text-5xl font-bold text-wooly-brown shrink-0">全部商品</h1>
-        
+
         {/* Search Bar */}
         <div className="flex-grow w-full md:w-auto relative">
-          <input 
-            type="text" 
-            placeholder="搜索温暖的好物..." 
+          <input
+            type="text"
+            placeholder="搜索温暖的好物..."
             className="w-full pl-12 pr-4 py-3 rounded-full border-none bg-white shadow-soft focus:ring-2 focus:ring-wooly-pink-300 outline-none"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -390,11 +405,11 @@ const Shop = () => {
       {/* Categories */}
       <div className="flex flex-wrap gap-3 mb-12">
         {CATEGORIES.map(cat => (
-          <CategoryBadge 
-            key={cat} 
-            label={cat} 
-            active={activeCategory === cat} 
-            onClick={() => setActiveCategory(cat)} 
+          <CategoryBadge
+            key={cat}
+            label={cat}
+            active={activeCategory === cat}
+            onClick={() => setActiveCategory(cat)}
           />
         ))}
       </div>
@@ -403,18 +418,18 @@ const Shop = () => {
       {filteredProducts.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {filteredProducts.map(p => (
-            <ProductCard 
-              key={p.id} 
-              product={p} 
+            <ProductCard
+              key={p.id}
+              product={p}
               onAddToCart={(prod) => {
                 addToCart(prod);
                 toast.success(
                   <div className="flex items-center gap-2">
-                    <img src={prod.image} className="w-8 h-8 rounded-full object-cover"/>
+                    <img src={prod.image} className="w-8 h-8 rounded-full object-cover" />
                     <span>已加入选购清单!</span>
                   </div>
                 );
-              }} 
+              }}
             />
           ))}
         </div>
@@ -432,7 +447,7 @@ const Shop = () => {
 const Cart = () => {
   const { cart, removeFromCart, updateQuantity } = useStore();
   const navigate = useNavigate();
-  
+
   const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
   if (cart.length === 0) {
@@ -451,8 +466,8 @@ const Cart = () => {
   return (
     <div className="max-w-4xl mx-auto px-6 py-10 min-h-screen pb-32">
       <h1 className="font-hand text-4xl font-bold text-wooly-brown mb-2">你的选购清单</h1>
-      <p className="text-gray-500 mb-8 flex items-center gap-2"><Sparkles className="w-4 h-4 text-wooly-pink-500"/> 截图此页面发给董董，确认定制细节哦</p>
-      
+      <p className="text-gray-500 mb-8 flex items-center gap-2"><Sparkles className="w-4 h-4 text-wooly-pink-500" /> 截图此页面发给董董，确认定制细节哦</p>
+
       <div className="grid md:grid-cols-3 gap-8">
         <div className="md:col-span-2 space-y-4">
           {cart.map(item => (
@@ -462,13 +477,13 @@ const Cart = () => {
                 <h3 className="font-bold text-wooly-brown">{item.title}</h3>
                 <p className="text-wooly-pink-500 font-bold">${item.price.toFixed(2)}</p>
               </div>
-              
+
               <div className="flex items-center gap-3 bg-wooly-cream rounded-full px-3 py-1">
                 <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="text-xl font-bold text-wooly-brown hover:text-wooly-pink-500">-</button>
                 <span className="w-4 text-center font-bold">{item.quantity}</span>
                 <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="text-xl font-bold text-wooly-brown hover:text-wooly-pink-500">+</button>
               </div>
-              
+
               <button onClick={() => removeFromCart(item.id)} className="p-2 text-gray-400 hover:text-red-400">
                 <Trash2 className="w-5 h-5" />
               </button>
@@ -482,7 +497,7 @@ const Cart = () => {
             <div className="space-y-3 mb-6">
               <div className="flex justify-between text-gray-600">
                 <span>商品数量</span>
-                <span>{cart.reduce((a,c) => a+c.quantity, 0)} 件</span>
+                <span>{cart.reduce((a, c) => a + c.quantity, 0)} 件</span>
               </div>
               <div className="h-px bg-gray-100 my-2"></div>
               <div className="flex justify-between text-xl font-bold text-wooly-brown">
@@ -539,55 +554,55 @@ const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
 
     <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50">
 
-       <div className="bg-white p-10 rounded-[40px] shadow-soft text-center max-w-sm w-full border border-slate-100">
+      <div className="bg-white p-10 rounded-[40px] shadow-soft text-center max-w-sm w-full border border-slate-100">
 
-          <div className="w-20 h-20 bg-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6 text-white text-3xl font-bold shadow-lg shadow-indigo-100">H</div>
+        <div className="w-20 h-20 bg-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6 text-white text-3xl font-bold shadow-lg shadow-indigo-100">H</div>
 
-          <h2 className="text-2xl font-bold mb-8 text-slate-800 tracking-tight">Hook Admin Login</h2>
+        <h2 className="text-2xl font-bold mb-8 text-slate-800 tracking-tight">Hook Admin Login</h2>
 
-          <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleLogin} className="space-y-4">
 
-            <input 
+          <input
 
-              type="text" 
+            type="text"
 
-              placeholder="管理员账号" 
+            placeholder="管理员账号"
 
-              autoComplete="username"
+            autoComplete="username"
 
-              className="w-full p-4 rounded-2xl bg-slate-50 font-bold outline-none focus:ring-2 focus:ring-indigo-500 transition-all border-none"
+            className="w-full p-4 rounded-2xl bg-slate-50 font-bold outline-none focus:ring-2 focus:ring-indigo-500 transition-all border-none"
 
-              value={loginData.username}
+            value={loginData.username}
 
-              onChange={e => setLoginData({...loginData, username: e.target.value})}
+            onChange={e => setLoginData({ ...loginData, username: e.target.value })}
 
-            />
+          />
 
-            <input 
+          <input
 
-              type="password" 
+            type="password"
 
-              placeholder="管理员密码" 
+            placeholder="管理员密码"
 
-              autoComplete="current-password"
+            autoComplete="current-password"
 
-              className="w-full p-4 rounded-2xl bg-slate-50 font-bold outline-none focus:ring-2 focus:ring-indigo-500 transition-all border-none"
+            className="w-full p-4 rounded-2xl bg-slate-50 font-bold outline-none focus:ring-2 focus:ring-indigo-500 transition-all border-none"
 
-              value={loginData.password}
+            value={loginData.password}
 
-              onChange={e => setLoginData({...loginData, password: e.target.value})}
+            onChange={e => setLoginData({ ...loginData, password: e.target.value })}
 
-            />
+          />
 
-            <button type="submit" className="w-full bg-indigo-600 text-white p-4 rounded-2xl font-bold text-lg hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-100">
+          <button type="submit" className="w-full bg-indigo-600 text-white p-4 rounded-2xl font-bold text-lg hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-100">
 
-              登 录
+            登 录
 
-            </button>
+          </button>
 
-          </form>
+        </form>
 
-       </div>
+      </div>
 
     </div>
 
@@ -619,17 +634,17 @@ const Contact = () => {
         </div>
         <h1 className="font-hand text-3xl font-bold text-wooly-brown mb-2">联系我</h1>
         <p className="text-gray-500 mb-6 text-sm px-4">
-          每一件手作都是独一无二的。<br/>
-          截图你的【选购清单】发给我，<br/>
+          每一件手作都是独一无二的。<br />
+          截图你的【选购清单】发给我，<br />
           我们一起聊聊颜色和细节吧！
         </p>
         <div className="w-48 h-48 bg-wooly-cream mx-auto rounded-2xl mb-6 p-4 flex items-center justify-center border-2 border-dashed border-wooly-pink-300 relative group-hover:scale-105 transition-transform duration-300">
-           <div className="w-full h-full bg-wooly-brown/10 rounded-lg flex items-center justify-center text-wooly-brown/30">
-              <span className="text-xs">二维码区域</span>
-           </div>
-           <div className="absolute -bottom-3 -right-3 bg-white p-2 rounded-full shadow-md">
-             <MessageCircle className="w-6 h-6 text-green-500 fill-green-100" />
-           </div>
+          <div className="w-full h-full bg-wooly-brown/10 rounded-lg flex items-center justify-center text-wooly-brown/30">
+            <span className="text-xs">二维码区域</span>
+          </div>
+          <div className="absolute -bottom-3 -right-3 bg-white p-2 rounded-full shadow-md">
+            <MessageCircle className="w-6 h-6 text-green-500 fill-green-100" />
+          </div>
         </div>
         <button onClick={handleCopy} className="w-full bg-gray-50 hover:bg-wooly-pink-50 p-4 rounded-2xl flex items-center justify-between group/btn transition-colors border border-transparent hover:border-wooly-pink-200">
           <div className="text-left">
@@ -637,7 +652,7 @@ const Contact = () => {
             <p className="font-bold text-wooly-brown font-mono text-lg">{wechatId}</p>
           </div>
           <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-400 group-hover/btn:text-wooly-pink-500 group-hover/btn:scale-110 transition-all">
-             {copied ? <Check className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5" />}
+            {copied ? <Check className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5" />}
           </div>
         </button>
       </div>
@@ -751,23 +766,23 @@ export default function App() {
 
 
 
-                {/* Admin Section (Isolated) */}
+        {/* Admin Section (Isolated) */}
 
 
 
-                <Route path="/admin/login" element={<AdminLogin onLogin={() => handleAdminLogin('spencer')} />} />
+        <Route path="/admin/login" element={<AdminLogin onLogin={() => handleAdminLogin('spencer')} />} />
 
 
 
-                <Route element={<AdminLayout isAuthenticated={isAuth} onLogout={handleAdminLogout} />}>
+        <Route element={<AdminLayout isAuthenticated={isAuth} onLogout={handleAdminLogout} />}>
 
 
 
-                  <Route path="/admin" element={
+          <Route path="/admin" element={
 
 
 
-        
+
 
             <Suspense fallback={<div className="p-10 text-center font-bold text-slate-400">正在加载后台系统...</div>}>
 
