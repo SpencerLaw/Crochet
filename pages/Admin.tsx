@@ -54,7 +54,7 @@ export default function Admin() {
 
   // Form State
   const initialForm = {
-    title: '', price: '', category: Category.PLUSHIES, description: '',
+    title: '', price: '', category: Category.PENDANTS, description: '',
     images: [] as string[], is_featured: false, is_banner: false, banner_text: '',
     colors: '', sizes: '', tags: ''
   };
