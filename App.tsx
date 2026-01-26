@@ -27,7 +27,7 @@ const UserLayout = () => {
   const isContactPage = location.pathname === '/contact';
 
   return (
-    <div className={`min-h-screen font-sans text-wooly-brown selection:bg-wooly-pink-200 flex flex-col ${isContactPage ? 'h-screen overflow-hidden' : ''}`}>
+    <div className={`min-h-screen font-sans text-wooly-brown selection:bg-orange-200 flex flex-col ${isContactPage ? 'h-screen overflow-hidden' : ''}`}>
       {!isContactPage && <Navbar />}
       {!isContactPage && <MobileHeader />}
       <main className={`flex-1 ${isContactPage ? 'overflow-hidden' : ''}`}>
@@ -36,7 +36,7 @@ const UserLayout = () => {
       <MobileTabBar />
       {!isContactPage && (
         <footer className="mt-auto py-10 text-center text-wooly-brown/60 text-sm pb-32 md:pb-10">
-          <p className="font-hand text-lg">© 2026 董董手作. 用爱手工钩织 ❤️</p>
+          <p className="font-hand text-lg">© 2026 董董手作. 用爱手工钩织 🧡</p>
         </footer>
       )}
     </div>
@@ -141,15 +141,15 @@ const MobileTabBar = () => {
             <button
               key={tab.id}
               onClick={() => navigate(tab.path)}
-              className={`relative flex flex-col items-center justify-center transition-all duration-500 ease-out ${isActive ? 'text-wooly-pink-500 scale-110 drop-shadow-sm' : 'text-gray-400 hover:text-wooly-brown'
+              className={`relative flex flex-col items-center justify-center transition-all duration-500 ease-out ${isActive ? 'text-orange-500 scale-110 drop-shadow-sm' : 'text-gray-400 hover:text-wooly-brown'
                 }`}
             >
               <div className="relative">
                 <tab.icon
-                  className={`w-7 h-7 transition-all duration-300 ${isActive ? 'fill-wooly-pink-500/20 stroke-[2.5px]' : 'stroke-[2px]'}`}
+                  className={`w-7 h-7 transition-all duration-300 ${isActive ? 'fill-orange-500/20 stroke-[2.5px]' : 'stroke-[2px]'}`}
                 />
                 {tab.badge ? (
-                  <span className="absolute -top-1.5 -right-1.5 bg-wooly-pink-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full ring-2 ring-white shadow-sm">
+                  <span className="absolute -top-1.5 -right-1.5 bg-orange-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full ring-2 ring-white shadow-sm">
                     {tab.badge}
                   </span>
                 ) : null}
@@ -166,11 +166,11 @@ const MobileTabBar = () => {
 const MobileHeader = () => {
   return (
     <div className="md:hidden pt-8 px-6 pb-2 flex items-center justify-center animate-in fade-in slide-in-from-top-4 duration-700">
-      <div className="flex items-center gap-2 opacity-80">
-        <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-lg shadow-sm border border-orange-200">
+      <div className="flex items-center gap-2 opacity-90">
+        <div className="w-8 h-8 bg-orange-400 rounded-full flex items-center justify-center text-lg shadow-sm">
           🧶
         </div>
-        <span className="font-hand text-2xl font-bold text-wooly-brown/90 tracking-wide">董董手作</span>
+        <span className="font-hand text-2xl font-bold text-wooly-brown tracking-wide">董董手作</span>
       </div>
     </div>
   );
@@ -418,7 +418,7 @@ const Shop = () => {
           <input
             type="text"
             placeholder="搜索温暖的好物..."
-            className="w-full pl-12 pr-4 py-3 rounded-full border-none bg-white shadow-soft focus:ring-2 focus:ring-wooly-pink-300 outline-none"
+            className="w-full pl-12 pr-4 py-3 rounded-full border-none bg-white shadow-soft focus:ring-2 focus:ring-orange-300 outline-none"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />

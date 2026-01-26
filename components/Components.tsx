@@ -80,8 +80,8 @@ export const CategoryBadge: React.FC<CategoryBadgeProps> = ({ active, label, onC
   <button
     onClick={onClick}
     className={`px-6 py-2 rounded-full font-hand text-lg transition-all ${active
-        ? 'bg-wooly-pink-300 text-white shadow-cute transform -translate-y-1'
-        : 'bg-white text-wooly-brown hover:bg-wooly-pink-100'
+      ? 'bg-orange-400 text-white shadow-cute transform -translate-y-1'
+      : 'bg-white text-wooly-brown hover:bg-orange-100'
       }`}
   >
     {label}
