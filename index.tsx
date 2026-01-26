@@ -13,3 +13,30 @@ root.render(
     <App />
   </React.StrictMode>
 );
+
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then((registration) => {
+        console.log('SW registered: ', registration);
+
+        // Auto-update logic
+        registration.onupdatefound = () => {
+          const installingWorker = registration.installing;
+          if (installingWorker) {
+            installingWorker.onstatechange = () => {
+              if (installingWorker.state === 'installed') {
+                if (navigator.serviceWorker.controller) {
+                  // New content is available; refresh the page to apply updates
+                  console.log('New version available, refreshing...');
+                  window.location.reload();
+                }
+              }
+            };
+          }
+        };
+      })
+      .catch((err) => console.log('SW registration failed: ', err));
+  });
+}
