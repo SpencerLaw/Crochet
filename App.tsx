@@ -167,8 +167,8 @@ const MobileHeader = () => {
   return (
     <div className="md:hidden pt-8 px-6 pb-2 flex items-center justify-center animate-in fade-in slide-in-from-top-4 duration-700">
       <div className="flex items-center gap-2 opacity-90">
-        <div className="w-8 h-8 bg-orange-400 rounded-full flex items-center justify-center text-lg shadow-sm">
-          🧶
+        <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden shadow-sm">
+          <img src="/icon-192.png" alt="Logo" className="w-full h-full object-cover" />
         </div>
         <span className="font-hand text-2xl font-bold text-wooly-brown tracking-wide">董董手作</span>
       </div>
@@ -190,8 +190,8 @@ const Navbar = () => {
       <div className="bg-white/90 backdrop-blur-md rounded-full shadow-soft px-6 py-3 flex items-center justify-between max-w-7xl mx-auto border border-white">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
-          <div className="w-10 h-10 bg-orange-400 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform shadow-md">
-            <span className="text-2xl">🧶</span>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform shadow-md overflow-hidden">
+            <img src="/icon-192.png" alt="Logo" className="w-full h-full object-cover" />
           </div>
           <span className="font-hand text-2xl font-bold text-wooly-brown">董董手作</span>
         </Link>
