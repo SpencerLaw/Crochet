@@ -649,7 +649,7 @@ const Contact = () => {
   };
 
   return (
-    <div className="h-full flex items-center justify-center p-4">
+    <div className="h-full flex items-center justify-center p-4 pb-32">
       <div className="bg-white rounded-[40px] shadow-cute p-10 max-w-[460px] w-full text-center relative overflow-hidden group">
 
         {/* Avatar Area - Increased Size & Real Image */}
@@ -676,7 +676,7 @@ const Contact = () => {
         {/* WeChat ID Button - Increased Padding & Font */}
         <button onClick={handleCopy} className="w-full bg-gray-50 hover:bg-wooly-pink-50 p-5 rounded-2xl flex items-center justify-between group/btn transition-all duration-300 border border-transparent hover:border-wooly-pink-200 hover:shadow-md">
           <div className="text-left">
-            <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">微信号</p>
+            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">微信号</p>
             <p className="font-bold text-wooly-brown font-mono text-xl">{wechatId}</p>
           </div>
           <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-400 group-hover/btn:text-wooly-pink-500 group-hover/btn:scale-110 transition-all">
