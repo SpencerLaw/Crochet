@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft, Sparkles } from 'lucide-react';
+import { ChevronLeft, Sparkles, X, Maximize2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { useStore } from '../store';
 import { Button } from '../components/Components';
@@ -11,6 +12,7 @@ const ProductDetail = () => {
     const { products, addToCart } = useStore();
     const product = products.find(p => p.id === id);
     const [activeImg, setActiveImg] = useState(0);
+    const [isZoomed, setIsZoomed] = useState(false);
 
     if (!product) return <div className="text-center py-20">商品加载中...</div>;
 
@@ -28,12 +30,24 @@ const ProductDetail = () => {
 
             <div className="grid md:grid-cols-2 gap-12">
                 <div className="space-y-4">
-                    <div className="aspect-square rounded-[40px] overflow-hidden shadow-soft">
-                        <img src={allImages[activeImg]} className="w-full h-full object-cover" />
+                    <div
+                        className="group relative aspect-square rounded-[40px] overflow-hidden shadow-soft cursor-zoom-in"
+                        onClick={() => setIsZoomed(true)}
+                    >
+                        <img src={allImages[activeImg]} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                            <div className="bg-white/90 p-3 rounded-full shadow-lg scale-0 group-hover:scale-100 transition-transform duration-300">
+                                <Maximize2 className="w-6 h-6 text-wooly-pink-500" />
+                            </div>
+                        </div>
                     </div>
                     <div className="flex gap-4 overflow-x-auto pb-2">
                         {allImages.map((img, i) => (
-                            <button key={i} onClick={() => setActiveImg(i)} className={`w-20 h-20 rounded-2xl overflow-hidden border-2 transition-all ${activeImg === i ? 'border-wooly-pink-500 scale-105' : 'border-transparent'}`}>
+                            <button
+                                key={i}
+                                onClick={() => setActiveImg(i)}
+                                className={`w-20 h-20 rounded-2xl overflow-hidden border-2 flex-shrink-0 transition-all ${activeImg === i ? 'border-wooly-pink-500 scale-105 shadow-md' : 'border-transparent opacity-70 hover:opacity-100'}`}
+                            >
                                 <img src={img} className="w-full h-full object-cover" />
                             </button>
                         ))}
@@ -73,6 +87,35 @@ const ProductDetail = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Lightbox Modal */}
+            <AnimatePresence>
+                {isZoomed && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4 md:p-10"
+                        onClick={() => setIsZoomed(false)}
+                    >
+                        <button
+                            className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors p-2"
+                            onClick={() => setIsZoomed(false)}
+                        >
+                            <X className="w-10 h-10" />
+                        </button>
+                        <motion.img
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            src={allImages[activeImg]}
+                            className="max-w-full max-h-full rounded-2xl shadow-2xl object-contain selection:bg-transparent"
+                            onClick={(e) => e.stopPropagation()}
+                        />
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };
