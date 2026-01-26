@@ -25,6 +25,7 @@ export interface CartItem extends Product {
 export enum Category {
   ALL = '全部',
   PENDANTS = '挂件',
+  ORNAMENTS_CAR_POTTED = '摆件、车载（盆栽）',
   DECOR_MIXED = '挂件、摆件、车载',
   BAGS = '包包',
   HEADBANDS = '发箍',

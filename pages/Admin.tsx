@@ -52,7 +52,7 @@ const INITIAL_FORM = {
   is_banner: false,
   banner_text: '',
   colors: '',
-  sizes: '',
+  sizes: '12cm',
   tags: ''
 };
 
