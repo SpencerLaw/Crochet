@@ -275,13 +275,24 @@ export default function App() {
       <ScrollToTop />
       <Toaster position="bottom-center" />
 
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          {/* User Facing App */}
+          <Route element={<UserLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/shop" element={<Shop />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/contact" element={<Contact />} />
+          </Route>
 
-    </Route>
-
-      </Routes >
-
-    </BrowserRouter >
-
+          {/* Admin Section */}
+          <Route path="/admin/login" element={<AdminLogin onLogin={handleAdminLogin} />} />
+          <Route element={<AdminLayout isAuthenticated={isAuth} onLogout={handleAdminLogout} />}>
+            <Route path="/admin" element={<Admin />} />
+          </Route>
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
   );
-
 }

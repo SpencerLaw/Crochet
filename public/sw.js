@@ -43,13 +43,12 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // 2. Network First for navigation (index.html, root, shop etc.)
-    // This ensures users always get the latest JS bundle hashes if online.
+    // 2. Network First for navigation (index.html, root)
+    // Ensures user gets the latest bundle hashes.
     if (event.request.mode === 'navigate' || url.pathname === '/' || url.pathname === '/index.html') {
         event.respondWith(
             fetch(event.request)
                 .then((response) => {
-                    // If valid response, update cache
                     if (response.status === 200) {
                         const copy = response.clone();
                         caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
@@ -61,11 +60,28 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // 3. Cache First for static assets (images, CSS, manifest)
+    // 3. Stale-While-Revalidate for CSS, JS and local Assets
+    // Best for performance while keeping things relatively fresh.
+    if (url.pathname.endsWith('.css') || url.pathname.endsWith('.js') || url.pathname.endsWith('.tsx') || url.pathname.includes('/assets/')) {
+        event.respondWith(
+            caches.match(event.request).then((cachedResponse) => {
+                const fetchPromise = fetch(event.request).then((networkResponse) => {
+                    if (networkResponse.status === 200) {
+                        const copy = networkResponse.clone();
+                        caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+                    }
+                    return networkResponse;
+                });
+                return cachedResponse || fetchPromise;
+            })
+        );
+        return;
+    }
+
+    // 4. Cache First for images and fonts (static content)
     event.respondWith(
         caches.match(event.request).then((response) => {
             return response || fetch(event.request).then((fetchResponse) => {
-                // Cache new static assets on the fly
                 if (fetchResponse.status === 200) {
                     const copy = fetchResponse.clone();
                     caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
