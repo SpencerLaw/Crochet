@@ -84,6 +84,7 @@ export const MOCK_PRODUCTS: Product[] = [
 export const CATEGORIES = [
   '全部',
   '挂件',
+  '摆件、车载（盆栽）',
   '挂件、摆件、车载',
   '包包',
   '发箍',
