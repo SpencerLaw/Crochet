@@ -1,0 +1,21 @@
+{
+    "name": "董董手作",
+    "short_name": "董董手作",
+    "description": "温暖手工钩织作品展示与交流",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#FFF5E1",
+    "theme_color": "#FF8A3D",
+    "icons": [
+        {
+            "src": "/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
