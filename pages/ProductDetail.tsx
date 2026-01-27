@@ -173,7 +173,7 @@ const ProductDetail = () => {
 
                         {/* Navigation Arrows (Desktop) */}
                         <button
-                            className="hidden md:flex absolute left-8 top-1/2 -translate-y-1/2 w-14 h-14 items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/50 hover:text-white hover:bg-white/10 transition-all z-[110]"
+                            className="hidden md:flex absolute left-8 top-1/2 -translate-y-1/2 w-14 h-14 items-center justify-center rounded-full bg-white/5 border border-white/10 text-orange-500 hover:text-orange-400 hover:bg-white/10 transition-all z-[110] drop-shadow-md"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 setDirection(-1);
@@ -184,7 +184,7 @@ const ProductDetail = () => {
                             <ChevronLeft className="w-8 h-8" />
                         </button>
                         <button
-                            className="hidden md:flex absolute right-8 top-1/2 -translate-y-1/2 w-14 h-14 items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/50 hover:text-white hover:bg-white/10 transition-all z-[110]"
+                            className="hidden md:flex absolute right-8 top-1/2 -translate-y-1/2 w-14 h-14 items-center justify-center rounded-full bg-white/5 border border-white/10 text-orange-500 hover:text-orange-400 hover:bg-white/10 transition-all z-[110] drop-shadow-md"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 setDirection(1);
