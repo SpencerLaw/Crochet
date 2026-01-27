@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useStore } from '../store';
 import { Button, ProductCard } from '../components/Components';
@@ -60,9 +60,30 @@ const Home = () => {
         })
     };
 
-    const swipeConfidenceThreshold = 10000;
-    const swipePower = (offset: number, velocity: number) => {
-        return Math.abs(offset) * velocity;
+    const x = useMotionValue(0);
+    const containerRef = React.useRef(null);
+
+    const handleDragEnd = async () => {
+        const currentX = x.get();
+        const width = containerRef.current ? containerRef.current.offsetWidth : window.innerWidth;
+        const velocity = x.getVelocity();
+        // Threshold can be relative to width
+        const threshold = width * 0.25;
+
+        if (currentX < -threshold || velocity < -500) {
+            // Next
+            await animate(x, -width, { type: "spring", stiffness: 300, damping: 30 }).finished;
+            setCurrentSlide((prev) => (prev + 1) % banners.length);
+            x.set(0);
+        } else if (currentX > threshold || velocity > 500) {
+            // Prev
+            await animate(x, width, { type: "spring", stiffness: 300, damping: 30 }).finished;
+            setCurrentSlide((prev) => (prev - 1 + banners.length) % banners.length);
+            x.set(0);
+        } else {
+            // Revert
+            animate(x, 0, { type: "spring", stiffness: 300, damping: 30 });
+        }
     };
 
     return (
@@ -76,46 +97,53 @@ const Home = () => {
             </div>
 
             <div className="relative mt-4 md:mt-6 mx-4 rounded-[32px] overflow-hidden min-h-[296px] md:h-[420px] shadow-xl z-10 group bg-slate-100">
-                <AnimatePresence initial={false} custom={direction}>
+                <div ref={containerRef} className="absolute inset-0 overflow-hidden">
                     <motion.div
-                        key={currentSlide}
-                        custom={direction}
-                        variants={variants}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        transition={{
-                            x: { type: "spring", stiffness: 300, damping: 30 },
-                            opacity: { duration: 0.4 }
-                        }}
+                        className="absolute inset-0 flex items-center justify-center cursor-grab active:cursor-grabbing"
+                        style={{ x }}
                         drag="x"
-                        dragConstraints={{ left: 0, right: 0 }}
-                        dragElastic={1}
-                        onDragEnd={(e, { offset, velocity }) => {
-                            const swipe = swipePower(offset.x, velocity.x);
-
-                            if (swipe < -swipeConfidenceThreshold) {
-                                paginate(1);
-                            } else if (swipe > swipeConfidenceThreshold) {
-                                paginate(-1);
-                            }
+                        dragElastic={0.2}
+                        onDragEnd={handleDragEnd}
+                        onClick={(e) => {
+                            // If it's a tap (not drag), standard click propagation happens inside children if needed,
+                            // or we can handle navigation here if we moved the navigate call up.
+                            // But keeping buttons separate is fine.
                         }}
-                        className="absolute inset-0 cursor-grab active:cursor-grabbing"
                     >
-                        <img src={banners[currentSlide].image} className="w-full h-full object-cover pointer-events-none" />
-                        <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent pointer-events-none"></div>
-                        <div className="absolute inset-0 p-8 md:p-12 z-20 flex flex-col justify-center items-start text-white pointer-events-none">
-                            <h1 className="font-hand text-4xl md:text-5xl font-bold leading-[1.1] whitespace-pre-line drop-shadow-lg">{banners[currentSlide].title}</h1>
-                            <p className="text-lg md:text-xl text-white/90 font-medium max-w-lg mt-2">{banners[currentSlide].subtitle}</p>
-                            <button
-                                onClick={(e) => { e.stopPropagation(); navigate(banners[currentSlide].id ? `/product/${banners[currentSlide].id}` : '/shop'); }}
-                                className="mt-6 pointer-events-auto font-hand font-bold text-lg px-8 py-2.5 rounded-full bg-white text-wooly-brown shadow-cute hover:scale-105 transition-transform"
-                            >
-                                立即查看
-                            </button>
-                        </div>
+                        {[-1, 0, 1].map((offset) => {
+                            const index = (currentSlide + offset + banners.length) % banners.length;
+                            const banner = banners[index];
+                            return (
+                                <motion.div
+                                    key={`${index}-${offset}`}
+                                    className="absolute top-0 bottom-0 w-full h-full flex items-center justify-center"
+                                    style={{ left: `${offset * 100}%` }}
+                                >
+                                    <img src={banner.image} className="w-full h-full object-cover pointer-events-none" />
+                                    <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent pointer-events-none"></div>
+                                    <div className="absolute inset-0 p-8 md:p-12 z-20 flex flex-col justify-center items-start text-white pointer-events-none">
+                                        <h1 className="font-hand text-4xl md:text-5xl font-bold leading-[1.1] whitespace-pre-line drop-shadow-lg">{banner.title}</h1>
+                                        <p className="text-lg md:text-xl text-white/90 font-medium max-w-lg mt-2">{banner.subtitle}</p>
+                                        <button
+                                            onClick={(e) => {
+                                                // We need to stop propagation only if dragging didn't occur?
+                                                // Actually since button is pointer-events-auto inside pointer-events-none container?
+                                                // Wait, the parent motion.div has cursor-grab.
+                                                // We need the button to be interactive.
+                                                // In the new structure, we can make the content overlay have pointer-events-auto for specific elements?
+                                                e.stopPropagation();
+                                                navigate(banner.id ? `/product/${banner.id}` : '/shop');
+                                            }}
+                                            className="mt-6 pointer-events-auto font-hand font-bold text-lg px-8 py-2.5 rounded-full bg-white text-wooly-brown shadow-cute hover:scale-105 transition-transform"
+                                        >
+                                            立即查看
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            );
+                        })}
                     </motion.div>
-                </AnimatePresence>
+                </div>
 
                 {/* Desktop Navigation Arrows */}
                 {banners.length > 1 && (
