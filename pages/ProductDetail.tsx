@@ -22,6 +22,32 @@ const ProductDetail = () => {
     const [initialDist, setInitialDist] = useState<number | null>(null);
     const constraintsRef = React.useRef(null);
     const x = useMotionValue(0);
+    const bannerX = useMotionValue(0);
+
+    const handleBannerDragEnd = async () => {
+        const currentX = bannerX.get();
+        const width = window.innerWidth; // Or approximate container width, but checking relative screen width is usually fine for threshold
+        // Actually for the banner, the container is smaller (grid col), so we should use a smaller threshold or %
+        // But velocity check helps.
+        const velocity = bannerX.getVelocity();
+        // Since banner is roughly half screen on desktop, full screen on mobile?
+        // Let's use a fixed threshold or relative to window is fine for swipe intention.
+
+        if (currentX < -100 || velocity < -500) {
+            await animate(bannerX, -window.innerWidth, { duration: 0.2 }).finished; // Animate out
+            // Actually we just need to animate enough to look like it moved, but standard is switch index and reset x
+            // Wait, if we use % layout, 1 unit is 100% of container.
+            // Moving x by -containerWidth
+            // We can just animate x to some negative value then reset.
+            setActiveImg(i => (i + 1) % allImages.length);
+            bannerX.set(0);
+        } else if (currentX > 100 || velocity > 500) {
+            setActiveImg(i => (i - 1 + allImages.length) % allImages.length);
+            bannerX.set(0);
+        } else {
+            animate(bannerX, 0, { type: "spring", stiffness: 300, damping: 30 });
+        }
+    };
 
     const handleDragEnd = async () => {
         const currentX = x.get();
@@ -102,13 +128,7 @@ const ProductDetail = () => {
             <div className="grid md:grid-cols-2 gap-12">
                 <div className="space-y-4">
                     <motion.div
-                        className="group relative aspect-square rounded-[40px] overflow-hidden shadow-soft cursor-zoom-in bg-slate-50"
-                        onClick={() => {
-                            setLightboxIndex(activeImg);
-                            setDirection(0);
-                            setIsZoomed(true);
-                            setLightboxScale(1);
-                        }}
+                        className="group relative aspect-square rounded-[40px] overflow-hidden shadow-soft cursor-grab active:cursor-grabbing bg-slate-50"
                         animate={{
                             scale: [1, 1.02, 1],
                         }}
@@ -116,20 +136,46 @@ const ProductDetail = () => {
                             duration: 4,
                             repeat: Infinity,
                             ease: "easeInOut",
-                            // Only animate breathing on mobile (no hover)
                             repeatType: "loop",
                             delay: 1,
-                            // We can use a custom property or just let it run if it's subtle enough
-                            // But usually we want to disable it if hover is possible
                         }}
                     >
-                        <motion.img
-                            src={allImages[activeImg]}
-                            className="w-full h-full object-cover"
-                            whileHover={{ scale: 1.1 }}
-                            transition={{ duration: 0.6 }}
-                        />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                        <motion.div
+                            className="absolute inset-0 flex items-center justify-center"
+                            style={{ x: bannerX }}
+                            drag="x"
+                            dragElastic={0.2}
+                            onDragEnd={handleBannerDragEnd}
+                            onClick={(e) => {
+                                // Simple click detection
+                                if (Math.abs(bannerX.get()) < 5) {
+                                    setLightboxIndex(activeImg);
+                                    setDirection(0);
+                                    setIsZoomed(true);
+                                    setLightboxScale(1);
+                                }
+                            }}
+                        >
+                            {[-1, 0, 1].map((offset) => {
+                                const index = (activeImg + offset + allImages.length) % allImages.length;
+                                return (
+                                    <motion.div
+                                        key={`${index}-${offset}`}
+                                        className="absolute top-0 bottom-0 w-full flex items-center justify-center"
+                                        style={{ left: `${offset * 100}%` }}
+                                    >
+                                        <motion.img
+                                            src={allImages[index]}
+                                            className="w-full h-full object-cover pointer-events-none"
+                                            whileHover={{ scale: 1.1 }}
+                                            transition={{ duration: 0.6 }}
+                                        />
+                                    </motion.div>
+                                );
+                            })}
+                        </motion.div>
+
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center pointer-events-none">
                             <div className="bg-white/90 p-3 rounded-full shadow-lg scale-0 group-hover:scale-100 md:group-hover:scale-110 transition-all duration-300">
                                 <Maximize2 className="w-6 h-6 text-wooly-pink-500" />
                             </div>
