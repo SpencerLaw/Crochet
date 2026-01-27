@@ -11,6 +11,8 @@ const ProductDetail = () => {
     const navigate = useNavigate();
     const { products, addToCart } = useStore();
     const product = products.find(p => p.id === id);
+    const [activeImg, setActiveImg] = useState(0);
+    const [lightboxIndex, setLightboxIndex] = useState(0);
     const [isZoomed, setIsZoomed] = useState(false);
     const [lightboxZoomed, setLightboxZoomed] = useState(false);
     const [direction, setDirection] = useState(0);
