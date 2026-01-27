@@ -11,11 +11,10 @@ const ProductDetail = () => {
     const navigate = useNavigate();
     const { products, addToCart } = useStore();
     const product = products.find(p => p.id === id);
-    const [activeImg, setActiveImg] = useState(0);
-    const [lightboxIndex, setLightboxIndex] = useState(0);
     const [isZoomed, setIsZoomed] = useState(false);
     const [lightboxZoomed, setLightboxZoomed] = useState(false);
     const [direction, setDirection] = useState(0);
+    const [lastTap, setLastTap] = useState(0);
 
     if (!product) return <div className="text-center py-20">商品加载中...</div>;
 
@@ -207,14 +206,21 @@ const ProductDetail = () => {
                                             }
                                         }
                                     }}
-                                    className={`absolute inset-0 flex items-center justify-center pointer-events-auto ${lightboxZoomed ? 'cursor-zoom-out' : 'cursor-grab active:cursor-grabbing'}`}
+                                    className={`absolute inset-0 flex items-center justify-center pointer-events-auto ${lightboxZoomed ? 'cursor-move' : 'cursor-grab active:cursor-grabbing'}`}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        setLightboxZoomed(!lightboxZoomed);
+                                        const now = Date.now();
+                                        if (now - lastTap < 300) {
+                                            // Double tap
+                                            setLightboxZoomed(!lightboxZoomed);
+                                        }
+                                        setLastTap(now);
                                     }}
                                 >
                                     <motion.img
-                                        animate={{ scale: lightboxZoomed ? 1.5 : 1 }}
+                                        drag={lightboxZoomed}
+                                        dragConstraints={{ left: -150, right: 150, top: -150, bottom: 150 }}
+                                        animate={{ scale: lightboxZoomed ? 2.5 : 1 }}
                                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
                                         src={allImages[lightboxIndex]}
                                         className="max-w-full max-h-full rounded-2xl shadow-2xl object-contain selection:bg-transparent pointer-events-none"
