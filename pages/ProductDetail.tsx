@@ -20,8 +20,6 @@ const ProductDetail = () => {
 
     // Gestures state
     const [initialDist, setInitialDist] = useState<number | null>(null);
-    // Gestures state
-    const [initialDist, setInitialDist] = useState<number | null>(null);
     const constraintsRef = React.useRef(null);
     const x = useMotionValue(0);
 
