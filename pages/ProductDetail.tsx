@@ -12,7 +12,9 @@ const ProductDetail = () => {
     const { products, addToCart } = useStore();
     const product = products.find(p => p.id === id);
     const [activeImg, setActiveImg] = useState(0);
+    const [lightboxIndex, setLightboxIndex] = useState(0);
     const [isZoomed, setIsZoomed] = useState(false);
+    const [direction, setDirection] = useState(0);
 
     if (!product) return <div className="text-center py-20">商品加载中...</div>;
 
@@ -32,7 +34,10 @@ const ProductDetail = () => {
                 <div className="space-y-4">
                     <motion.div
                         className="group relative aspect-square rounded-[40px] overflow-hidden shadow-soft cursor-zoom-in bg-slate-50"
-                        onClick={() => setIsZoomed(true)}
+                        onClick={() => {
+                            setLightboxIndex(activeImg);
+                            setIsZoomed(true);
+                        }}
                         animate={{
                             scale: [1, 1.02, 1],
                         }}
@@ -112,24 +117,101 @@ const ProductDetail = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4 md:p-10"
+                        className="fixed inset-0 z-[100] bg-black/98 backdrop-blur-md flex items-center justify-center overflow-hidden"
                         onClick={() => setIsZoomed(false)}
                     >
+                        {/* Close Button */}
                         <button
-                            className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors p-2"
+                            className="absolute top-6 right-6 text-white/50 hover:text-white transition-all p-2 z-[110] hover:scale-110"
                             onClick={() => setIsZoomed(false)}
                         >
                             <X className="w-10 h-10" />
                         </button>
-                        <motion.img
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                            src={allImages[activeImg]}
-                            className="max-w-full max-h-full rounded-2xl shadow-2xl object-contain selection:bg-transparent"
-                            onClick={(e) => e.stopPropagation()}
-                        />
+
+                        {/* Counter */}
+                        <div className="absolute top-8 left-1/2 -translate-x-1/2 text-white/70 font-medium tracking-widest z-[110] bg-white/10 px-4 py-1 rounded-full backdrop-blur-sm">
+                            {lightboxIndex + 1} / {allImages.length}
+                        </div>
+
+                        {/* Navigation Arrows (Desktop) */}
+                        <button
+                            className="hidden md:flex absolute left-8 top-1/2 -translate-y-1/2 w-14 h-14 items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/50 hover:text-white hover:bg-white/10 transition-all z-[110]"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setDirection(-1);
+                                setLightboxIndex(prev => (prev - 1 + allImages.length) % allImages.length);
+                            }}
+                        >
+                            <ChevronLeft className="w-8 h-8" />
+                        </button>
+                        <button
+                            className="hidden md:flex absolute right-8 top-1/2 -translate-y-1/2 w-14 h-14 items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/50 hover:text-white hover:bg-white/10 transition-all z-[110]"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setDirection(1);
+                                setLightboxIndex(prev => (prev + 1) % allImages.length);
+                            }}
+                        >
+                            <ChevronLeft className="w-8 h-8 rotate-180" />
+                        </button>
+
+                        {/* Carousel Container */}
+                        <div className="relative w-full h-full flex items-center justify-center p-4 md:p-10 pointer-events-none">
+                            <AnimatePresence initial={false} custom={direction}>
+                                <motion.div
+                                    key={lightboxIndex}
+                                    custom={direction}
+                                    variants={{
+                                        enter: (direction: number) => ({
+                                            x: direction > 0 ? 1000 : -1000,
+                                            opacity: 0,
+                                            scale: 0.95
+                                        }),
+                                        center: {
+                                            zIndex: 1,
+                                            x: 0,
+                                            opacity: 1,
+                                            scale: 1
+                                        },
+                                        exit: (direction: number) => ({
+                                            zIndex: 0,
+                                            x: direction < 0 ? 1000 : -1000,
+                                            opacity: 0,
+                                            scale: 0.95
+                                        })
+                                    }}
+                                    initial="enter"
+                                    animate="center"
+                                    exit="exit"
+                                    transition={{
+                                        x: { type: "spring", stiffness: 300, damping: 30 },
+                                        opacity: { duration: 0.2 }
+                                    }}
+                                    drag="x"
+                                    dragConstraints={{ left: 0, right: 0 }}
+                                    dragElastic={1}
+                                    onDragEnd={(e, { offset, velocity }) => {
+                                        const swipe = Math.abs(offset.x) > 50 || Math.abs(velocity.x) > 500;
+                                        if (swipe) {
+                                            if (offset.x > 0) {
+                                                setDirection(-1);
+                                                setLightboxIndex(prev => (prev - 1 + allImages.length) % allImages.length);
+                                            } else {
+                                                setDirection(1);
+                                                setLightboxIndex(prev => (prev + 1) % allImages.length);
+                                            }
+                                        }
+                                    }}
+                                    className="absolute inset-0 flex items-center justify-center pointer-events-auto cursor-grab active:cursor-grabbing"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <img
+                                        src={allImages[lightboxIndex]}
+                                        className="max-w-full max-h-full rounded-2xl shadow-2xl object-contain selection:bg-transparent pointer-events-none"
+                                    />
+                                </motion.div>
+                            </AnimatePresence>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
