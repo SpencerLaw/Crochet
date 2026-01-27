@@ -231,17 +231,24 @@ const ProductDetail = () => {
                                     dragConstraints={lightboxScale === 1 ? { left: 0, right: 0 } : false}
                                     dragElastic={lightboxScale === 1 ? 1 : 0.2}
                                     onDragEnd={(e, { offset, velocity }) => {
-                                        if (lightboxScale > 1.1) return;
-                                        const swipe = Math.abs(offset.x) > 50 || Math.abs(velocity.x) > 500;
-                                        if (swipe) {
-                                            if (offset.x > 0) {
-                                                setDirection(-1);
-                                                setLightboxIndex(prev => (prev - 1 + allImages.length) % allImages.length);
-                                                setLightboxScale(1);
-                                            } else {
-                                                setDirection(1);
-                                                setLightboxIndex(prev => (prev + 1) % allImages.length);
-                                                setLightboxScale(1);
+                                        // When zoomed, we need a more decisive swipe to change images
+                                        const threshold = lightboxScale > 1.1 ? 200 : 50;
+                                        const velocityThreshold = 500;
+
+                                        const isSwipe = Math.abs(offset.x) > threshold || Math.abs(velocity.x) > velocityThreshold;
+
+                                        if (isSwipe) {
+                                            // Ensure the horizontal movement is more dominant than vertical for a "switch"
+                                            if (Math.abs(offset.x) > Math.abs(offset.y) * 1.2) {
+                                                if (offset.x > 0) {
+                                                    setDirection(-1);
+                                                    setLightboxIndex(prev => (prev - 1 + allImages.length) % allImages.length);
+                                                    setLightboxScale(1);
+                                                } else {
+                                                    setDirection(1);
+                                                    setLightboxIndex(prev => (prev + 1) % allImages.length);
+                                                    setLightboxScale(1);
+                                                }
                                             }
                                         }
                                     }}
