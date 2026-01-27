@@ -14,6 +14,7 @@ const ProductDetail = () => {
     const [activeImg, setActiveImg] = useState(0);
     const [lightboxIndex, setLightboxIndex] = useState(0);
     const [isZoomed, setIsZoomed] = useState(false);
+    const [lightboxZoomed, setLightboxZoomed] = useState(false);
     const [direction, setDirection] = useState(0);
 
     if (!product) return <div className="text-center py-20">商品加载中...</div>;
@@ -36,7 +37,9 @@ const ProductDetail = () => {
                         className="group relative aspect-square rounded-[40px] overflow-hidden shadow-soft cursor-zoom-in bg-slate-50"
                         onClick={() => {
                             setLightboxIndex(activeImg);
+                            setDirection(0); // Reset direction for initial zoom entry
                             setIsZoomed(true);
+                            setLightboxZoomed(false);
                         }}
                         animate={{
                             scale: [1, 1.02, 1],
@@ -54,11 +57,12 @@ const ProductDetail = () => {
                     >
                         <motion.img
                             src={allImages[activeImg]}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        // Desktop hover is handled by CSS group-hover:scale-110 above
+                            className="w-full h-full object-cover"
+                            whileHover={{ scale: 1.1 }}
+                            transition={{ duration: 0.6 }}
                         />
-                        <div className="absolute inset-0 bg-black/0 md:group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                            <div className="bg-white/90 p-3 rounded-full shadow-lg scale-0 md:group-hover:scale-100 transition-transform duration-300">
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                            <div className="bg-white/90 p-3 rounded-full shadow-lg scale-0 group-hover:scale-100 md:group-hover:scale-110 transition-all duration-300">
                                 <Maximize2 className="w-6 h-6 text-wooly-pink-500" />
                             </div>
                         </div>
@@ -163,9 +167,9 @@ const ProductDetail = () => {
                                     custom={direction}
                                     variants={{
                                         enter: (direction: number) => ({
-                                            x: direction > 0 ? 1000 : -1000,
+                                            x: direction === 0 ? 0 : (direction > 0 ? 1000 : -1000),
                                             opacity: 0,
-                                            scale: 0.95
+                                            scale: direction === 0 ? 0.5 : 0.95
                                         }),
                                         center: {
                                             zIndex: 1,
@@ -175,9 +179,9 @@ const ProductDetail = () => {
                                         },
                                         exit: (direction: number) => ({
                                             zIndex: 0,
-                                            x: direction < 0 ? 1000 : -1000,
+                                            x: direction === 0 ? 0 : (direction < 0 ? 1000 : -1000),
                                             opacity: 0,
-                                            scale: 0.95
+                                            scale: direction === 0 ? 0.5 : 0.95
                                         })
                                     }}
                                     initial="enter"
@@ -191,6 +195,7 @@ const ProductDetail = () => {
                                     dragConstraints={{ left: 0, right: 0 }}
                                     dragElastic={1}
                                     onDragEnd={(e, { offset, velocity }) => {
+                                        if (lightboxZoomed) return;
                                         const swipe = Math.abs(offset.x) > 50 || Math.abs(velocity.x) > 500;
                                         if (swipe) {
                                             if (offset.x > 0) {
@@ -202,10 +207,15 @@ const ProductDetail = () => {
                                             }
                                         }
                                     }}
-                                    className="absolute inset-0 flex items-center justify-center pointer-events-auto cursor-grab active:cursor-grabbing"
-                                    onClick={(e) => e.stopPropagation()}
+                                    className={`absolute inset-0 flex items-center justify-center pointer-events-auto ${lightboxZoomed ? 'cursor-zoom-out' : 'cursor-grab active:cursor-grabbing'}`}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setLightboxZoomed(!lightboxZoomed);
+                                    }}
                                 >
-                                    <img
+                                    <motion.img
+                                        animate={{ scale: lightboxZoomed ? 1.5 : 1 }}
+                                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
                                         src={allImages[lightboxIndex]}
                                         className="max-w-full max-h-full rounded-2xl shadow-2xl object-contain selection:bg-transparent pointer-events-none"
                                     />
