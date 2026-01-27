@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Sparkles, X, Maximize2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { useStore } from '../store';
 import { Button } from '../components/Components';
@@ -20,7 +20,33 @@ const ProductDetail = () => {
 
     // Gestures state
     const [initialDist, setInitialDist] = useState<number | null>(null);
+    // Gestures state
+    const [initialDist, setInitialDist] = useState<number | null>(null);
     const constraintsRef = React.useRef(null);
+    const x = useMotionValue(0);
+
+    const handleDragEnd = async () => {
+        const currentX = x.get();
+        // Use a reasonable width approximation or window width since it is fullscreen
+        const width = window.innerWidth;
+        const threshold = width * 0.25;
+        const velocity = x.getVelocity();
+
+        if (currentX < -threshold || velocity < -500) {
+            // Swipe Left -> Next
+            await animate(x, -width, { type: "spring", stiffness: 300, damping: 30 }).finished;
+            setLightboxIndex(i => (i + 1) % allImages.length);
+            x.set(0);
+        } else if (currentX > threshold || velocity > 500) {
+            // Swipe Right -> Prev
+            await animate(x, width, { type: "spring", stiffness: 300, damping: 30 }).finished;
+            setLightboxIndex(i => (i - 1 + allImages.length) % allImages.length);
+            x.set(0);
+        } else {
+            // Revert
+            animate(x, 0, { type: "spring", stiffness: 300, damping: 30 });
+        }
+    };
 
     const handleTouchStart = (e: React.TouchEvent) => {
         if (e.touches.length === 2) {
@@ -210,80 +236,66 @@ const ProductDetail = () => {
 
                         {/* Carousel Container */}
                         <div ref={constraintsRef} className="relative w-full h-full flex items-center justify-center p-4 md:p-10 pointer-events-none">
-                            <AnimatePresence initial={false} custom={direction}>
+                            {lightboxScale > 1 ? (
+                                /* Zoom Mode - Single Image Panning */
                                 <motion.div
-                                    key={lightboxIndex}
-                                    custom={direction}
-                                    variants={{
-                                        enter: (direction: number) => ({
-                                            x: direction === 0 ? 0 : (direction > 0 ? 1000 : -1000),
-                                            opacity: 0,
-                                            scale: direction === 0 ? 0.5 : 0.95
-                                        }),
-                                        center: {
-                                            zIndex: 1,
-                                            x: 0,
-                                            opacity: 1,
-                                            scale: 1
-                                        },
-                                        exit: (direction: number) => ({
-                                            zIndex: 0,
-                                            x: direction === 0 ? 0 : (direction < 0 ? 1000 : -1000),
-                                            opacity: 0,
-                                            scale: direction === 0 ? 0.5 : 0.95
-                                        })
-                                    }}
-                                    initial="enter"
-                                    animate="center"
-                                    exit="exit"
-                                    transition={{
-                                        x: { type: "spring", stiffness: 300, damping: 30 },
-                                        opacity: { duration: 0.2 }
-                                    }}
-                                    drag={lightboxScale === 1 ? "x" : true}
+                                    className="w-full h-full flex items-center justify-center"
+                                    drag
                                     dragConstraints={constraintsRef}
                                     dragElastic={0.2}
-                                    onDragEnd={(e, { offset, velocity }) => {
-                                        // When zoomed, we need a more decisive swipe to change images
-                                        const threshold = lightboxScale > 1.1 ? 200 : 50;
-                                        const velocityThreshold = 500;
-
-                                        const isSwipe = Math.abs(offset.x) > threshold || Math.abs(velocity.x) > velocityThreshold;
-
-                                        if (isSwipe) {
-                                            // Ensure the horizontal movement is more dominant than vertical for a "switch"
-                                            if (Math.abs(offset.x) > Math.abs(offset.y) * 1.2) {
-                                                if (offset.x > 0) {
-                                                    setDirection(-1);
-                                                    setLightboxIndex(prev => (prev - 1 + allImages.length) % allImages.length);
-                                                    setLightboxScale(1);
-                                                } else {
-                                                    setDirection(1);
-                                                    setLightboxIndex(prev => (prev + 1) % allImages.length);
-                                                    setLightboxScale(1);
-                                                }
-                                            }
-                                        }
-                                    }}
-                                    className={`absolute inset-0 flex items-center justify-center pointer-events-auto ${lightboxScale > 1 ? 'cursor-move' : 'cursor-grab active:cursor-grabbing'}`}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        const now = Date.now();
-                                        if (now - lastTap < 300) {
-                                            // Double tap to jump to max or reset
-                                            setLightboxScale(lightboxScale > 1.1 ? 1 : 2.5);
-                                        }
-                                        setLastTap(now);
-                                    }}
                                 >
                                     <motion.img
-                                        animate={{ scale: lightboxScale }}
-                                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
                                         src={allImages[lightboxIndex]}
                                         className="max-w-full max-h-full rounded-2xl shadow-2xl object-contain selection:bg-transparent pointer-events-none"
+                                        style={{ scale: lightboxScale }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            const now = Date.now();
+                                            if (now - lastTap < 300) {
+                                                setLightboxScale(1);
+                                            }
+                                            setLastTap(now);
+                                        }}
                                     />
                                 </motion.div>
-                            </AnimatePresence>
+                            ) : (
+                                /* Swipe Mode - 3 Panel Carousel */
+                                <motion.div
+                                    className="absolute inset-0 flex items-center justify-center cursor-grab active:cursor-grabbing"
+                                    style={{ x }}
+                                    drag="x"
+                                    dragElastic={0.2}
+                                    onDragEnd={handleDragEnd}
+                                    onClick={(e) => {
+                                        // Handle tap vs drag
+                                        if (Math.abs(x.get()) < 5) {
+                                            e.stopPropagation();
+                                            const now = Date.now();
+                                            if (now - lastTap < 300) {
+                                                setLightboxScale(2.5);
+                                            }
+                                            setLastTap(now);
+                                        }
+                                    }}
+                                >
+                                    {[-1, 0, 1].map((offset) => {
+                                        const index = (lightboxIndex + offset + allImages.length) % allImages.length;
+                                        return (
+                                            <motion.div
+                                                key={`${index}-${offset}`}
+                                                className="absolute top-0 bottom-0 w-full flex items-center justify-center p-4 md:p-10"
+                                                style={{ left: `${offset * 100}%` }}
+                                            >
+                                                <img
+                                                    src={allImages[index]}
+                                                    className="max-w-full max-h-full rounded-2xl shadow-2xl object-contain pointer-events-none"
+                                                    draggable={false}
+                                                />
+                                            </motion.div>
+                                        );
+                                    })}
+                                </motion.div>
+                            )}
                         </div>
                     </motion.div>
                 )}
