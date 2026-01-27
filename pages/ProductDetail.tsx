@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Sparkles, X, Maximize2 } from 'lucide-react';
-import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { useStore } from '../store';
 import { Button } from '../components/Components';
@@ -21,56 +21,6 @@ const ProductDetail = () => {
     // Gestures state
     const [initialDist, setInitialDist] = useState<number | null>(null);
     const constraintsRef = React.useRef(null);
-    const x = useMotionValue(0);
-    const bannerX = useMotionValue(0);
-
-    const handleBannerDragEnd = async () => {
-        const currentX = bannerX.get();
-        const width = window.innerWidth; // Or approximate container width, but checking relative screen width is usually fine for threshold
-        // Actually for the banner, the container is smaller (grid col), so we should use a smaller threshold or %
-        // But velocity check helps.
-        const velocity = bannerX.getVelocity();
-        // Since banner is roughly half screen on desktop, full screen on mobile?
-        // Let's use a fixed threshold or relative to window is fine for swipe intention.
-
-        if (currentX < -100 || velocity < -500) {
-            await animate(bannerX, -window.innerWidth, { duration: 0.2 }).finished; // Animate out
-            // Actually we just need to animate enough to look like it moved, but standard is switch index and reset x
-            // Wait, if we use % layout, 1 unit is 100% of container.
-            // Moving x by -containerWidth
-            // We can just animate x to some negative value then reset.
-            setActiveImg(i => (i + 1) % allImages.length);
-            bannerX.set(0);
-        } else if (currentX > 100 || velocity > 500) {
-            setActiveImg(i => (i - 1 + allImages.length) % allImages.length);
-            bannerX.set(0);
-        } else {
-            animate(bannerX, 0, { type: "spring", stiffness: 300, damping: 30 });
-        }
-    };
-
-    const handleDragEnd = async () => {
-        const currentX = x.get();
-        // Use a reasonable width approximation or window width since it is fullscreen
-        const width = window.innerWidth;
-        const threshold = width * 0.25;
-        const velocity = x.getVelocity();
-
-        if (currentX < -threshold || velocity < -500) {
-            // Swipe Left -> Next
-            await animate(x, -width, { type: "spring", stiffness: 300, damping: 30 }).finished;
-            setLightboxIndex(i => (i + 1) % allImages.length);
-            x.set(0);
-        } else if (currentX > threshold || velocity > 500) {
-            // Swipe Right -> Prev
-            await animate(x, width, { type: "spring", stiffness: 300, damping: 30 }).finished;
-            setLightboxIndex(i => (i - 1 + allImages.length) % allImages.length);
-            x.set(0);
-        } else {
-            // Revert
-            animate(x, 0, { type: "spring", stiffness: 300, damping: 30 });
-        }
-    };
 
     const handleTouchStart = (e: React.TouchEvent) => {
         if (e.touches.length === 2) {
@@ -128,7 +78,13 @@ const ProductDetail = () => {
             <div className="grid md:grid-cols-2 gap-12">
                 <div className="space-y-4">
                     <motion.div
-                        className="group relative aspect-square rounded-[40px] overflow-hidden shadow-soft cursor-grab active:cursor-grabbing bg-slate-50"
+                        className="group relative aspect-square rounded-[40px] overflow-hidden shadow-soft cursor-zoom-in bg-slate-50"
+                        onClick={() => {
+                            setLightboxIndex(activeImg);
+                            setDirection(0);
+                            setIsZoomed(true);
+                            setLightboxScale(1);
+                        }}
                         animate={{
                             scale: [1, 1.02, 1],
                         }}
@@ -136,46 +92,20 @@ const ProductDetail = () => {
                             duration: 4,
                             repeat: Infinity,
                             ease: "easeInOut",
+                            // Only animate breathing on mobile (no hover)
                             repeatType: "loop",
                             delay: 1,
+                            // We can use a custom property or just let it run if it's subtle enough
+                            // But usually we want to disable it if hover is possible
                         }}
                     >
-                        <motion.div
-                            className="absolute inset-0 flex items-center justify-center"
-                            style={{ x: bannerX }}
-                            drag="x"
-                            dragElastic={0.2}
-                            onDragEnd={handleBannerDragEnd}
-                            onClick={(e) => {
-                                // Simple click detection
-                                if (Math.abs(bannerX.get()) < 5) {
-                                    setLightboxIndex(activeImg);
-                                    setDirection(0);
-                                    setIsZoomed(true);
-                                    setLightboxScale(1);
-                                }
-                            }}
-                        >
-                            {[-1, 0, 1].map((offset) => {
-                                const index = (activeImg + offset + allImages.length) % allImages.length;
-                                return (
-                                    <motion.div
-                                        key={`${index}-${offset}`}
-                                        className="absolute top-0 bottom-0 w-full flex items-center justify-center"
-                                        style={{ left: `${offset * 100}%` }}
-                                    >
-                                        <motion.img
-                                            src={allImages[index]}
-                                            className="w-full h-full object-cover pointer-events-none"
-                                            whileHover={{ scale: 1.1 }}
-                                            transition={{ duration: 0.6 }}
-                                        />
-                                    </motion.div>
-                                );
-                            })}
-                        </motion.div>
-
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center pointer-events-none">
+                        <motion.img
+                            src={allImages[activeImg]}
+                            className="w-full h-full object-cover"
+                            whileHover={{ scale: 1.1 }}
+                            transition={{ duration: 0.6 }}
+                        />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
                             <div className="bg-white/90 p-3 rounded-full shadow-lg scale-0 group-hover:scale-100 md:group-hover:scale-110 transition-all duration-300">
                                 <Maximize2 className="w-6 h-6 text-wooly-pink-500" />
                             </div>
@@ -280,66 +210,80 @@ const ProductDetail = () => {
 
                         {/* Carousel Container */}
                         <div ref={constraintsRef} className="relative w-full h-full flex items-center justify-center p-4 md:p-10 pointer-events-none">
-                            {lightboxScale > 1 ? (
-                                /* Zoom Mode - Single Image Panning */
+                            <AnimatePresence initial={false} custom={direction}>
                                 <motion.div
-                                    className="w-full h-full flex items-center justify-center"
-                                    drag
+                                    key={lightboxIndex}
+                                    custom={direction}
+                                    variants={{
+                                        enter: (direction: number) => ({
+                                            x: direction === 0 ? 0 : (direction > 0 ? 1000 : -1000),
+                                            opacity: 0,
+                                            scale: direction === 0 ? 0.5 : 0.95
+                                        }),
+                                        center: {
+                                            zIndex: 1,
+                                            x: 0,
+                                            opacity: 1,
+                                            scale: 1
+                                        },
+                                        exit: (direction: number) => ({
+                                            zIndex: 0,
+                                            x: direction === 0 ? 0 : (direction < 0 ? 1000 : -1000),
+                                            opacity: 0,
+                                            scale: direction === 0 ? 0.5 : 0.95
+                                        })
+                                    }}
+                                    initial="enter"
+                                    animate="center"
+                                    exit="exit"
+                                    transition={{
+                                        x: { type: "spring", stiffness: 300, damping: 30 },
+                                        opacity: { duration: 0.2 }
+                                    }}
+                                    drag={lightboxScale === 1 ? "x" : true}
                                     dragConstraints={constraintsRef}
                                     dragElastic={0.2}
-                                >
-                                    <motion.img
-                                        src={allImages[lightboxIndex]}
-                                        className="max-w-full max-h-full rounded-2xl shadow-2xl object-contain selection:bg-transparent pointer-events-none"
-                                        style={{ scale: lightboxScale }}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            const now = Date.now();
-                                            if (now - lastTap < 300) {
-                                                setLightboxScale(1);
+                                    onDragEnd={(e, { offset, velocity }) => {
+                                        // When zoomed, we need a more decisive swipe to change images
+                                        const threshold = lightboxScale > 1.1 ? 200 : 50;
+                                        const velocityThreshold = 500;
+
+                                        const isSwipe = Math.abs(offset.x) > threshold || Math.abs(velocity.x) > velocityThreshold;
+
+                                        if (isSwipe) {
+                                            // Ensure the horizontal movement is more dominant than vertical for a "switch"
+                                            if (Math.abs(offset.x) > Math.abs(offset.y) * 1.2) {
+                                                if (offset.x > 0) {
+                                                    setDirection(-1);
+                                                    setLightboxIndex(prev => (prev - 1 + allImages.length) % allImages.length);
+                                                    setLightboxScale(1);
+                                                } else {
+                                                    setDirection(1);
+                                                    setLightboxIndex(prev => (prev + 1) % allImages.length);
+                                                    setLightboxScale(1);
+                                                }
                                             }
-                                            setLastTap(now);
-                                        }}
-                                    />
-                                </motion.div>
-                            ) : (
-                                /* Swipe Mode - 3 Panel Carousel */
-                                <motion.div
-                                    className="absolute inset-0 flex items-center justify-center cursor-grab active:cursor-grabbing"
-                                    style={{ x }}
-                                    drag="x"
-                                    dragElastic={0.2}
-                                    onDragEnd={handleDragEnd}
-                                    onClick={(e) => {
-                                        // Handle tap vs drag
-                                        if (Math.abs(x.get()) < 5) {
-                                            e.stopPropagation();
-                                            const now = Date.now();
-                                            if (now - lastTap < 300) {
-                                                setLightboxScale(2.5);
-                                            }
-                                            setLastTap(now);
                                         }
                                     }}
+                                    className={`absolute inset-0 flex items-center justify-center pointer-events-auto ${lightboxScale > 1 ? 'cursor-move' : 'cursor-grab active:cursor-grabbing'}`}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        const now = Date.now();
+                                        if (now - lastTap < 300) {
+                                            // Double tap to jump to max or reset
+                                            setLightboxScale(lightboxScale > 1.1 ? 1 : 2.5);
+                                        }
+                                        setLastTap(now);
+                                    }}
                                 >
-                                    {[-1, 0, 1].map((offset) => {
-                                        const index = (lightboxIndex + offset + allImages.length) % allImages.length;
-                                        return (
-                                            <motion.div
-                                                key={`${index}-${offset}`}
-                                                className="absolute top-0 bottom-0 w-full flex items-center justify-center p-4 md:p-10"
-                                                style={{ left: `${offset * 100}%` }}
-                                            >
-                                                <img
-                                                    src={allImages[index]}
-                                                    className="max-w-full max-h-full rounded-2xl shadow-2xl object-contain pointer-events-none"
-                                                    draggable={false}
-                                                />
-                                            </motion.div>
-                                        );
-                                    })}
+                                    <motion.img
+                                        animate={{ scale: lightboxScale }}
+                                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                        src={allImages[lightboxIndex]}
+                                        className="max-w-full max-h-full rounded-2xl shadow-2xl object-contain selection:bg-transparent pointer-events-none"
+                                    />
                                 </motion.div>
-                            )}
+                            </AnimatePresence>
                         </div>
                     </motion.div>
                 )}
