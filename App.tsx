@@ -162,6 +162,7 @@ const MobileTabBar = () => {
                   </span>
                 ) : null}
               </div>
+              <span className="text-[10px] font-bold mt-1">{tab.label}</span>
             </button>
           );
         })}
