@@ -26,14 +26,17 @@ export const useStore = create<AppState>()(
       fetchProducts: async () => {
         set({ isLoading: true });
         try {
-          const res = await fetch('/api/products');
+          // Add cache-busting timestamp
+          const res = await fetch(`/api/products?_t=${Date.now()}`);
           if (res.ok) {
             const data = await res.json();
-            set({ products: data.length > 0 ? data : MOCK_PRODUCTS });
+            // Only use MOCK_PRODUCTS if data is null/undefined, not empty array
+            set({ products: data && data.length >= 0 ? data : MOCK_PRODUCTS });
           }
         } catch (err) {
           console.error('Fetch error:', err);
-          set({ products: MOCK_PRODUCTS }); // Fallback
+          // Only fallback if fetch totally fails
+          set({ products: MOCK_PRODUCTS });
         } finally {
           set({ isLoading: false });
         }

@@ -181,7 +181,11 @@ export default function Admin() {
     try {
       const adminPass = localStorage.getItem('admin_pass') || '';
       const res = await fetch(`/api/products?id=${id}`, { method: 'DELETE', headers: { 'Authorization': adminPass } });
-      if (res.ok) { await fetchProducts(); toast.success('商品已删除'); }
+      if (res.ok) {
+        // Optimistic update using store action
+        useStore.getState().deleteProduct(id);
+        toast.success('商品已删除');
+      }
       else { toast.error('删除失败'); }
     } catch (err: any) { toast.error('删除请求异常'); }
   };
