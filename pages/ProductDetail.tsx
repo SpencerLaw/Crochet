@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Sparkles, X, Maximize2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
