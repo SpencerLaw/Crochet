@@ -20,6 +20,7 @@ const ProductDetail = () => {
 
     // Gestures state
     const [initialDist, setInitialDist] = useState<number | null>(null);
+    const constraintsRef = React.useRef(null);
 
     const handleTouchStart = (e: React.TouchEvent) => {
         if (e.touches.length === 2) {
@@ -208,7 +209,7 @@ const ProductDetail = () => {
                         </button>
 
                         {/* Carousel Container */}
-                        <div className="relative w-full h-full flex items-center justify-center p-4 md:p-10 pointer-events-none">
+                        <div ref={constraintsRef} className="relative w-full h-full flex items-center justify-center p-4 md:p-10 pointer-events-none">
                             <AnimatePresence initial={false} custom={direction}>
                                 <motion.div
                                     key={lightboxIndex}
@@ -240,8 +241,8 @@ const ProductDetail = () => {
                                         opacity: { duration: 0.2 }
                                     }}
                                     drag={lightboxScale === 1 ? "x" : true}
-                                    dragConstraints={lightboxScale === 1 ? { left: 0, right: 0 } : false}
-                                    dragElastic={lightboxScale === 1 ? 1 : 0.2}
+                                    dragConstraints={constraintsRef}
+                                    dragElastic={0.2}
                                     onDragEnd={(e, { offset, velocity }) => {
                                         // When zoomed, we need a more decisive swipe to change images
                                         const threshold = lightboxScale > 1.1 ? 200 : 50;
