@@ -137,7 +137,7 @@ const MobileTabBar = () => {
     <div className="md:hidden fixed bottom-8 left-6 right-6 z-50">
       <div className="
         flex justify-between items-center px-8 py-4
-        bg-white/5 backdrop-blur-2xl
+        bg-white/5 backdrop-blur-md
         rounded-[32px]
         shadow-lg
         border border-white/10
