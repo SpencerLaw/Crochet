@@ -137,11 +137,11 @@ const MobileTabBar = () => {
     <div className="md:hidden fixed bottom-8 left-6 right-6 z-50">
       <div className="
         flex justify-between items-center px-8 py-4
-        bg-white/60 backdrop-blur-3xl
+        bg-white/30 backdrop-blur-xl
         rounded-[32px]
-        shadow-[0_8px_32px_0_rgba(31,38,135,0.15)]
-        border border-white/50
-        ring-1 ring-white/40
+        shadow-lg
+        border border-white/30
+        ring-1 ring-white/20
       ">
         {tabs.map((tab) => {
           const isActive = location.pathname === tab.path;
