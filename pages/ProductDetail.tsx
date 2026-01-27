@@ -14,9 +14,39 @@ const ProductDetail = () => {
     const [activeImg, setActiveImg] = useState(0);
     const [lightboxIndex, setLightboxIndex] = useState(0);
     const [isZoomed, setIsZoomed] = useState(false);
-    const [lightboxZoomed, setLightboxZoomed] = useState(false);
+    const [lightboxScale, setLightboxScale] = useState(1);
     const [direction, setDirection] = useState(0);
     const [lastTap, setLastTap] = useState(0);
+
+    // Gestures state
+    const [initialDist, setInitialDist] = useState<number | null>(null);
+
+    const handleTouchStart = (e: React.TouchEvent) => {
+        if (e.touches.length === 2) {
+            const dist = Math.hypot(
+                e.touches[0].pageX - e.touches[1].pageX,
+                e.touches[0].pageY - e.touches[1].pageY
+            );
+            setInitialDist(dist);
+        }
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        if (e.touches.length === 2 && initialDist !== null) {
+            const dist = Math.hypot(
+                e.touches[0].pageX - e.touches[1].pageX,
+                e.touches[0].pageY - e.touches[1].pageY
+            );
+            const zoomDelta = dist / initialDist;
+            const newScale = Math.min(Math.max(1, lightboxScale * zoomDelta), 4);
+            setLightboxScale(newScale);
+            setInitialDist(dist);
+        }
+    };
+
+    const handleTouchEnd = () => {
+        setInitialDist(null);
+    };
 
     if (!product) return <div className="text-center py-20">商品加载中...</div>;
 
@@ -38,9 +68,9 @@ const ProductDetail = () => {
                         className="group relative aspect-square rounded-[40px] overflow-hidden shadow-soft cursor-zoom-in bg-slate-50"
                         onClick={() => {
                             setLightboxIndex(activeImg);
-                            setDirection(0); // Reset direction for initial zoom entry
+                            setDirection(0);
                             setIsZoomed(true);
-                            setLightboxZoomed(false);
+                            setLightboxScale(1);
                         }}
                         animate={{
                             scale: [1, 1.02, 1],
@@ -123,6 +153,9 @@ const ProductDetail = () => {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         className="fixed inset-0 z-[100] bg-black/98 backdrop-blur-md flex items-center justify-center overflow-hidden"
+                        onTouchStart={handleTouchStart}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleTouchEnd}
                         onClick={() => setIsZoomed(false)}
                     >
                         {/* Close Button */}
@@ -145,6 +178,7 @@ const ProductDetail = () => {
                                 e.stopPropagation();
                                 setDirection(-1);
                                 setLightboxIndex(prev => (prev - 1 + allImages.length) % allImages.length);
+                                setLightboxScale(1);
                             }}
                         >
                             <ChevronLeft className="w-8 h-8" />
@@ -155,6 +189,7 @@ const ProductDetail = () => {
                                 e.stopPropagation();
                                 setDirection(1);
                                 setLightboxIndex(prev => (prev + 1) % allImages.length);
+                                setLightboxScale(1);
                             }}
                         >
                             <ChevronLeft className="w-8 h-8 rotate-180" />
@@ -192,37 +227,37 @@ const ProductDetail = () => {
                                         x: { type: "spring", stiffness: 300, damping: 30 },
                                         opacity: { duration: 0.2 }
                                     }}
-                                    drag="x"
-                                    dragConstraints={{ left: 0, right: 0 }}
-                                    dragElastic={1}
+                                    drag={lightboxScale === 1 ? "x" : true}
+                                    dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+                                    dragElastic={lightboxScale === 1 ? 1 : 0.2}
                                     onDragEnd={(e, { offset, velocity }) => {
-                                        if (lightboxZoomed) return;
+                                        if (lightboxScale > 1.1) return;
                                         const swipe = Math.abs(offset.x) > 50 || Math.abs(velocity.x) > 500;
                                         if (swipe) {
                                             if (offset.x > 0) {
                                                 setDirection(-1);
                                                 setLightboxIndex(prev => (prev - 1 + allImages.length) % allImages.length);
+                                                setLightboxScale(1);
                                             } else {
                                                 setDirection(1);
                                                 setLightboxIndex(prev => (prev + 1) % allImages.length);
+                                                setLightboxScale(1);
                                             }
                                         }
                                     }}
-                                    className={`absolute inset-0 flex items-center justify-center pointer-events-auto ${lightboxZoomed ? 'cursor-move' : 'cursor-grab active:cursor-grabbing'}`}
+                                    className={`absolute inset-0 flex items-center justify-center pointer-events-auto ${lightboxScale > 1 ? 'cursor-move' : 'cursor-grab active:cursor-grabbing'}`}
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         const now = Date.now();
                                         if (now - lastTap < 300) {
-                                            // Double tap
-                                            setLightboxZoomed(!lightboxZoomed);
+                                            // Double tap to jump to max or reset
+                                            setLightboxScale(lightboxScale > 1.1 ? 1 : 2.5);
                                         }
                                         setLastTap(now);
                                     }}
                                 >
                                     <motion.img
-                                        drag={lightboxZoomed}
-                                        dragConstraints={{ left: -150, right: 150, top: -150, bottom: 150 }}
-                                        animate={{ scale: lightboxZoomed ? 2.5 : 1 }}
+                                        animate={{ scale: lightboxScale }}
                                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
                                         src={allImages[lightboxIndex]}
                                         className="max-w-full max-h-full rounded-2xl shadow-2xl object-contain selection:bg-transparent pointer-events-none"
