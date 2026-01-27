@@ -127,8 +127,8 @@ const MobileTabBar = () => {
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   const tabs = [
-    { id: 'home', icon: HomeIcon, label: '首页', path: '/' },
-    { id: 'shop', icon: Store, label: '商店', path: '/shop' },
+    { id: 'home', icon: HomeIcon, label: '主页', path: '/' },
+    { id: 'shop', icon: Store, label: '商品', path: '/shop' },
     { id: 'cart', icon: ShoppingBag, label: '清单', path: '/cart', badge: cartCount },
     { id: 'contact', icon: MessageCircle, label: '联系', path: '/contact' },
   ];
@@ -149,15 +149,15 @@ const MobileTabBar = () => {
             <button
               key={tab.id}
               onClick={() => navigate(tab.path)}
-              className={`relative flex flex-col items-center justify-center transition-all duration-500 ease-out ${isActive ? 'text-orange-500 scale-110 drop-shadow-sm' : 'text-gray-400 hover:text-wooly-brown'
+              className={`relative flex flex-col items-center justify-center transition-all duration-500 ease-out ${isActive ? 'text-wooly-pink-500 scale-110 drop-shadow-sm' : 'text-gray-400 hover:text-wooly-brown'
                 }`}
             >
               <div className="relative">
                 <tab.icon
-                  className={`w-7 h-7 transition-all duration-300 ${isActive ? 'fill-orange-500/20 stroke-[2.5px]' : 'stroke-[2px]'}`}
+                  className={`w-7 h-7 transition-all duration-300 ${isActive ? 'fill-wooly-pink-500/20 stroke-[2.5px]' : 'stroke-[2px]'}`}
                 />
                 {tab.badge ? (
-                  <span className="absolute -top-1.5 -right-1.5 bg-orange-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full ring-2 ring-white shadow-sm">
+                  <span className="absolute -top-1.5 -right-1.5 bg-wooly-pink-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full ring-2 ring-white shadow-sm">
                     {tab.badge}
                   </span>
                 ) : null}
