@@ -126,7 +126,7 @@ const ProductDetail = () => {
                     >
                         {/* Close Button */}
                         <button
-                            className="absolute top-6 right-6 text-white/50 hover:text-white transition-all p-2 z-[110] hover:scale-110"
+                            className="absolute top-6 right-6 text-orange-500 hover:text-orange-400 transition-all p-2 z-[110] hover:scale-110 drop-shadow-lg"
                             onClick={() => setIsZoomed(false)}
                         >
                             <X className="w-10 h-10" />
