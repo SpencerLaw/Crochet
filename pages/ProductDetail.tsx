@@ -228,7 +228,7 @@ const ProductDetail = () => {
                                         opacity: { duration: 0.2 }
                                     }}
                                     drag={lightboxScale === 1 ? "x" : true}
-                                    dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+                                    dragConstraints={lightboxScale === 1 ? { left: 0, right: 0 } : false}
                                     dragElastic={lightboxScale === 1 ? 1 : 0.2}
                                     onDragEnd={(e, { offset, velocity }) => {
                                         if (lightboxScale > 1.1) return;
