@@ -30,23 +30,40 @@ const ProductDetail = () => {
 
             <div className="grid md:grid-cols-2 gap-12">
                 <div className="space-y-4">
-                    <div
-                        className="group relative aspect-square rounded-[40px] overflow-hidden shadow-soft cursor-zoom-in"
+                    <motion.div
+                        className="group relative aspect-square rounded-[40px] overflow-hidden shadow-soft cursor-zoom-in bg-slate-50"
                         onClick={() => setIsZoomed(true)}
+                        animate={{
+                            scale: [1, 1.02, 1],
+                        }}
+                        transition={{
+                            duration: 4,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                            // Only animate breathing on mobile (no hover)
+                            repeatType: "loop",
+                            delay: 1,
+                            // We can use a custom property or just let it run if it's subtle enough
+                            // But usually we want to disable it if hover is possible
+                        }}
                     >
-                        <img src={allImages[activeImg]} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                            <div className="bg-white/90 p-3 rounded-full shadow-lg scale-0 group-hover:scale-100 transition-transform duration-300">
+                        <motion.img
+                            src={allImages[activeImg]}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        // Desktop hover is handled by CSS group-hover:scale-110 above
+                        />
+                        <div className="absolute inset-0 bg-black/0 md:group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                            <div className="bg-white/90 p-3 rounded-full shadow-lg scale-0 md:group-hover:scale-100 transition-transform duration-300">
                                 <Maximize2 className="w-6 h-6 text-wooly-pink-500" />
                             </div>
                         </div>
-                    </div>
-                    <div className="flex gap-4 overflow-x-auto pb-2">
+                    </motion.div>
+                    <div className="flex gap-4 overflow-x-auto py-4 px-2 -mx-2 hide-scrollbar">
                         {allImages.map((img, i) => (
                             <button
                                 key={i}
                                 onClick={() => setActiveImg(i)}
-                                className={`w-20 h-20 rounded-2xl overflow-hidden border-2 flex-shrink-0 transition-all ${activeImg === i ? 'border-wooly-pink-500 scale-105 shadow-md' : 'border-transparent opacity-70 hover:opacity-100'}`}
+                                className={`w-20 h-20 rounded-2xl overflow-hidden border-2 flex-shrink-0 transition-all duration-300 ${activeImg === i ? 'border-wooly-pink-500 scale-110 shadow-lg ring-4 ring-wooly-pink-50' : 'border-transparent opacity-70 hover:opacity-100 hover:scale-105'}`}
                             >
                                 <img src={img} className="w-full h-full object-cover" />
                             </button>
