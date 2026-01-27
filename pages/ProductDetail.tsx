@@ -48,6 +48,18 @@ const ProductDetail = () => {
         setInitialDist(null);
     };
 
+    // Lock body scroll when lightbox is open
+    useEffect(() => {
+        if (isZoomed) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [isZoomed]);
+
     if (!product) return <div className="text-center py-20">商品加载中...</div>;
 
     const allImages = [...new Set([product.image, ...(product.images || [])])].filter(Boolean);
