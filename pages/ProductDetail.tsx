@@ -63,7 +63,7 @@ const ProductDetail = () => {
                             <button
                                 key={i}
                                 onClick={() => setActiveImg(i)}
-                                className={`w-20 h-20 rounded-2xl overflow-hidden border-2 flex-shrink-0 transition-all duration-300 ${activeImg === i ? 'border-wooly-pink-500 scale-110 shadow-lg ring-4 ring-wooly-pink-50' : 'border-transparent opacity-70 hover:opacity-100 hover:scale-105'}`}
+                                className={`w-20 h-20 rounded-2xl overflow-hidden border-2 flex-shrink-0 transition-all duration-300 focus:outline-none ${activeImg === i ? 'border-wooly-pink-500 scale-110 shadow-lg' : 'border-transparent opacity-70 hover:opacity-100 hover:scale-105'}`}
                             >
                                 <img src={img} className="w-full h-full object-cover" />
                             </button>
