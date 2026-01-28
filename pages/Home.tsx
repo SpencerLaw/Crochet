@@ -123,6 +123,7 @@ const Home = () => {
                                     <div className="absolute inset-0 p-8 md:p-12 z-20 flex flex-col justify-end items-start text-white pointer-events-none">
                                         <div className="bg-white/10 backdrop-blur-md p-5 pb-7 rounded-[32px] border border-white/20 shadow-xl max-w-sm mb-12 md:mb-0">
                                             <h1 className="font-hand text-3xl md:text-4xl font-bold leading-[1.2] drop-shadow-lg">{banner.title}</h1>
+                                            {banner.subtitle && <p className="text-sm md:text-base text-white/90 font-medium mt-2">{banner.subtitle}</p>}
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
