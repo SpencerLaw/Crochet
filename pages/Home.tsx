@@ -120,17 +120,15 @@ const Home = () => {
                                     style={{ left: `${offset * 100}%` }}
                                 >
                                     <img src={banner.image} className="w-full h-full object-cover pointer-events-none" />
-                                    <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent pointer-events-none"></div>
-                                    <div className="absolute inset-0 p-8 md:p-12 z-20 flex flex-col justify-center items-start text-white pointer-events-none">
-                                        <div className="bg-white/10 backdrop-blur-md p-6 md:p-8 rounded-[32px] border border-white/20 shadow-xl max-w-lg">
-                                            <h1 className="font-hand text-4xl md:text-5xl font-bold leading-[1.1] whitespace-pre-line drop-shadow-lg">{banner.title}</h1>
-                                            <p className="text-lg md:text-xl text-white/90 font-medium mt-2">{banner.subtitle}</p>
+                                    <div className="absolute inset-0 p-8 md:p-12 z-20 flex flex-col justify-end items-start text-white pointer-events-none">
+                                        <div className="bg-white/10 backdrop-blur-md p-5 pb-7 rounded-[32px] border border-white/20 shadow-xl max-w-sm mb-12 md:mb-0">
+                                            <h1 className="font-hand text-3xl md:text-4xl font-bold leading-[1.2] drop-shadow-lg">{banner.title}</h1>
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     navigate(banner.id ? `/product/${banner.id}` : '/shop');
                                                 }}
-                                                className="mt-6 pointer-events-auto font-hand font-bold text-lg px-8 py-2.5 rounded-full bg-white text-wooly-brown shadow-cute hover:scale-105 transition-transform"
+                                                className="mt-4 pointer-events-auto font-hand font-bold text-base px-6 py-2 rounded-full bg-white text-wooly-brown shadow-cute hover:scale-105 transition-transform"
                                             >
                                                 立即查看
                                             </button>
@@ -143,42 +141,46 @@ const Home = () => {
                 </div>
 
                 {/* Desktop Navigation Arrows */}
-                {banners.length > 1 && (
-                    <>
-                        <button
-                            onClick={() => paginate(-1)}
-                            className="absolute left-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex"
-                        >
-                            <ChevronLeft className="w-6 h-6" />
-                        </button>
-                        <button
-                            onClick={() => paginate(1)}
-                            className="absolute right-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex"
-                        >
-                            <ChevronRight className="w-6 h-6" />
-                        </button>
-                    </>
-                )}
+                {
+                    banners.length > 1 && (
+                        <>
+                            <button
+                                onClick={() => paginate(-1)}
+                                className="absolute left-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex"
+                            >
+                                <ChevronLeft className="w-6 h-6" />
+                            </button>
+                            <button
+                                onClick={() => paginate(1)}
+                                className="absolute right-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex"
+                            >
+                                <ChevronRight className="w-6 h-6" />
+                            </button>
+                        </>
+                    )
+                }
 
                 {/* Banner Indicators - Cute Capsule Style */}
-                {banners.length > 1 && (
-                    <div className="absolute bottom-6 right-8 z-30 flex gap-1.5 items-center">
-                        {banners.map((_, idx) => (
-                            <button
-                                key={idx}
-                                onClick={() => {
-                                    setDirection(idx > currentSlide ? 1 : -1);
-                                    setCurrentSlide(idx);
-                                }}
-                                className={`h-1.5 rounded-full transition-all duration-500 ease-out shadow-sm ${currentSlide === idx
-                                    ? 'w-6 bg-wooly-pink-500 shadow-wooly-pink-300/40'
-                                    : 'w-1.5 bg-white/40 hover:bg-white/60'
-                                    }`}
-                            />
-                        ))}
-                    </div>
-                )}
-            </div>
+                {
+                    banners.length > 1 && (
+                        <div className="absolute bottom-6 right-8 z-30 flex gap-1.5 items-center">
+                            {banners.map((_, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => {
+                                        setDirection(idx > currentSlide ? 1 : -1);
+                                        setCurrentSlide(idx);
+                                    }}
+                                    className={`h-1.5 rounded-full transition-all duration-500 ease-out shadow-sm ${currentSlide === idx
+                                        ? 'w-6 bg-wooly-pink-500 shadow-wooly-pink-300/40'
+                                        : 'w-1.5 bg-white/40 hover:bg-white/60'
+                                        }`}
+                                />
+                            ))}
+                        </div>
+                    )
+                }
+            </div >
 
             <div className="relative z-10 max-w-7xl mx-auto px-6 mt-12 md:mt-16">
                 <div className="flex items-end justify-between mb-8">
@@ -190,7 +192,7 @@ const Home = () => {
                     ))}
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

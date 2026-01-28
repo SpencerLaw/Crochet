@@ -151,18 +151,10 @@ const ProductDetail = () => {
                     <div className="prose prose-stone mb-8">
                         <p className="text-gray-600 leading-relaxed">{product.description}</p>
                     </div>
-                </div>
-            </div>
-
-            {/* Floating Action Bar */}
-            <div className="fixed bottom-32 md:bottom-10 left-0 right-0 z-40 px-6 pointer-events-none">
-                <div className="max-w-3xl mx-auto bg-white/20 backdrop-blur-xl rounded-[32px] p-4 border border-white/30 shadow-2xl flex flex-col md:flex-row items-center gap-4 pointer-events-auto">
-                    <div className="flex-1 hidden md:block">
-                        <p className="font-bold text-wooly-brown truncate">{product.title}</p>
-                        <p className="text-wooly-pink-500 font-bold">${product.price.toFixed(2)}</p>
+                    <div className="mt-auto space-y-4">
+                        <Button onClick={() => { addToCart(product); toast.success('已加入清单'); }} className="w-full py-4 text-xl">加入选购清单</Button>
+                        <p className="text-center text-gray-400 text-sm flex items-center justify-center gap-2"><Sparkles className="w-4 h-4" /> 每一件均为纯手工钩织，下单后约 7-10 天发出</p>
                     </div>
-                    <Button onClick={() => { addToCart(product); toast.success('已加入清单'); }} className="w-full md:w-auto px-12 py-4 text-xl">加入选购清单</Button>
-                    <p className="md:hidden text-center text-gray-400 text-[10px] flex items-center justify-center gap-1"><Sparkles className="w-3 h-3" /> 手工钩织 7-10 天发出</p>
                 </div>
             </div>
 
