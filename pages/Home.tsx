@@ -120,16 +120,17 @@ const Home = () => {
                                     style={{ left: `${offset * 100}%` }}
                                 >
                                     <img src={banner.image} className="w-full h-full object-cover pointer-events-none" />
-                                    <div className="absolute inset-0 p-6 md:p-8 z-20 flex flex-col justify-start items-start text-white pointer-events-none">
-                                        <div className="bg-white/10 backdrop-blur-md p-4 rounded-[24px] border border-white/20 shadow-xl max-w-[240px] md:max-w-xs mt-4">
-                                            <h1 className="font-hand text-2xl md:text-3xl font-bold leading-tight drop-shadow-lg">{banner.title}</h1>
-                                            {banner.subtitle && <p className="text-[10px] md:text-sm text-white/90 font-medium mt-1 leading-relaxed">{banner.subtitle}</p>}
+                                    <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-transparent to-transparent pointer-events-none" />
+                                    <div className="absolute inset-0 p-6 md:p-10 z-20 flex flex-col justify-start items-start text-white pointer-events-none">
+                                        <div className="max-w-[240px] md:max-w-sm mt-4 md:mt-8">
+                                            <h1 className="font-hand text-3xl md:text-5xl font-bold leading-tight drop-shadow-xl">{banner.title}</h1>
+                                            {banner.subtitle && <p className="text-xs md:text-base text-white/90 font-medium mt-2 leading-relaxed drop-shadow-md">{banner.subtitle}</p>}
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     navigate(banner.id ? `/product/${banner.id}` : '/shop');
                                                 }}
-                                                className="mt-3 pointer-events-auto font-hand font-bold text-xs md:text-sm px-5 py-1.5 rounded-full bg-white text-wooly-brown shadow-cute hover:scale-105 transition-transform"
+                                                className="mt-5 pointer-events-auto font-hand font-bold text-sm md:text-base px-7 py-2 rounded-full bg-white text-wooly-brown shadow-cute hover:scale-105 transition-transform"
                                             >
                                                 立即查看
                                             </button>
