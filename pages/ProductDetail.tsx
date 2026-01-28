@@ -70,7 +70,7 @@ const ProductDetail = () => {
             {/* Floating Back Button */}
             <button
                 onClick={() => navigate(-1)}
-                className="fixed top-8 left-6 md:absolute md:top-0 md:-left-4 z-40 w-12 h-12 bg-white/60 backdrop-blur-xl rounded-full shadow-lg border border-white flex items-center justify-center text-wooly-pink-500 hover:scale-110 transition-all hover:bg-white animate-in fade-in slide-in-from-left-4 duration-500"
+                className="fixed top-8 left-6 md:absolute md:top-0 md:-left-4 z-40 w-12 h-12 bg-white/[0.05] backdrop-blur-sm rounded-full shadow-lg border border-white/20 ring-1 ring-white/10 flex items-center justify-center text-wooly-pink-500 hover:scale-110 transition-all animate-in fade-in slide-in-from-left-4 duration-500"
             >
                 <ChevronLeft className="w-6 h-6 stroke-[3px]" />
             </button>
