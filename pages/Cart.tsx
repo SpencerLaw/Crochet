@@ -51,27 +51,36 @@ const Cart = () => {
                     ))}
                 </div>
 
-                <div className="md:col-span-1">
-                    <div className="bg-white p-6 rounded-[32px] shadow-soft sticky top-24">
-                        <h3 className="font-hand text-2xl font-bold mb-6">清单汇总</h3>
-                        <div className="space-y-3 mb-6">
-                            <div className="flex justify-between text-gray-600">
-                                <span>商品数量</span>
-                                <span>{cart.reduce((a, c) => a + c.quantity, 0)} 件</span>
-                            </div>
-                            <div className="h-px bg-gray-100 my-2"></div>
-                            <div className="flex justify-between text-xl font-bold text-wooly-brown">
-                                <span>预估总价</span>
-                                <span>${total.toFixed(2)}</span>
-                            </div>
+                <div className="md:col-span-1 p-6 bg-white/20 backdrop-blur-xl rounded-[32px] border border-white/30 shadow-soft self-start sticky top-24">
+                    <h3 className="font-hand text-2xl font-bold mb-6">清单汇总</h3>
+                    <div className="space-y-3 mb-6">
+                        <div className="flex justify-between text-gray-600">
+                            <span>商品数量</span>
+                            <span>{cart.reduce((a, c) => a + c.quantity, 0)} 件</span>
                         </div>
-                        <Button className="w-full !bg-wooly-pink-500 hover:!bg-wooly-pink-400" onClick={() => navigate('/contact')}>
-                            联系店主购买
-                        </Button>
-                        <p className="text-xs text-center text-gray-400 mt-3">
-                            *最终价格以定制需求确认后为准
-                        </p>
+                        <div className="h-px bg-gray-100/50 my-2"></div>
+                        <div className="flex justify-between text-xl font-bold text-wooly-brown">
+                            <span>预估总价</span>
+                            <span>${total.toFixed(2)}</span>
+                        </div>
                     </div>
+                    <Button className="w-full !bg-wooly-pink-500 hover:!bg-wooly-pink-400" onClick={() => navigate('/contact')}>
+                        联系店主购买
+                    </Button>
+                    <p className="text-xs text-center text-gray-400 mt-3">
+                        *最终价格以定制需求确认后为准
+                    </p>
+                </div>
+            </div>
+
+            {/* Mobile Floating Checkout Bar */}
+            <div className="fixed bottom-32 left-0 right-0 z-40 px-6 md:hidden pointer-events-none">
+                <div className="bg-white/20 backdrop-blur-xl rounded-[32px] p-4 border border-white/30 shadow-2xl flex items-center justify-between pointer-events-auto">
+                    <div>
+                        <p className="text-xs text-gray-500">预估总计</p>
+                        <p className="text-xl font-bold text-wooly-pink-500">${total.toFixed(2)}</p>
+                    </div>
+                    <Button onClick={() => navigate('/contact')} className="px-8 py-3">去下单</Button>
                 </div>
             </div>
         </div>

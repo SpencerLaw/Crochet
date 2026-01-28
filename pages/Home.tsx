@@ -122,22 +122,19 @@ const Home = () => {
                                     <img src={banner.image} className="w-full h-full object-cover pointer-events-none" />
                                     <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent pointer-events-none"></div>
                                     <div className="absolute inset-0 p-8 md:p-12 z-20 flex flex-col justify-center items-start text-white pointer-events-none">
-                                        <h1 className="font-hand text-4xl md:text-5xl font-bold leading-[1.1] whitespace-pre-line drop-shadow-lg">{banner.title}</h1>
-                                        <p className="text-lg md:text-xl text-white/90 font-medium max-w-lg mt-2">{banner.subtitle}</p>
-                                        <button
-                                            onClick={(e) => {
-                                                // We need to stop propagation only if dragging didn't occur?
-                                                // Actually since button is pointer-events-auto inside pointer-events-none container?
-                                                // Wait, the parent motion.div has cursor-grab.
-                                                // We need the button to be interactive.
-                                                // In the new structure, we can make the content overlay have pointer-events-auto for specific elements?
-                                                e.stopPropagation();
-                                                navigate(banner.id ? `/product/${banner.id}` : '/shop');
-                                            }}
-                                            className="mt-6 pointer-events-auto font-hand font-bold text-lg px-8 py-2.5 rounded-full bg-white text-wooly-brown shadow-cute hover:scale-105 transition-transform"
-                                        >
-                                            立即查看
-                                        </button>
+                                        <div className="bg-white/10 backdrop-blur-md p-6 md:p-8 rounded-[32px] border border-white/20 shadow-xl max-w-lg">
+                                            <h1 className="font-hand text-4xl md:text-5xl font-bold leading-[1.1] whitespace-pre-line drop-shadow-lg">{banner.title}</h1>
+                                            <p className="text-lg md:text-xl text-white/90 font-medium mt-2">{banner.subtitle}</p>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    navigate(banner.id ? `/product/${banner.id}` : '/shop');
+                                                }}
+                                                className="mt-6 pointer-events-auto font-hand font-bold text-lg px-8 py-2.5 rounded-full bg-white text-wooly-brown shadow-cute hover:scale-105 transition-transform"
+                                            >
+                                                立即查看
+                                            </button>
+                                        </div>
                                     </div>
                                 </motion.div>
                             );

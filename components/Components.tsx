@@ -79,9 +79,9 @@ interface CategoryBadgeProps {
 export const CategoryBadge: React.FC<CategoryBadgeProps> = ({ active, label, onClick }) => (
   <button
     onClick={onClick}
-    className={`px-6 py-2 rounded-full font-hand text-lg transition-all ${active
-      ? 'bg-orange-400 text-white shadow-cute transform -translate-y-1'
-      : 'bg-white text-wooly-brown hover:bg-orange-100'
+    className={`px-6 py-2 rounded-full font-hand text-lg transition-all border ${active
+      ? 'bg-orange-400 text-white shadow-cute transform -translate-y-1 border-orange-300'
+      : 'bg-white/40 backdrop-blur-md text-wooly-brown hover:bg-white/60 border-white/40'
       }`}
   >
     {label}
