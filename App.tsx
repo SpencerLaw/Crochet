@@ -31,22 +31,17 @@ const ScrollToTop = () => {
 // --- LAYOUTS ---
 
 const UserLayout = () => {
-  const location = useLocation();
-  const isContactPage = location.pathname === '/contact';
-
   return (
     <div className="min-h-screen font-sans text-wooly-brown selection:bg-orange-200 flex flex-col">
-      {!isContactPage && <Navbar />}
-      {!isContactPage && <MobileHeader />}
+      <Navbar />
+      <MobileHeader />
       <main className="flex-1">
         <Outlet />
       </main>
       <MobileTabBar />
-      {!isContactPage && (
-        <footer className="mt-auto py-10 text-center text-wooly-brown/60 text-sm pb-32 md:pb-10">
-          <p className="font-hand text-lg">© 2026 董董手作. 用爱手工钩织 🧡</p>
-        </footer>
-      )}
+      <footer className="mt-auto py-10 text-center text-wooly-brown/60 text-sm pb-32 md:pb-10">
+        <p className="font-hand text-lg">© 2026 董董手作. 用爱手工钩织 🧡</p>
+      </footer>
     </div>
   );
 };

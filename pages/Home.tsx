@@ -120,18 +120,16 @@ const Home = () => {
                                     style={{ left: `${offset * 100}%` }}
                                 >
                                     <img src={banner.image} className="w-full h-full object-cover pointer-events-none" />
-                                    <div className="absolute inset-x-0 bottom-0 z-20 p-6 md:p-10 pointer-events-none">
-                                        <div className="bg-white/10 backdrop-blur-md p-4 md:p-6 rounded-[24px] border border-white/20 shadow-xl flex items-center justify-between gap-4 pointer-events-auto">
-                                            <div className="flex flex-col max-w-[60%] md:max-w-[70%] text-white">
-                                                <h1 className="font-hand text-2xl md:text-3xl font-bold leading-tight drop-shadow-lg truncate">{banner.title}</h1>
-                                                {banner.subtitle && <p className="text-xs md:text-sm text-white/80 font-medium truncate mt-0.5 line-clamp-1">{banner.subtitle}</p>}
-                                            </div>
+                                    <div className="absolute inset-0 p-6 md:p-8 z-20 flex flex-col justify-start items-start text-white pointer-events-none">
+                                        <div className="bg-white/10 backdrop-blur-md p-4 rounded-[24px] border border-white/20 shadow-xl max-w-[240px] md:max-w-xs mt-4">
+                                            <h1 className="font-hand text-2xl md:text-3xl font-bold leading-tight drop-shadow-lg">{banner.title}</h1>
+                                            {banner.subtitle && <p className="text-[10px] md:text-sm text-white/90 font-medium mt-1 leading-relaxed">{banner.subtitle}</p>}
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     navigate(banner.id ? `/product/${banner.id}` : '/shop');
                                                 }}
-                                                className="shrink-0 font-hand font-bold text-sm md:text-base px-6 py-2 rounded-full bg-white text-wooly-brown shadow-cute hover:scale-105 transition-transform"
+                                                className="mt-3 pointer-events-auto font-hand font-bold text-xs md:text-sm px-5 py-1.5 rounded-full bg-white text-wooly-brown shadow-cute hover:scale-105 transition-transform"
                                             >
                                                 立即查看
                                             </button>
