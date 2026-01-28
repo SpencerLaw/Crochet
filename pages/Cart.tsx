@@ -53,10 +53,22 @@ const Cart = () => {
 
                 <div className="md:col-span-1">
                     <div className="bg-white/20 backdrop-blur-xl p-6 rounded-[32px] border border-white/30 shadow-soft sticky top-24">
+                        <h3 className="font-hand text-2xl font-bold mb-6">清单汇总</h3>
+                        <div className="space-y-3 mb-6">
+                            <div className="flex justify-between text-sm text-gray-600">
+                                <span>商品数量</span>
+                                <span>{cart.reduce((a, c) => a + c.quantity, 0)} 件</span>
+                            </div>
+                            <div className="h-px bg-gray-100/50 my-2"></div>
+                            <div className="flex justify-between text-xl font-bold text-wooly-brown">
+                                <span>预估总价</span>
+                                <span className="text-wooly-pink-500">${total.toFixed(2)}</span>
+                            </div>
+                        </div>
                         <Button className="w-full !bg-wooly-pink-500 hover:!bg-wooly-pink-400" onClick={() => navigate('/contact')}>
                             联系店主开始定制
                         </Button>
-                        <p className="text-xs text-center text-gray-400 mt-4 px-2">
+                        <p className="text-[10px] text-center text-gray-400 mt-4 px-2">
                             截图清单发送给店主<br />进行最终确认与定制
                         </p>
                     </div>
