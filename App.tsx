@@ -46,67 +46,12 @@ const UserLayout = () => {
 };
 
 const AdminLayout = ({ isAuthenticated, onLogout }: { isAuthenticated: boolean; onLogout: () => void }) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   if (!isAuthenticated) return <Navigate to="/admin/login" replace />;
 
-  const navLinks = [
-    { to: "/admin", icon: LayoutDashboard, label: "控制台" },
-    { to: "/", icon: Globe, label: "返回前台" },
-  ];
-
   return (
-    <div className="min-h-screen bg-[#F1F5F9] flex flex-col md:flex-row font-sans text-slate-800">
-      {/* Mobile Header */}
-      <div className="md:hidden bg-white border-b border-slate-200 p-4 flex items-center justify-between sticky top-0 z-50">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">H</div>
-          <span className="font-bold tracking-tight">Hook Admin</span>
-        </div>
-        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 text-slate-500">
-          {isMobileMenuOpen ? <X /> : <Menu />}
-        </button>
-      </div>
-
-      {/* Mobile Nav Dropdown */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-slate-200 p-4 flex flex-col gap-2 animate-in slide-in-from-top-4">
-          {navLinks.map(link => (
-            <Link key={link.to} to={link.to} onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg text-slate-600 font-semibold">
-              <link.icon className="w-5 h-5" /> {link.label}
-            </Link>
-          ))}
-          <button onClick={onLogout} className="flex items-center gap-3 p-3 text-red-500 font-semibold border-t mt-2 pt-4">
-            <LogoutIcon className="w-5 h-5" /> 退出登录
-          </button>
-        </div>
-      )}
-
-      {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-64 bg-white border-r border-slate-200 p-6 flex-col gap-8 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">H</div>
-          <span className="font-bold text-xl tracking-tight">Hook Admin</span>
-        </div>
-
-        <nav className="flex flex-col gap-2">
-          {navLinks.map(link => (
-            <Link key={link.to} to={link.to} className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 text-slate-600 font-semibold transition-colors">
-              <link.icon className="w-5 h-5" /> {link.label}
-            </Link>
-          ))}
-        </nav>
-
-        <div className="mt-auto border-t pt-6">
-          <button onClick={onLogout} className="flex items-center gap-3 p-3 w-full text-slate-400 hover:text-red-500 transition-colors font-semibold">
-            <LogoutIcon className="w-5 h-5" /> 退出登录
-          </button>
-        </div>
-      </aside>
-
-      <main className="flex-1 p-4 md:p-10 overflow-y-auto">
-        <div className="max-w-6xl mx-auto">
-          <Outlet />
-        </div>
+    <div className="min-h-screen bg-wooly-cream/30 font-sans text-wooly-brown">
+      <main className="flex-1 overflow-visible">
+        <Outlet />
       </main>
     </div>
   );

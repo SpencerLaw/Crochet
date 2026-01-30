@@ -7,15 +7,32 @@ body {
   color: #5D4037;
 }
 
-/* Hide scrollbars for Chrome, Safari and Opera */
+/* Cute Wooly Scrollbars */
 ::-webkit-scrollbar {
-  display: none;
+  width: 10px;
+  height: 10px;
 }
 
-/* Hide scrollbars for IE, Edge and Firefox */
+::-webkit-scrollbar-track {
+  background: #FFF5E1;
+  /* wooly-cream */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #FFD1DC;
+  /* wooly-pink-200 */
+  border: 3px solid #FFF5E1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #FFB6C1;
+  /* wooly-pink-300 */
+}
+
+/* Firefox */
 * {
-  -ms-overflow-style: none;
-  /* IE and Edge */
-  scrollbar-width: none;
-  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: #FFD1DC #FFF5E1;
 }

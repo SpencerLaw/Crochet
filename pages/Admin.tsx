@@ -268,10 +268,18 @@ export default function Admin() {
 
             <button
               onClick={() => setIsCategoryModalOpen(true)}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold shadow-sm hover:bg-slate-50 transition-all active:scale-95"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 bg-white border-2 border-wooly-cream text-wooly-brown rounded-2xl font-bold shadow-sm hover:bg-wooly-cream/20 transition-all active:scale-95 font-hand"
             >
-              <Settings className="w-5 h-5 text-pink-600" />
-              <span>分类与排序</span>
+              <LayoutGrid className="w-5 h-5 text-wooly-pink-400" />
+              <span>分类管理</span>
+            </button>
+
+            <button
+              onClick={() => setIsSortingModalOpen(true)}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 bg-white border-2 border-wooly-cream text-wooly-brown rounded-2xl font-bold shadow-sm hover:bg-wooly-cream/20 transition-all active:scale-95 font-hand"
+            >
+              <Settings className="w-5 h-5 text-wooly-pink-400" />
+              <span>首页排序</span>
             </button>
 
             <button
