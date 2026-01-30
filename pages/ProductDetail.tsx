@@ -129,25 +129,6 @@ const ProductDetail = () => {
                     <h1 className="font-hand text-5xl font-bold text-wooly-brown mb-4">{product.title}</h1>
                     <p className="text-3xl font-bold text-wooly-pink-500 mb-6">${product.price.toFixed(2)}</p>
 
-                    <div className="flex flex-wrap gap-4 mb-8">
-                        {product.colors && product.colors.length > 0 && (
-                            <div className="flex flex-col gap-1">
-                                <span className="text-[10px] uppercase font-bold text-gray-400">可选颜色</span>
-                                <div className="flex Slab-serif transition-colors gap-2">
-                                    {product.colors.map(c => <span key={c} className="px-3 py-1 bg-gray-100 rounded-full text-xs font-bold">{c}</span>)}
-                                </div>
-                            </div>
-                        )}
-                        {product.sizes && product.sizes.length > 0 && (
-                            <div className="flex flex-col gap-1">
-                                <span className="text-[10px] uppercase font-bold text-gray-400">参考尺寸</span>
-                                <div className="flex gap-2">
-                                    {product.sizes.map(s => <span key={s} className="px-3 py-1 bg-wooly-cream rounded-full text-xs font-bold">{s}</span>)}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
                     <div className="prose prose-stone mb-8">
                         <p className="text-gray-600 leading-relaxed">{product.description}</p>
                     </div>
@@ -288,7 +269,7 @@ const ProductDetail = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </div>
+        </div >
     );
 };
 

@@ -19,8 +19,6 @@ const Shop = () => {
             p.title.toLowerCase().includes(searchLower) ||
             p.description.toLowerCase().includes(searchLower) ||
             p.category.toLowerCase().includes(searchLower) ||
-            p.colors?.some(c => c.toLowerCase().includes(searchLower)) ||
-            p.sizes?.some(s => s.toLowerCase().includes(searchLower)) ||
             p.tags?.some(t => t.toLowerCase().includes(searchLower));
 
         return matchesCategory && matchesSearch;

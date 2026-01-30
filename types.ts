@@ -12,8 +12,6 @@ export interface Product {
   is_banner: boolean;
   banner_text?: string;
   // New precision attributes
-  colors?: string[];
-  sizes?: string[];
   materials?: string[];
   created_at?: string;
 }

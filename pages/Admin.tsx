@@ -7,7 +7,7 @@ import { uploadImage } from '../services/imageService';
 import { toast } from 'react-hot-toast';
 import {
   ShoppingBag, LogOut, Plus, Search, Menu, X,
-  Trash2, Edit, Upload, Filter, MoreHorizontal, LayoutGrid
+  Trash2, Edit, Upload, Filter, MoreHorizontal, LayoutGrid, ChevronLeft, ChevronRight
 } from 'lucide-react';
 
 // --- COMPONENTS ---
@@ -51,8 +51,6 @@ const INITIAL_FORM = {
   is_featured: false,
   is_banner: false,
   banner_text: '',
-  colors: '',
-  sizes: '12cm',
   tags: ''
 };
 
@@ -84,8 +82,6 @@ export default function Admin() {
       is_featured: product.is_featured || false,
       is_banner: product.is_banner || false,
       banner_text: product.banner_text || '',
-      colors: product.colors?.join(', ') || '',
-      sizes: product.sizes?.join(', ') || '',
       tags: product.tags?.join(', ') || ''
     });
     setIsModalOpen(true);
@@ -136,17 +132,19 @@ export default function Admin() {
     setFormData(prev => ({ ...prev, is_banner: checked }));
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     if (!formData.category) return toast.error('请选择商品分类');
     if (formData.images.length === 0) return toast.error('请上传商品图片');
 
+    setIsSubmitting(true);
     const productPayload = {
       ...formData,
       image: formData.images[0], // Main image
       images: formData.images,   // All images
-      colors: formData.colors.split(',').map(s => s.trim()).filter(Boolean),
-      sizes: formData.sizes.split(',').map(s => s.trim()).filter(Boolean),
       tags: formData.tags.split(',').map(s => s.trim()).filter(Boolean),
       stock: 999 // Default high stock as requested to ignore inventory
     };
@@ -173,6 +171,8 @@ export default function Admin() {
       }
     } catch (err: any) {
       toast.error(`网络错误: ${err.message}`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -431,24 +431,6 @@ export default function Admin() {
                 {CATEGORIES.filter(c => c !== Category.ALL).map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </InputGroup>
-            <div className="grid grid-cols-2 gap-4">
-              <InputGroup label="颜色">
-                <input
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-base outline-none focus:border-indigo-500"
-                  placeholder="如: 蓝色"
-                  value={formData.colors}
-                  onChange={e => setFormData({ ...formData, colors: e.target.value })}
-                />
-              </InputGroup>
-              <InputGroup label="尺寸">
-                <input
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-base outline-none focus:border-indigo-500"
-                  placeholder="如: 15cm"
-                  value={formData.sizes}
-                  onChange={e => setFormData({ ...formData, sizes: e.target.value })}
-                />
-              </InputGroup>
-            </div>
           </div>
 
           <InputGroup label="商品描述" required>
@@ -488,13 +470,44 @@ export default function Admin() {
                 {formData.images.map((url, i) => (
                   <div key={url} className="w-20 h-20 rounded-lg border border-slate-200 overflow-hidden relative shrink-0 group shadow-sm hover:shadow-md transition-all">
                     <img src={url} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-slate-900/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-[1px]">
+                    <div className="absolute inset-0 bg-slate-900/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-[1px] gap-1">
+                      <div className="flex gap-1">
+                        {i > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newImages = [...formData.images];
+                              [newImages[i - 1], newImages[i]] = [newImages[i], newImages[i - 1]];
+                              setFormData({ ...formData, images: newImages });
+                            }}
+                            className="p-1 bg-white/20 hover:bg-white/40 rounded text-white transition-colors"
+                            title="左移"
+                          >
+                            <ChevronLeft className="w-4 h-4" />
+                          </button>
+                        )}
+                        {i < formData.images.length - 1 && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newImages = [...formData.images];
+                              [newImages[i + 1], newImages[i]] = [newImages[i], newImages[i + 1]];
+                              setFormData({ ...formData, images: newImages });
+                            }}
+                            className="p-1 bg-white/20 hover:bg-white/40 rounded text-white transition-colors"
+                            title="右移"
+                          >
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
                       <button
                         type="button"
                         onClick={() => setFormData(p => ({ ...p, images: p.images.filter((_, idx) => idx !== i) }))}
-                        className="text-white hover:text-red-400 transition-colors"
+                        className="p-1 bg-white/20 hover:bg-red-500/60 rounded text-white transition-colors"
+                        title="删除"
                       >
-                        <Trash2 className="w-5 h-5" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
@@ -533,16 +546,20 @@ export default function Admin() {
             </button>
             <button
               type="submit"
-              disabled={isUploading || formData.images.length === 0}
+              disabled={isUploading || isSubmitting || formData.images.length === 0}
               className="px-6 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-base font-semibold shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/40 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              <Plus className="w-4 h-4" />
-              <span>{editingId ? '保存修改' : '发布商品'}</span>
+              {isSubmitting ? (
+                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+              ) : (
+                <Plus className="w-4 h-4" />
+              )}
+              <span>{isSubmitting ? '保存中...' : (editingId ? '保存修改' : '发布商品')}</span>
             </button>
           </div>
         </form>
       </Modal>
-    </div>
+    </div >
   );
 }
 
