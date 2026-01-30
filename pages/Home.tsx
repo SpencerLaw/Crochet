@@ -134,11 +134,15 @@ const Home = () => {
                             const index = (currentSlide + offset + banners.length) % banners.length;
                             const banner = banners[index];
 
-                            // 3D Transformation for each card
-                            const rotateY = useTransform(dragProgress, (p) => (offset + p) * -45);
-                            const scale = useTransform(dragProgress, (p) => 1 - Math.abs(offset + p) * 0.15);
-                            const opacity = useTransform(dragProgress, (p) => 1 - Math.abs(offset + p) * 0.6);
-                            const z = useTransform(dragProgress, (p) => Math.abs(offset + p) * -200);
+                            // 3D Transformation for seamless hinged folding
+                            const rotateY = useTransform(dragProgress, (p) => (offset + p) * -60);
+                            const scale = useTransform(dragProgress, (p) => 1 - Math.abs(offset + p) * 0.1);
+                            const opacity = useTransform(dragProgress, (p) => 1 - Math.pow(Math.abs(offset + p), 2) * 0.7);
+                            const z = useTransform(dragProgress, (p) => Math.abs(offset + p) * -100);
+
+                            // The "hinge" logic: left items hinge on their right edge, right items on their left edge.
+                            // The center item hinges on whichever side is interacting with the neighbor.
+                            const transformOrigin = offset === -1 ? 'right' : offset === 1 ? 'left' : (dragProgress.get() > 0 ? 'left' : 'right');
 
                             return (
                                 <motion.div
@@ -150,8 +154,9 @@ const Home = () => {
                                         scale,
                                         opacity,
                                         z,
+                                        transformOrigin,
                                         transformStyle: "preserve-3d",
-                                        perspective: "1000px"
+                                        perspective: "1200px"
                                     }}
                                 >
                                     <img src={banner.image} className="w-full h-full object-cover pointer-events-none" />
