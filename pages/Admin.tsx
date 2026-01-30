@@ -652,7 +652,7 @@ export default function Admin() {
           </div>
 
           <p className="text-xs text-slate-400 italic">
-            提示：删除分类不会删除关联的商品，但该商品将失去分类标签。
+            提示：只有在这个列表中存在的分类，才会出现在商品编辑的下拉框里。
           </p>
         </div>
       </Modal>
