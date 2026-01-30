@@ -9,17 +9,18 @@ const Shop = () => {
     const [activeCategory, setActiveCategory] = useState<string>('全部');
     const [searchTerm, setSearchTerm] = useState("");
 
-    const filteredProducts = products.filter(p => {
-        const matchesCategory = activeCategory === '全部' || p.category === activeCategory;
+    const sortedProducts = [...filteredProducts].sort((a, b) => {
+        // Group by category sort_order
+        const catA = categories.find(c => c.name === a.category);
+        const catB = categories.find(c => c.name === b.category);
 
-        const searchLower = searchTerm.toLowerCase();
-        const matchesSearch =
-            p.title.toLowerCase().includes(searchLower) ||
-            p.description.toLowerCase().includes(searchLower) ||
-            p.category.toLowerCase().includes(searchLower) ||
-            p.tags?.some(t => t.toLowerCase().includes(searchLower));
+        const orderA = catA ? (catA.sort_order ?? 999) : 999;
+        const orderB = catB ? (catB.sort_order ?? 999) : 999;
 
-        return matchesCategory && matchesSearch;
+        if (orderA !== orderB) return orderA - orderB;
+
+        // Secondary sort: title
+        return a.title.localeCompare(b.title);
     });
 
     return (
@@ -58,9 +59,9 @@ const Shop = () => {
             </div>
 
             {/* Grid */}
-            {filteredProducts.length > 0 ? (
+            {sortedProducts.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {filteredProducts.map(p => (
+                    {sortedProducts.map(p => (
                         <ProductCard
                             key={p.id}
                             product={p}

@@ -193,13 +193,13 @@ const Home = () => {
                         <>
                             <button
                                 onClick={() => paginate(-1)}
-                                className="absolute left-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 bg-white/40 hover:bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-wooly-brown/80 border border-white/30 shadow-lg ring-1 ring-black/5 opacity-80 md:opacity-0 group-hover:opacity-100 transition-all duration-300 flex hover:scale-110 active:scale-95"
+                                className="absolute left-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 bg-white/40 hover:bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-wooly-brown/80 border border-white/30 shadow-lg ring-1 ring-black/5 opacity-0 group-hover:opacity-100 transition-all duration-300 hidden md:flex hover:scale-110 active:scale-95"
                             >
                                 <ChevronLeft className="w-6 h-6" />
                             </button>
                             <button
                                 onClick={() => paginate(1)}
-                                className="absolute right-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 bg-white/40 hover:bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-wooly-brown/80 border border-white/30 shadow-lg ring-1 ring-black/5 opacity-80 md:opacity-0 group-hover:opacity-100 transition-all duration-300 flex hover:scale-110 active:scale-95"
+                                className="absolute right-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 bg-white/40 hover:bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-wooly-brown/80 border border-white/30 shadow-lg ring-1 ring-black/5 opacity-0 group-hover:opacity-100 transition-all duration-300 hidden md:flex hover:scale-110 active:scale-95"
                             >
                                 <ChevronRight className="w-6 h-6" />
                             </button>
