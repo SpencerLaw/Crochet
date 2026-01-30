@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Package, Search } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useStore } from '../store';
-import { CategoryBadge, ProductCard } from '../components/Components';
+import { CategoryBadge, ProductCard, SectionHeader } from '../components/Components';
 
 const Shop = () => {
     const { products, addToCart, categories } = useStore();
@@ -82,10 +82,7 @@ const Shop = () => {
 
                                 return (
                                     <div key={cat.id} className="space-y-6">
-                                        <div className="flex items-center gap-4 bg-rose-50 p-4 rounded-xl border border-rose-100">
-                                            <h2 className="text-2xl md:text-3xl font-bold text-rose-800 font-hand">{cat.name}</h2>
-                                            <div className="h-px bg-rose-200 flex-grow"></div>
-                                        </div>
+                                        <SectionHeader title={cat.name} />
                                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                                             {catProducts.map(p => (
                                                 <ProductCard
@@ -115,10 +112,7 @@ const Shop = () => {
 
                                 return (
                                     <div className="space-y-6">
-                                        <div className="flex items-center gap-4">
-                                            <h2 className="text-2xl md:text-3xl font-bold text-gray-400 font-hand">未分类 / 其他</h2>
-                                            <div className="h-px bg-gray-200 flex-grow"></div>
-                                        </div>
+                                        <SectionHeader title="未分类 / 其他" />
                                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                                             {otherProducts.map(p => (
                                                 <ProductCard

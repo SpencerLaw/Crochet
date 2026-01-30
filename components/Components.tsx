@@ -87,3 +87,17 @@ export const CategoryBadge: React.FC<CategoryBadgeProps> = ({ active, label, onC
     {label}
   </button>
 );
+
+interface SectionHeaderProps {
+  title: string;
+}
+
+export const SectionHeader: React.FC<SectionHeaderProps> = ({ title }) => (
+  <div className="inline-flex items-center px-6 py-2 bg-wooly-pink-100/50 rounded-2xl border-2 border-dashed border-wooly-pink-300 relative group overflow-hidden">
+    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+    <Sparkles className="w-5 h-5 text-wooly-pink-500 mr-2 group-hover:rotate-12 transition-transform" />
+    <h2 className="text-2xl md:text-3xl font-bold text-wooly-brown font-hand drop-shadow-sm select-none">
+      {title}
+    </h2>
+  </div>
+);
