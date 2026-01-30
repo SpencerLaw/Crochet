@@ -632,10 +632,10 @@ export default function Admin() {
             </button>
           </div>
 
-          <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
+          <div className="flex flex-wrap gap-2 max-h-60 overflow-y-auto pr-2">
             {categories.map((cat) => (
-              <div key={cat.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100 group">
-                <span className="font-medium text-slate-700">{cat.name}</span>
+              <div key={cat.id} className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100/80 text-slate-700 rounded-full border border-slate-200 group hover:bg-slate-200/80 transition-all">
+                <span className="text-sm font-semibold">{cat.name}</span>
                 <button
                   onClick={async () => {
                     if (window.confirm(`确定要删除分类 "${cat.name}" 吗？`)) {
@@ -643,12 +643,16 @@ export default function Admin() {
                       toast.success('分类已删除');
                     }
                   }}
-                  className="p-1.5 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+                  className="p-0.5 text-slate-400 hover:text-red-500 transition-colors"
+                  title="删除"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <X className="w-3.5 h-3.5" />
                 </button>
               </div>
             ))}
+            {categories.length === 0 && (
+              <p className="text-sm text-slate-400 py-4 w-full text-center">暂无分类，请在上方添加</p>
+            )}
           </div>
 
           <p className="text-xs text-slate-400 italic">
