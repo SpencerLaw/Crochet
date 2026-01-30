@@ -227,7 +227,7 @@ export default function Admin() {
     <div className="min-h-screen bg-slate-50/50 font-sans text-slate-900">
 
       {/* --- TOP NAVBAR --- */}
-      <header className="h-16 bg-white border-b border-slate-200 px-4 md:px-10 flex items-center justify-between sticky top-0 z-40 shadow-sm">
+      <header className="h-16 bg-white/70 backdrop-blur-xl border-b border-slate-200/50 px-4 md:px-10 flex items-center justify-between sticky top-0 z-40 shadow-sm">
         <div className="flex items-center gap-2 md:gap-3">
           <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold shadow-md shadow-indigo-500/20 shrink-0">H</div>
           <span className="font-bold text-xl md:text-2xl tracking-tight text-slate-800 truncate">Hook 后台</span>

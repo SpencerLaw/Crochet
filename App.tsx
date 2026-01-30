@@ -189,7 +189,7 @@ const Navbar = () => {
   // Hidden on mobile (md:block) to prevent blocking content
   return (
     <nav className="hidden md:block sticky top-4 z-50 mx-4">
-      <div className="bg-white/20 backdrop-blur-xl rounded-full shadow-soft px-6 py-3 flex items-center justify-between max-w-7xl mx-auto border border-white/30">
+      <div className="bg-white/10 backdrop-blur-md rounded-full shadow-soft px-8 py-3 flex items-center justify-between max-w-7xl mx-auto border border-white/20 ring-1 ring-white/5">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
           <div className="w-10 h-10 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform shadow-md overflow-hidden">
