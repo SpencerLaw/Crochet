@@ -231,7 +231,7 @@ const Home = () => {
                 <div className="flex items-end justify-between mb-8">
                     <h2 className="font-hand text-4xl font-bold text-wooly-brown mt-1">新品上架</h2>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {displayFeatured.map(p => (
                         <ProductCard key={p.id} product={p} onAddToCart={(prod) => { addToCart(prod); toast.success(`已添加 ${prod.title}!`); }} />
                     ))}

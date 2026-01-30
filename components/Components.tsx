@@ -37,8 +37,8 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
   return (
-    <div className="group bg-white rounded-[32px] p-4 shadow-soft hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-transparent hover:border-wooly-pink-100 flex flex-col h-full">
-      <Link to={`/product/${product.id}`} className="block relative overflow-hidden rounded-[24px] aspect-square mb-4 bg-gray-100 isolate">
+    <div className="group bg-white rounded-[32px] p-3 shadow-soft hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-transparent hover:border-wooly-pink-100 flex flex-col h-full">
+      <Link to={`/product/${product.id}`} className="block relative overflow-hidden rounded-[24px] aspect-square mb-3 bg-gray-100 isolate">
         <img
           src={product.image}
           alt={product.title}
