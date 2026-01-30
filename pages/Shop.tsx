@@ -69,25 +69,98 @@ const Shop = () => {
                 ))}
             </div>
 
-            {/* Grid */}
+            {/* Content Area */}
             {sortedProducts.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {sortedProducts.map(p => (
-                        <ProductCard
-                            key={p.id}
-                            product={p}
-                            onAddToCart={(prod) => {
-                                addToCart(prod);
-                                toast.success(
-                                    <div className="flex items-center gap-2">
-                                        <img src={prod.image} className="w-8 h-8 rounded-full object-cover" />
-                                        <span>已加入选购清单!</span>
+                <>
+                    {activeCategory === '全部' ? (
+                        // Sectioned View for "All"
+                        <div className="space-y-16">
+                            {categories.map(cat => {
+                                // Filter products for this category
+                                const catProducts = sortedProducts.filter(p => p.category === cat.name);
+                                if (catProducts.length === 0) return null;
+
+                                return (
+                                    <div key={cat.id} className="space-y-6">
+                                        <div className="flex items-center gap-4 bg-rose-50 p-4 rounded-xl border border-rose-100">
+                                            <h2 className="text-2xl md:text-3xl font-bold text-rose-800 font-hand">{cat.name}</h2>
+                                            <div className="h-px bg-rose-200 flex-grow"></div>
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                            {catProducts.map(p => (
+                                                <ProductCard
+                                                    key={p.id}
+                                                    product={p}
+                                                    onAddToCart={(prod) => {
+                                                        addToCart(prod);
+                                                        toast.success(
+                                                            <div className="flex items-center gap-2">
+                                                                <img src={prod.image} className="w-8 h-8 rounded-full object-cover" />
+                                                                <span>已加入选购清单!</span>
+                                                            </div>
+                                                        );
+                                                    }}
+                                                />
+                                            ))}
+                                        </div>
                                     </div>
                                 );
-                            }}
-                        />
-                    ))}
-                </div>
+                            })}
+
+                            {/* Uncategorized / Others Section */}
+                            {(() => {
+                                const knownCategories = categories.map(c => c.name);
+                                const otherProducts = sortedProducts.filter(p => !knownCategories.includes(p.category));
+                                if (otherProducts.length === 0) return null;
+
+                                return (
+                                    <div className="space-y-6">
+                                        <div className="flex items-center gap-4">
+                                            <h2 className="text-2xl md:text-3xl font-bold text-gray-400 font-hand">未分类 / 其他</h2>
+                                            <div className="h-px bg-gray-200 flex-grow"></div>
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                            {otherProducts.map(p => (
+                                                <ProductCard
+                                                    key={p.id}
+                                                    product={p}
+                                                    onAddToCart={(prod) => {
+                                                        addToCart(prod);
+                                                        toast.success(
+                                                            <div className="flex items-center gap-2">
+                                                                <img src={prod.image} className="w-8 h-8 rounded-full object-cover" />
+                                                                <span>已加入选购清单!</span>
+                                                            </div>
+                                                        );
+                                                    }}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                );
+                            })()}
+                        </div>
+                    ) : (
+                        // Simple Grid for Specific Category
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {sortedProducts.map(p => (
+                                <ProductCard
+                                    key={p.id}
+                                    product={p}
+                                    onAddToCart={(prod) => {
+                                        addToCart(prod);
+                                        toast.success(
+                                            <div className="flex items-center gap-2">
+                                                <img src={prod.image} className="w-8 h-8 rounded-full object-cover" />
+                                                <span>已加入选购清单!</span>
+                                            </div>
+                                        );
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </>
             ) : (
                 <div className="text-center py-20 opacity-50">
                     <Package className="w-16 h-16 mx-auto mb-4" />
