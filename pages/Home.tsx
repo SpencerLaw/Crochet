@@ -148,13 +148,13 @@ const Home = () => {
                         <>
                             <button
                                 onClick={() => paginate(-1)}
-                                className="absolute left-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex"
+                                className="absolute left-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 bg-white/40 hover:bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-wooly-brown/80 border border-white/30 shadow-lg ring-1 ring-black/5 opacity-0 group-hover:opacity-100 transition-all duration-300 hidden md:flex hover:scale-110 active:scale-95"
                             >
                                 <ChevronLeft className="w-6 h-6" />
                             </button>
                             <button
                                 onClick={() => paginate(1)}
-                                className="absolute right-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex"
+                                className="absolute right-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 bg-white/40 hover:bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-wooly-brown/80 border border-white/30 shadow-lg ring-1 ring-black/5 opacity-0 group-hover:opacity-100 transition-all duration-300 hidden md:flex hover:scale-110 active:scale-95"
                             >
                                 <ChevronRight className="w-6 h-6" />
                             </button>
@@ -165,7 +165,7 @@ const Home = () => {
                 {/* Banner Indicators - Cute Capsule Style */}
                 {
                     banners.length > 1 && (
-                        <div className="absolute bottom-6 right-8 z-30 flex gap-1.5 items-center">
+                        <div className="absolute bottom-6 right-8 z-30 flex gap-1.5 items-center px-3 py-2 bg-white/20 backdrop-blur-md rounded-full border border-white/30 ring-1 ring-black/5">
                             {banners.map((_, idx) => (
                                 <button
                                     key={idx}
