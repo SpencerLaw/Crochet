@@ -57,7 +57,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
         </Link>
 
         <div className="mt-auto flex items-center justify-between">
-          <span className="text-2xl font-bold text-wooly-pink-500">${product.price.toFixed(2)}</span>
+          <span className="text-2xl font-bold text-wooly-pink-500">¥{product.price.toFixed(2)}</span>
           <button
             onClick={() => onAddToCart(product)}
             className="bg-wooly-sage hover:bg-purple-200 text-wooly-brown p-3 rounded-full transition-colors shadow-sm group-hover:shadow-md"

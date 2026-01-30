@@ -127,7 +127,7 @@ const ProductDetail = () => {
                 <div className="flex flex-col">
                     <span className="text-wooly-pink-500 font-bold tracking-widest uppercase text-sm mb-2">{product.category}</span>
                     <h1 className="font-hand text-5xl font-bold text-wooly-brown mb-4">{product.title}</h1>
-                    <p className="text-3xl font-bold text-wooly-pink-500 mb-6">${product.price.toFixed(2)}</p>
+                    <p className="text-3xl font-bold text-wooly-pink-500 mb-6">¥{product.price.toFixed(2)}</p>
 
                     <div className="prose prose-stone mb-8">
                         <p className="text-gray-600 leading-relaxed">{product.description}</p>

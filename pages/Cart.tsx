@@ -35,7 +35,7 @@ const Cart = () => {
                             <img src={item.image} alt={item.title} className="w-24 h-24 rounded-2xl object-cover bg-gray-100" />
                             <div className="flex-grow">
                                 <h3 className="font-bold text-wooly-brown">{item.title}</h3>
-                                <p className="text-wooly-pink-500 font-bold">${item.price.toFixed(2)}</p>
+                                <p className="text-wooly-pink-500 font-bold">¥{item.price.toFixed(2)}</p>
                             </div>
 
                             <div className="flex items-center gap-3 bg-wooly-cream rounded-full px-3 py-1">
@@ -62,7 +62,7 @@ const Cart = () => {
                             <div className="h-px bg-gray-100/50 my-2"></div>
                             <div className="flex justify-between text-xl font-bold text-wooly-brown">
                                 <span>预估总价</span>
-                                <span className="text-wooly-pink-500">${total.toFixed(2)}</span>
+                                <span className="text-wooly-pink-500">¥{total.toFixed(2)}</span>
                             </div>
                         </div>
                         <Button className="w-full !bg-wooly-pink-500 hover:!bg-wooly-pink-400" onClick={() => navigate('/contact')}>

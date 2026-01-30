@@ -335,7 +335,7 @@ export default function Admin() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="font-bold text-slate-900 tracking-tight text-base font-mono">${p.price.toFixed(2)}</span>
+                      <span className="font-bold text-slate-900 tracking-tight text-base font-mono">¥{p.price.toFixed(2)}</span>
                     </td>
                     <td className="px-8 py-4 text-right">
                       <div className="flex items-center justify-end gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
@@ -366,7 +366,7 @@ export default function Admin() {
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start mb-1">
                     <h4 className="font-bold text-slate-900 text-base truncate">{p.title}</h4>
-                    <span className="font-mono font-bold text-indigo-600 text-base whitespace-nowrap">${p.price.toFixed(2)}</span>
+                    <span className="font-mono font-bold text-indigo-600 text-base whitespace-nowrap">¥{p.price.toFixed(2)}</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5 mb-2">
                     <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 uppercase">
@@ -448,7 +448,7 @@ export default function Admin() {
                 onChange={e => setFormData({ ...formData, title: e.target.value })}
               />
             </InputGroup>
-            <InputGroup label="价格 ($)" required>
+            <InputGroup label="价格 (¥)" required>
               <input
                 required
                 type="number"
