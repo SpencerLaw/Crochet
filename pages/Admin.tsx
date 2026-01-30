@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useStore } from '../store';
 import { Category, Product } from '../types';
 import { CATEGORIES } from '../constants';
@@ -9,6 +9,7 @@ import {
   ShoppingBag, LogOut, Plus, Search, Menu, X,
   Trash2, Edit, Upload, Filter, MoreHorizontal, LayoutGrid, ChevronLeft, ChevronRight
 } from 'lucide-react';
+import axios from 'axios';
 
 // --- COMPONENTS ---
 
@@ -69,9 +70,22 @@ export default function Admin() {
   // Form State
   const [formData, setFormData] = useState(INITIAL_FORM);
 
+  // --- UPLOAD ABORT LOGIC ---
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  const stopUploads = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setIsUploading(false);
+    setUploadProgress(0);
+  };
+
   // --- HANDLERS ---
 
   const handleEdit = (product: Product) => {
+    stopUploads();
     setEditingId(product.id);
     setFormData({
       title: product.title,
@@ -88,6 +102,7 @@ export default function Admin() {
   };
 
   const handleCreateNew = () => {
+    stopUploads();
     setEditingId(null);
     setFormData(INITIAL_FORM);
     setIsModalOpen(true);
@@ -109,14 +124,25 @@ export default function Admin() {
     setUploadProgress(0);
     const uploadedUrls: string[] = [...formData.images];
 
+    // Create new controller for this batch
+    abortControllerRef.current = new AbortController();
+
     try {
       for (let i = 0; i < files.length; i++) {
-        const url = await uploadImage(files[i], (p) => setUploadProgress(Math.round(((i / files.length) * 100) + (p / files.length))));
+        const url = await uploadImage(
+          files[i],
+          (p) => setUploadProgress(Math.round(((i / files.length) * 100) + (p / files.length))),
+          abortControllerRef.current.signal
+        );
         uploadedUrls.push(url);
       }
       setFormData(prev => ({ ...prev, images: uploadedUrls }));
       toast.success('图片上传成功');
     } catch (err: any) {
+      if (err.name === 'CanceledError' || axios.isCancel(err)) {
+        console.log('Upload aborted by user');
+        return;
+      }
       console.error(err);
       const data = err.response?.data;
       const msg = data?.message || data?.error || err.message || '上传未知错误';
@@ -395,7 +421,10 @@ export default function Admin() {
       {/* --- ADD/EDIT PRODUCT MODAL --- */}
       <Modal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          stopUploads();
+          setIsModalOpen(false);
+        }}
         title={editingId ? "编辑商品" : "发布新商品"}
       >
         <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
@@ -539,7 +568,10 @@ export default function Admin() {
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-50">
             <button
               type="button"
-              onClick={() => setIsModalOpen(false)}
+              onClick={() => {
+                stopUploads();
+                setIsModalOpen(false);
+              }}
               className="px-5 py-2.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 text-base font-medium transition-all"
             >
               取消

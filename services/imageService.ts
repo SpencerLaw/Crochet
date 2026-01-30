@@ -43,12 +43,13 @@ export const processImageForUpload = (file: File): Promise<{ image: string; file
   });
 };
 
-export const uploadImage = async (file: File, onProgress?: UploadProgressCallback): Promise<string> => {
+export const uploadImage = async (file: File, onProgress?: UploadProgressCallback, signal?: AbortSignal): Promise<string> => {
   const processed = await processImageForUpload(file);
   const adminPass = localStorage.getItem('admin_pass') || '';
 
   const response = await axios.post('/api/upload', processed, {
     headers: { 'Authorization': adminPass },
+    signal,
     onUploadProgress: (progressEvent) => {
       if (onProgress && progressEvent.total) {
         const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
