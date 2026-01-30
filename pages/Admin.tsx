@@ -35,7 +35,7 @@ const Modal = ({ isOpen, onClose, title, children }: any) => {
 const InputGroup = ({ label, required, children }: any) => (
   <div className="space-y-2">
     <label className="block text-base font-medium text-slate-700">
-      {label} {required && <span className="text-red-500">*</span>}
+      {label} {required && <span className="text-pink-500">*</span>}
     </label>
     {children}
   </div>
@@ -229,7 +229,7 @@ export default function Admin() {
       {/* --- TOP NAVBAR --- */}
       <header className="h-16 bg-white/70 backdrop-blur-xl border-b border-slate-200/50 px-4 md:px-10 flex items-center justify-between sticky top-0 z-40 shadow-sm">
         <div className="flex items-center gap-2 md:gap-3">
-          <div className="w-8 h-8 bg-rose-600 rounded-lg flex items-center justify-center text-white font-bold shadow-md shadow-rose-500/20 shrink-0">H</div>
+          <div className="w-8 h-8 bg-pink-600 rounded-lg flex items-center justify-center text-white font-bold shadow-md shadow-pink-500/20 shrink-0">H</div>
           <span className="font-bold text-xl md:text-2xl tracking-tight text-slate-800 truncate">Hook 后台</span>
           <div className="hidden sm:block h-6 w-px bg-slate-200 mx-1 md:mx-2"></div>
           <span className="hidden sm:block text-base font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">商品管理</span>
@@ -240,7 +240,7 @@ export default function Admin() {
             <span className="font-medium text-slate-700">{filteredProducts.length}</span>
             <span className="mx-1">个商品</span>
           </div>
-          <button onClick={() => window.location.href = '/admin/login'} className="flex items-center gap-2 px-2 md:px-3 py-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors text-base font-medium group">
+          <button onClick={() => window.location.href = '/admin/login'} className="flex items-center gap-2 px-2 md:px-3 py-1.5 text-slate-500 hover:text-pink-600 hover:bg-red-50 rounded-lg transition-colors text-base font-medium group">
             <LogOut className="w-4 h-4" />
             <span className="hidden xs:inline">退出登录</span>
           </button>
@@ -260,23 +260,23 @@ export default function Admin() {
               <input
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-2.5 md:py-3 text-base focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10 outline-none transition-all shadow-sm"
+                className="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-2.5 md:py-3 text-base focus:border-pink-500 focus:ring-4 focus:ring-pink-500/10 outline-none transition-all shadow-sm"
                 placeholder="搜索商品名称..."
               />
-              <Search className="absolute left-4 top-3 md:top-3.5 w-4 h-4 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
+              <Search className="absolute left-4 top-3 md:top-3.5 w-4 h-4 text-slate-400 group-focus-within:text-pink-500 transition-colors" />
             </div>
 
             <button
               onClick={() => setIsCategoryModalOpen(true)}
               className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold shadow-sm hover:bg-slate-50 transition-all active:scale-95"
             >
-              <Settings className="w-5 h-5 text-rose-600" />
+              <Settings className="w-5 h-5 text-pink-600" />
               <span>分类与排序</span>
             </button>
 
             <button
               onClick={handleCreateNew}
-              className="w-full sm:w-auto bg-rose-600 hover:bg-rose-700 text-white px-6 py-2.5 md:py-3 rounded-xl text-base font-bold shadow-lg shadow-rose-500/30 transition-all hover:-translate-y-0.5 hover:shadow-rose-500/40 flex items-center justify-center gap-2 whitespace-nowrap"
+              className="w-full sm:w-auto bg-pink-600 hover:bg-pink-700 text-white px-6 py-2.5 md:py-3 rounded-xl text-base font-bold shadow-lg shadow-pink-500/30 transition-all hover:-translate-y-0.5 hover:shadow-pink-500/40 flex items-center justify-center gap-2 whitespace-nowrap"
             >
               <PlusCircle className="w-5 h-5" />
               <span>发布新商品</span>
@@ -328,8 +328,8 @@ export default function Admin() {
                           <span className="text-sm text-slate-300 font-medium px-2">普通</span>
                         )}
                         {p.is_banner && (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-100">
-                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span> 首页横幅
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-pink-50 text-pink-700 border border-pink-100">
+                            <span className="w-1.5 h-1.5 rounded-full bg-pink-500"></span> 首页横幅
                           </span>
                         )}
                       </div>
@@ -341,11 +341,11 @@ export default function Admin() {
                       <div className="flex items-center justify-end gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => handleEdit(p)}
-                          className="p-2 bg-white border border-slate-200 text-slate-400 hover:text-rose-600 hover:border-rose-300 rounded-lg transition-all shadow-sm hover:shadow" title="编辑"
+                          className="p-2 bg-white border border-slate-200 text-slate-400 hover:text-pink-600 hover:border-pink-300 rounded-lg transition-all shadow-sm hover:shadow" title="编辑"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
-                        <button onClick={() => handleDelete(p.id)} className="p-2 bg-white border border-slate-200 text-slate-400 hover:text-red-600 hover:border-red-300 rounded-lg transition-all shadow-sm hover:shadow" title="删除">
+                        <button onClick={() => handleDelete(p.id)} className="p-2 bg-white border border-slate-200 text-slate-400 hover:text-pink-600 hover:border-red-300 rounded-lg transition-all shadow-sm hover:shadow" title="删除">
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
@@ -366,7 +366,7 @@ export default function Admin() {
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start mb-1">
                     <h4 className="font-bold text-slate-900 text-base truncate">{p.title}</h4>
-                    <span className="font-mono font-bold text-rose-600 text-base whitespace-nowrap">¥{p.price.toFixed(2)}</span>
+                    <span className="font-mono font-bold text-pink-600 text-base whitespace-nowrap">¥{p.price.toFixed(2)}</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5 mb-2">
                     <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 uppercase">
@@ -378,22 +378,22 @@ export default function Admin() {
                       </span>
                     )}
                     {p.is_banner && (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-100">
-                        <span className="w-1 h-1 rounded-full bg-rose-500"></span> 横幅
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-pink-50 text-pink-700 border border-pink-100">
+                        <span className="w-1 h-1 rounded-full bg-pink-500"></span> 横幅
                       </span>
                     )}
                   </div>
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => handleEdit(p)}
-                      className="flex items-center gap-1 text-xs font-bold text-slate-500 hover:text-rose-600 transition-colors"
+                      className="flex items-center gap-1 text-xs font-bold text-slate-500 hover:text-pink-600 transition-colors"
                     >
                       <Edit className="w-3.5 h-3.5" />
                       编辑
                     </button>
                     <button
                       onClick={() => handleDelete(p.id)}
-                      className="flex items-center gap-1 text-xs font-bold text-slate-500 hover:text-red-600 transition-colors"
+                      className="flex items-center gap-1 text-xs font-bold text-slate-500 hover:text-pink-600 transition-colors"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                       删除
@@ -442,7 +442,7 @@ export default function Admin() {
             <InputGroup label="商品名称" required>
               <input
                 required
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-base focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-base focus:bg-white focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 outline-none transition-all"
                 placeholder="输入商品名称"
                 value={formData.title}
                 onChange={e => setFormData({ ...formData, title: e.target.value })}
@@ -452,7 +452,7 @@ export default function Admin() {
               <input
                 required
                 type="number"
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-base focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-base focus:bg-white focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 outline-none transition-all"
                 placeholder="0.00"
                 value={formData.price}
                 onChange={e => setFormData({ ...formData, price: e.target.value })}
@@ -464,7 +464,7 @@ export default function Admin() {
             <InputGroup label="分类" required>
               <select
                 required
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-base focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-base focus:bg-white focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 outline-none transition-all"
                 value={formData.category}
                 onChange={e => setFormData({ ...formData, category: e.target.value })}
               >
@@ -477,7 +477,7 @@ export default function Admin() {
           <InputGroup label="商品描述" required>
             <textarea
               required
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 h-24 text-base resize-none focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all"
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 h-24 text-base resize-none focus:bg-white focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 outline-none transition-all"
               placeholder="详细描述..."
               value={formData.description}
               onChange={e => setFormData({ ...formData, description: e.target.value })}
@@ -485,17 +485,17 @@ export default function Admin() {
           </InputGroup>
 
           <InputGroup label="商品图片 (最多 6 张)" required>
-            <div className="border-2 border-dashed border-slate-200 rounded-xl p-6 md:p-8 bg-slate-50 hover:bg-white hover:border-rose-400 hover:shadow-lg transition-all text-center cursor-pointer relative group">
+            <div className="border-2 border-dashed border-slate-200 rounded-xl p-6 md:p-8 bg-slate-50 hover:bg-white hover:border-pink-400 hover:shadow-lg transition-all text-center cursor-pointer relative group">
               <input type="file" multiple accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer z-10" onChange={handleFileChange} disabled={isUploading} />
 
               {isUploading ? (
                 <div className="flex flex-col items-center gap-2">
-                  <div className="w-8 h-8 border-4 border-slate-200 border-t-rose-600 rounded-full animate-spin" />
-                  <span className="text-rose-600 text-xs font-bold uppercase tracking-wide">上传中 {uploadProgress}%</span>
+                  <div className="w-8 h-8 border-4 border-slate-200 border-t-pink-600 rounded-full animate-spin" />
+                  <span className="text-pink-600 text-xs font-bold uppercase tracking-wide">上传中 {uploadProgress}%</span>
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-3 transition-transform group-hover:-translate-y-1">
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-pink-50 text-pink-600 rounded-full flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
                     <UploadCloudIcon className="w-6 h-6" />
                   </div>
                   <div className="space-y-1">
@@ -545,7 +545,7 @@ export default function Admin() {
                       <button
                         type="button"
                         onClick={() => setFormData(p => ({ ...p, images: p.images.filter((_, idx) => idx !== i) }))}
-                        className="p-1 bg-white/20 hover:bg-red-500/60 rounded text-white transition-colors"
+                        className="p-1 bg-white/20 hover:bg-pink-500/60 rounded text-white transition-colors"
                         title="删除"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -560,13 +560,13 @@ export default function Admin() {
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 border-t border-slate-100 pt-6">
             <label className="flex items-center gap-3 cursor-pointer group">
               <div className="relative flex items-center">
-                <input type="checkbox" className="peer w-5 h-5 text-rose-600 border-slate-300 rounded focus:ring-rose-500 cursor-pointer transition-all" checked={formData.is_featured} onChange={e => setFormData({ ...formData, is_featured: e.target.checked })} />
+                <input type="checkbox" className="peer w-5 h-5 text-pink-600 border-slate-300 rounded focus:ring-pink-500 cursor-pointer transition-all" checked={formData.is_featured} onChange={e => setFormData({ ...formData, is_featured: e.target.checked })} />
               </div>
               <span className="text-base font-medium text-slate-600 group-hover:text-slate-900 transition-colors">推荐到首页</span>
             </label>
             <label className="flex items-center gap-3 cursor-pointer group">
               <div className="relative flex items-center">
-                <input type="checkbox" className="peer w-5 h-5 text-rose-600 border-slate-300 rounded focus:ring-rose-500 cursor-pointer transition-all"
+                <input type="checkbox" className="peer w-5 h-5 text-pink-600 border-slate-300 rounded focus:ring-pink-500 cursor-pointer transition-all"
                   checked={formData.is_banner}
                   onChange={e => handleBannerCheck(e.target.checked)}
                 />
@@ -591,7 +591,7 @@ export default function Admin() {
             <button
               type="submit"
               disabled={isUploading || isSubmitting || formData.images.length === 0}
-              className="px-6 py-2.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-base font-semibold shadow-lg shadow-rose-500/30 hover:shadow-rose-500/40 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-6 py-2.5 rounded-lg bg-pink-600 hover:bg-pink-700 text-white text-base font-semibold shadow-lg shadow-pink-500/30 hover:shadow-pink-500/40 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {isSubmitting ? (
                 <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -615,7 +615,7 @@ export default function Admin() {
             <input
               type="text"
               placeholder="新分类名称..."
-              className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-base outline-none focus:border-rose-500"
+              className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-base outline-none focus:border-pink-500"
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
             />
@@ -626,7 +626,7 @@ export default function Admin() {
                 setNewCategoryName('');
                 toast.success('分类添加成功');
               }}
-              className="px-4 py-2 bg-rose-600 text-white rounded-lg font-semibold hover:bg-rose-700"
+              className="px-4 py-2 bg-pink-600 text-white rounded-lg font-semibold hover:bg-pink-700"
             >
               添加
             </button>
@@ -645,7 +645,7 @@ export default function Admin() {
                       toast.success('分类已删除');
                     }
                   }}
-                  className="p-2 text-slate-400 hover:text-red-500 opacity-60 hover:opacity-100 transition-all"
+                  className="p-2 text-slate-400 hover:text-pink-500 opacity-60 hover:opacity-100 transition-all"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
