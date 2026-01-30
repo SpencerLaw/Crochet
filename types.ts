@@ -16,19 +16,12 @@ export interface Product {
   created_at?: string;
 }
 
-export interface CartItem extends Product {
-  quantity: number;
+export interface CategoryEntity {
+  id: string;
+  name: string;
+  created_at?: string;
 }
 
-export enum Category {
-  ALL = '全部',
-  PENDANTS = '挂件',
-  ORNAMENTS_CAR_POTTED = '摆件、车载（盆栽）',
-  DECOR_MIXED = '挂件、摆件、车载',
-  BAGS = '包包',
-  HEADBANDS = '发箍',
-  PETS = '宠物（帽子、围脖）',
-  HAIR_CLIP = '发夹',
-  HAIR_TIE = '发绳',
-  PHONE_STRAP = '手机小挂件'
+export interface CartItem extends Product {
+  quantity: number;
 }

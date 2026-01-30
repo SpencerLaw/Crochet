@@ -3,8 +3,7 @@ import { BrowserRouter, Routes, Route, Link, useNavigate, useLocation, useParams
 import { ShoppingBag, Search, Menu, X, MessageCircle, LogOut, Package, Sparkles, Image as ImageIcon, Trash2, ArrowRight, Home as HomeIcon, Store, Heart, ChevronLeft, ChevronRight, Copy, Check, LayoutDashboard, PlusCircle, LogOut as LogoutIcon, Globe } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 import { useStore } from './store';
-import { Category, Product } from './types';
-import { CATEGORIES } from './constants';
+import { Product } from './types';
 import { Button, ProductCard, CategoryBadge } from './components/Components';
 
 // Lazy load pages for code splitting
@@ -233,16 +232,15 @@ const Navbar = () => {
 
 export default function App() {
 
-  const { fetchProducts } = useStore();
+  const { fetchProducts, fetchCategories } = useStore();
 
   const [isAuth, setIsAuth] = useState(!!localStorage.getItem('admin_pass'));
 
 
   useEffect(() => {
-
     fetchProducts();
-
-  }, [fetchProducts]);
+    fetchCategories();
+  }, [fetchProducts, fetchCategories]);
 
 
   const handleAdminLogin = (pass: string) => {

@@ -1,13 +1,13 @@
 
 import React, { useState, useRef } from 'react';
 import { useStore } from '../store';
-import { Category, Product } from '../types';
-import { CATEGORIES } from '../constants';
+import { Product, CategoryEntity } from '../types';
 import { uploadImage } from '../services/imageService';
 import { toast } from 'react-hot-toast';
 import {
   ShoppingBag, LogOut, Plus, Search, Menu, X,
-  Trash2, Edit, Upload, Filter, MoreHorizontal, LayoutGrid, ChevronLeft, ChevronRight
+  Trash2, Edit, Upload, Filter, MoreHorizontal, LayoutGrid, ChevronLeft, ChevronRight,
+  Settings, PlusCircle
 } from 'lucide-react';
 import axios from 'axios';
 
@@ -46,23 +46,25 @@ const InputGroup = ({ label, required, children }: any) => (
 const INITIAL_FORM = {
   title: '',
   price: '',
-  category: '挂件' as Category,
+  category: '',
   description: '',
   images: [] as string[],
   is_featured: false,
   is_banner: false,
   banner_text: '',
-  tags: ''
+  tags: []
 };
 
 // --- MAIN ADMIN COMPONENT ---
 
 export default function Admin() {
-  const { products, fetchProducts } = useStore();
+  const { products, deleteProduct, fetchProducts, categories, addCategory, deleteCategory } = useStore();
   const [searchTerm, setSearchTerm] = useState('');
 
   // Modal & Upload State
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -90,13 +92,13 @@ export default function Admin() {
     setFormData({
       title: product.title,
       price: product.price.toString(),
-      category: product.category as Category,
+      category: product.category,
       description: product.description,
       images: product.images && product.images.length > 0 ? product.images : [product.image],
       is_featured: product.is_featured || false,
       is_banner: product.is_banner || false,
       banner_text: product.banner_text || '',
-      tags: product.tags?.join(', ') || ''
+      tags: product.tags || []
     });
     setIsModalOpen(true);
   };
@@ -171,7 +173,7 @@ export default function Admin() {
       ...formData,
       image: formData.images[0], // Main image
       images: formData.images,   // All images
-      tags: formData.tags.split(',').map(s => s.trim()).filter(Boolean),
+      tags: formData.tags.map(s => s.trim()).filter(Boolean),
       stock: 999 // Default high stock as requested to ignore inventory
     };
 
@@ -265,11 +267,19 @@ export default function Admin() {
             </div>
 
             <button
+              onClick={() => setIsCategoryModalOpen(true)}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold shadow-sm hover:bg-slate-50 transition-all active:scale-95"
+            >
+              <Settings className="w-5 h-5 text-indigo-600" />
+              <span>分类管理</span>
+            </button>
+
+            <button
               onClick={handleCreateNew}
               className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 md:py-3 rounded-xl text-base font-bold shadow-lg shadow-indigo-500/30 transition-all hover:-translate-y-0.5 hover:shadow-indigo-500/40 flex items-center justify-center gap-2 whitespace-nowrap"
             >
-              <Plus className="w-5 h-5" />
-              <span>发布商品</span>
+              <PlusCircle className="w-5 h-5" />
+              <span>发布新商品</span>
             </button>
           </div>
         </div>
@@ -451,13 +461,15 @@ export default function Admin() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <InputGroup label="分类">
+            <InputGroup label="分类" required>
               <select
+                required
                 className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-base focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
                 value={formData.category}
-                onChange={e => setFormData({ ...formData, category: e.target.value as Category })}
+                onChange={e => setFormData({ ...formData, category: e.target.value })}
               >
-                {CATEGORIES.filter(c => c !== Category.ALL).map(c => <option key={c} value={c}>{c}</option>)}
+                <option value="">请选择分类</option>
+                {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
               </select>
             </InputGroup>
           </div>
@@ -590,6 +602,59 @@ export default function Admin() {
             </button>
           </div>
         </form>
+      </Modal>
+
+      {/* --- CATEGORY MANAGEMENT MODAL --- */}
+      <Modal
+        isOpen={isCategoryModalOpen}
+        onClose={() => setIsCategoryModalOpen(false)}
+        title="分类管理"
+      >
+        <div className="space-y-6">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="新分类名称..."
+              className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-base outline-none focus:border-indigo-500"
+              value={newCategoryName}
+              onChange={(e) => setNewCategoryName(e.target.value)}
+            />
+            <button
+              onClick={async () => {
+                if (!newCategoryName.trim()) return;
+                await addCategory(newCategoryName.trim());
+                setNewCategoryName('');
+                toast.success('分类添加成功');
+              }}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700"
+            >
+              添加
+            </button>
+          </div>
+
+          <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
+            {categories.map((cat) => (
+              <div key={cat.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100 group">
+                <span className="font-medium text-slate-700">{cat.name}</span>
+                <button
+                  onClick={async () => {
+                    if (window.confirm(`确定要删除分类 "${cat.name}" 吗？`)) {
+                      await deleteCategory(cat.id);
+                      toast.success('分类已删除');
+                    }
+                  }}
+                  className="p-1.5 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-xs text-slate-400 italic">
+            提示：删除分类不会删除关联的商品，但该商品将失去分类标签。
+          </p>
+        </div>
       </Modal>
     </div >
   );

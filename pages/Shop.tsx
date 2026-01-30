@@ -2,17 +2,15 @@ import React, { useState } from 'react';
 import { Package, Search } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useStore } from '../store';
-import { Category } from '../types';
-import { CATEGORIES } from '../constants';
 import { CategoryBadge, ProductCard } from '../components/Components';
 
 const Shop = () => {
-    const { products, addToCart } = useStore();
-    const [activeCategory, setActiveCategory] = useState<string>(Category.ALL);
+    const { products, addToCart, categories } = useStore();
+    const [activeCategory, setActiveCategory] = useState<string>('全部');
     const [searchTerm, setSearchTerm] = useState("");
 
     const filteredProducts = products.filter(p => {
-        const matchesCategory = activeCategory === Category.ALL || p.category === activeCategory;
+        const matchesCategory = activeCategory === '全部' || p.category === activeCategory;
 
         const searchLower = searchTerm.toLowerCase();
         const matchesSearch =
@@ -44,12 +42,17 @@ const Shop = () => {
 
             {/* Categories */}
             <div className="flex flex-wrap gap-3 mb-12">
-                {CATEGORIES.map(cat => (
+                <CategoryBadge
+                    label="全部"
+                    active={activeCategory === '全部'}
+                    onClick={() => setActiveCategory('全部')}
+                />
+                {categories.map(cat => (
                     <CategoryBadge
-                        key={cat}
-                        label={cat}
-                        active={activeCategory === cat}
-                        onClick={() => setActiveCategory(cat)}
+                        key={cat.id}
+                        label={cat.name}
+                        active={activeCategory === cat.name}
+                        onClick={() => setActiveCategory(cat.name)}
                     />
                 ))}
             </div>
