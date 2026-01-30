@@ -27,6 +27,7 @@ export default async function handler(req: any, res: any) {
                 const { data: categories, error: getError } = await supabase
                     .from('categories')
                     .select('*')
+                    .order('sort_order', { ascending: true })
                     .order('name', { ascending: true });
 
                 if (getError) throw getError;
@@ -42,6 +43,15 @@ export default async function handler(req: any, res: any) {
                 return res.status(201).json(newCat[0]);
 
             case 'PUT':
+                // Support both single update and bulk update for sorting
+                if (Array.isArray(req.body)) {
+                    const { error: bulkError } = await supabase
+                        .from('categories')
+                        .upsert(req.body);
+                    if (bulkError) throw bulkError;
+                    return res.status(200).json({ message: 'Reordered successfully' });
+                }
+
                 const { id: updateId, ...updates } = req.body;
                 const { data: updatedCat, error: putError } = await supabase
                     .from('categories')

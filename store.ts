@@ -18,6 +18,7 @@ interface AppState {
   deleteProduct: (id: string) => void;
   addCategory: (name: string) => Promise<void>;
   deleteCategory: (id: string) => Promise<void>;
+  reorderCategories: (categories: CategoryEntity[]) => Promise<void>;
 }
 
 export const useStore = create<AppState>()(
@@ -61,17 +62,18 @@ export const useStore = create<AppState>()(
           console.error('Fetch categories error, using legacy fallback:', err);
         }
         // Fallback to legacy categories if API fails or table empty
-        const fallback = LEGACY_CATEGORIES.map((name, i) => ({ id: `legacy-${i}`, name }));
+        const fallback = LEGACY_CATEGORIES.map((name, i) => ({ id: `legacy-${i}`, name, sort_order: i }));
         set({ categories: fallback });
       },
 
       addCategory: async (name) => {
         try {
           const adminPass = localStorage.getItem('admin_pass') || '';
+          const maxSort = get().categories.reduce((max, c) => Math.max(max, c.sort_order || 0), -1);
           const res = await fetch('/api/categories', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': adminPass },
-            body: JSON.stringify({ name })
+            body: JSON.stringify({ name, sort_order: maxSort + 1 })
           });
           if (res.ok) {
             await get().fetchCategories();
@@ -93,6 +95,26 @@ export const useStore = create<AppState>()(
           }
         } catch (err) {
           console.error('Delete category error:', err);
+        }
+      },
+
+      reorderCategories: async (newCategories) => {
+        // Optimistic update
+        set({ categories: newCategories });
+        try {
+          const adminPass = localStorage.getItem('admin_pass') || '';
+          const updates = newCategories.map((c, i) => ({ id: c.id, name: c.name, sort_order: i }));
+          const res = await fetch('/api/categories', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': adminPass },
+            body: JSON.stringify(updates)
+          });
+          if (!res.ok) {
+            await get().fetchCategories(); // Rollback on error
+          }
+        } catch (err) {
+          console.error('Reorder categories error:', err);
+          await get().fetchCategories();
         }
       },
 

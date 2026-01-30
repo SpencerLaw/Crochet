@@ -7,7 +7,7 @@ import { toast } from 'react-hot-toast';
 import {
   ShoppingBag, LogOut, Plus, Search, Menu, X,
   Trash2, Edit, Upload, Filter, MoreHorizontal, LayoutGrid, ChevronLeft, ChevronRight,
-  Settings, PlusCircle
+  Settings, PlusCircle, ChevronUp, ChevronDown
 } from 'lucide-react';
 import axios from 'axios';
 
@@ -58,7 +58,7 @@ const INITIAL_FORM = {
 // --- MAIN ADMIN COMPONENT ---
 
 export default function Admin() {
-  const { products, deleteProduct, fetchProducts, categories, addCategory, deleteCategory } = useStore();
+  const { products, deleteProduct, fetchProducts, categories, addCategory, deleteCategory, reorderCategories } = useStore();
   const [searchTerm, setSearchTerm] = useState('');
 
   // Modal & Upload State
@@ -632,10 +632,36 @@ export default function Admin() {
             </button>
           </div>
 
-          <div className="flex flex-wrap gap-2 max-h-60 overflow-y-auto pr-2">
-            {categories.map((cat) => (
-              <div key={cat.id} className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100/80 text-slate-700 rounded-full border border-slate-200 group hover:bg-slate-200/80 transition-all">
-                <span className="text-sm font-semibold">{cat.name}</span>
+          <div className="space-y-2 max-h-80 overflow-y-auto pr-2">
+            {categories.map((cat, index) => (
+              <div key={cat.id} className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-100 group hover:border-indigo-200 transition-all">
+                <div className="flex items-center gap-3">
+                  <div className="flex flex-col gap-0.5">
+                    <button
+                      disabled={index === 0}
+                      onClick={() => {
+                        const newCats = [...categories];
+                        [newCats[index - 1], newCats[index]] = [newCats[index], newCats[index - 1]];
+                        reorderCategories(newCats);
+                      }}
+                      className="p-0.5 text-slate-300 hover:text-indigo-600 disabled:opacity-0 transition-colors"
+                    >
+                      <ChevronUp className="w-4 h-4" />
+                    </button>
+                    <button
+                      disabled={index === categories.length - 1}
+                      onClick={() => {
+                        const newCats = [...categories];
+                        [newCats[index + 1], newCats[index]] = [newCats[index], newCats[index + 1]];
+                        reorderCategories(newCats);
+                      }}
+                      className="p-0.5 text-slate-300 hover:text-indigo-600 disabled:opacity-0 transition-colors"
+                    >
+                      <ChevronDown className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <span className="font-semibold text-slate-700">{cat.name}</span>
+                </div>
                 <button
                   onClick={async () => {
                     if (window.confirm(`确定要删除分类 "${cat.name}" 吗？`)) {
@@ -643,10 +669,9 @@ export default function Admin() {
                       toast.success('分类已删除');
                     }
                   }}
-                  className="p-0.5 text-slate-400 hover:text-red-500 transition-colors"
-                  title="删除"
+                  className="p-2 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             ))}

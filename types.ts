@@ -19,6 +19,7 @@ export interface Product {
 export interface CategoryEntity {
   id: string;
   name: string;
+  sort_order: number;
   created_at?: string;
 }
 
