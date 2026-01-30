@@ -271,15 +271,7 @@ export default function Admin() {
               className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 bg-white border-2 border-wooly-cream text-wooly-brown rounded-2xl font-bold shadow-sm hover:bg-wooly-cream/20 transition-all active:scale-95 font-hand"
             >
               <LayoutGrid className="w-5 h-5 text-wooly-pink-400" />
-              <span>分类管理</span>
-            </button>
-
-            <button
-              onClick={() => setIsSortingModalOpen(true)}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 bg-white border-2 border-wooly-cream text-wooly-brown rounded-2xl font-bold shadow-sm hover:bg-wooly-cream/20 transition-all active:scale-95 font-hand"
-            >
-              <Settings className="w-5 h-5 text-wooly-pink-400" />
-              <span>首页排序</span>
+              <span>分类与排序</span>
             </button>
 
             <button
@@ -570,8 +562,7 @@ export default function Admin() {
         </form>
       </Modal>
 
-      {/* --- CATEGORY MANAGEMENT MODAL --- */}
-      <Modal isOpen={isCategoryModalOpen} onClose={() => setIsCategoryModalOpen(false)} title="分类管理">
+      <Modal isOpen={isCategoryModalOpen} onClose={() => setIsCategoryModalOpen(false)} title="分类与排序">
         <div className="space-y-8">
           <div className="flex gap-3">
             <input type="text" placeholder="给新分区起个好名字..." className="flex-1 bg-wooly-cream/30 border border-wooly-cream rounded-2xl px-5 py-3 text-base outline-none focus:ring-4 focus:ring-wooly-pink-100 transition-all font-bold text-wooly-brown" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} />
@@ -584,9 +575,25 @@ export default function Admin() {
           </div>
 
           <div className="space-y-3 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
-            {categories.map((cat) => (
+            {categories.map((cat, index) => (
               <div key={cat.id} className="flex items-center justify-between p-4 bg-white/50 rounded-2xl border border-wooly-cream/50 hover:border-wooly-pink-200 transition-all group">
-                <span className="font-bold text-wooly-brown text-lg font-hand ml-2">{cat.name}</span>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1">
+                    <button disabled={index === 0} onClick={() => {
+                      const n = [...categories];[n[index - 1], n[index]] = [n[index], n[index - 1]];
+                      reorderCategories(n);
+                    }} className="p-1.5 hover:bg-wooly-pink-100 rounded-lg text-wooly-pink-400 disabled:opacity-20 transition-all">
+                      <ChevronUp className="w-5 h-5" />
+                    </button>
+                    <button disabled={index === categories.length - 1} onClick={() => {
+                      const n = [...categories];[n[index + 1], n[index]] = [n[index], n[index + 1]];
+                      reorderCategories(n);
+                    }} className="p-1.5 hover:bg-wooly-pink-100 rounded-lg text-wooly-pink-400 disabled:opacity-20 transition-all">
+                      <ChevronDown className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <span className="font-bold text-wooly-brown text-lg font-hand ml-2">{cat.name}</span>
+                </div>
                 <button onClick={async () => {
                   if (window.confirm(`确定要删除 "${cat.name}" 分类吗？`)) {
                     await deleteCategory(cat.id);
@@ -598,37 +605,10 @@ export default function Admin() {
               </div>
             ))}
           </div>
+          <p className="text-sm text-wooly-brown/40 font-hand text-center">💡 排序将直接同步到首页展示顺序哦</p>
         </div>
       </Modal>
 
-      {/* --- SORTING MODAL --- */}
-      <Modal isOpen={isSortingModalOpen} onClose={() => setIsSortingModalOpen(false)} title="首页/商品排序">
-        <div className="space-y-8">
-          <p className="text-wooly-brown/60 font-hand text-lg">上下拖动或点击箭头，调整商品在首页的展示顺序哦 🧶</p>
-          <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
-            {categories.map((cat, index) => (
-              <div key={cat.id} className="flex items-center justify-between p-5 bg-white rounded-[32px] border-2 border-wooly-cream shadow-sm hover:shadow-cute transition-all group overflow-hidden">
-                <div className="flex items-center gap-4">
-                  <div className="w-8 h-8 rounded-full bg-wooly-pink-100 text-wooly-pink-500 font-bold flex items-center justify-center font-hand text-xl">
-                    {index + 1}
-                  </div>
-                  <span className="font-bold text-wooly-brown text-xl font-hand">{cat.name}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button disabled={index === 0} onClick={() => {
-                    const n = [...categories];[n[index - 1], n[index]] = [n[index], n[index - 1]];
-                    reorderCategories(n);
-                  }} className="p-3 bg-wooly-cream/30 hover:bg-wooly-pink-100 rounded-2xl transition-all disabled:opacity-20 text-wooly-pink-500"><ChevronUp className="w-6 h-6" /></button>
-                  <button disabled={index === categories.length - 1} onClick={() => {
-                    const n = [...categories];[n[index + 1], n[index]] = [n[index], n[index + 1]];
-                    reorderCategories(n);
-                  }} className="p-3 bg-wooly-cream/30 hover:bg-wooly-pink-100 rounded-2xl transition-all disabled:opacity-20 text-wooly-pink-500"><ChevronDown className="w-6 h-6" /></button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Modal>
     </div>
   );
 }

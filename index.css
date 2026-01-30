@@ -7,32 +7,43 @@ body {
   color: #5D4037;
 }
 
-/* Cute Wooly Scrollbars */
+/* Global: Hide Scrollbars (Frontend) */
 ::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Admin Only: Custom Styled Scrollbars */
+.admin-scrollbar {
+  -ms-overflow-style: auto !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #FFD1DC #FFF5E1 !important;
+}
+
+.admin-scrollbar::-webkit-scrollbar {
+  display: block !important;
   width: 10px;
   height: 10px;
 }
 
-::-webkit-scrollbar-track {
+.admin-scrollbar::-webkit-scrollbar-track {
   background: #FFF5E1;
   /* wooly-cream */
   border-radius: 10px;
 }
 
-::-webkit-scrollbar-thumb {
+.admin-scrollbar::-webkit-scrollbar-thumb {
   background: #FFD1DC;
   /* wooly-pink-200 */
   border: 3px solid #FFF5E1;
   border-radius: 10px;
 }
 
-::-webkit-scrollbar-thumb:hover {
+.admin-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #FFB6C1;
   /* wooly-pink-300 */
-}
-
-/* Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #FFD1DC #FFF5E1;
 }

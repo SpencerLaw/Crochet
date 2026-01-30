@@ -49,8 +49,8 @@ const AdminLayout = ({ isAuthenticated, onLogout }: { isAuthenticated: boolean; 
   if (!isAuthenticated) return <Navigate to="/admin/login" replace />;
 
   return (
-    <div className="min-h-screen bg-wooly-cream/30 font-sans text-wooly-brown">
-      <main className="flex-1 overflow-visible">
+    <div className="h-screen overflow-y-auto admin-scrollbar bg-wooly-cream/30 font-sans text-wooly-brown">
+      <main className="flex-1">
         <Outlet />
       </main>
     </div>
