@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, animate, useTransform } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useStore } from '../store';
 import { Button, ProductCard } from '../components/Components';
@@ -29,6 +29,28 @@ const Home = () => {
 
     const [currentSlide, setCurrentSlide] = useState(0);
     const [direction, setDirection] = useState(0);
+    const [isAnimating, setIsAnimating] = useState(false);
+    const x = useMotionValue(0);
+    const containerRef = React.useRef<HTMLDivElement>(null);
+
+    const paginate = async (newDirection: number) => {
+        if (isAnimating || banners.length <= 1) return;
+        setIsAnimating(true);
+        setDirection(newDirection);
+
+        const width = containerRef.current?.offsetWidth || window.innerWidth;
+
+        await animate(x, -newDirection * width, {
+            type: "spring",
+            stiffness: 250,
+            damping: 30,
+            mass: 0.8
+        }).finished;
+
+        setCurrentSlide((prev) => (prev + newDirection + banners.length) % banners.length);
+        x.set(0);
+        setIsAnimating(false);
+    };
 
     useEffect(() => {
         if (banners.length <= 1) return;
@@ -36,12 +58,7 @@ const Home = () => {
             paginate(1);
         }, 6000);
         return () => clearInterval(timer);
-    }, [banners.length]);
-
-    const paginate = (newDirection: number) => {
-        setDirection(newDirection);
-        setCurrentSlide((prev) => (prev + newDirection + banners.length) % banners.length);
-    };
+    }, [banners.length, isAnimating]);
 
     const variants = {
         enter: (direction: number) => ({
@@ -60,8 +77,11 @@ const Home = () => {
         })
     };
 
-    const x = useMotionValue(0);
-    const containerRef = React.useRef(null);
+    const containerWidth = containerRef.current?.offsetWidth || 1000;
+
+    // 3D Flip Logic
+    // We calculate a normalized progress value from -1 to 1 based on x position
+    const dragProgress = useTransform(x, (val) => val / containerWidth);
 
     const handleDragEnd = async () => {
         const currentX = x.get();
@@ -113,16 +133,36 @@ const Home = () => {
                         {[-1, 0, 1].map((offset) => {
                             const index = (currentSlide + offset + banners.length) % banners.length;
                             const banner = banners[index];
+
+                            // 3D Transformation for each card
+                            const rotateY = useTransform(dragProgress, (p) => (offset + p) * -45);
+                            const scale = useTransform(dragProgress, (p) => 1 - Math.abs(offset + p) * 0.15);
+                            const opacity = useTransform(dragProgress, (p) => 1 - Math.abs(offset + p) * 0.6);
+                            const z = useTransform(dragProgress, (p) => Math.abs(offset + p) * -200);
+
                             return (
                                 <motion.div
                                     key={`${index}-${offset}`}
-                                    className="absolute top-0 bottom-0 w-full h-full flex items-center justify-center"
-                                    style={{ left: `${offset * 100}%` }}
+                                    className="absolute top-0 bottom-0 w-full h-full flex items-center justify-center overflow-hidden"
+                                    style={{
+                                        left: `${offset * 100}%`,
+                                        rotateY,
+                                        scale,
+                                        opacity,
+                                        z,
+                                        transformStyle: "preserve-3d",
+                                        perspective: "1000px"
+                                    }}
                                 >
                                     <img src={banner.image} className="w-full h-full object-cover pointer-events-none" />
-                                    <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-transparent to-transparent pointer-events-none" />
+                                    <div className="absolute inset-0 bg-gradient-to-br from-black/50 via-transparent to-transparent pointer-events-none" />
                                     <div className="absolute inset-0 p-6 md:p-10 z-20 flex flex-col justify-start items-start text-white pointer-events-none">
-                                        <div className="max-w-[240px] md:max-w-sm mt-4 md:mt-8">
+                                        <motion.div
+                                            className="max-w-[240px] md:max-w-sm mt-4 md:mt-8"
+                                            style={{
+                                                x: useTransform(dragProgress, (p) => (offset + p) * 50)
+                                            }}
+                                        >
                                             <h1 className="font-hand text-3xl md:text-5xl font-bold leading-tight drop-shadow-xl">{banner.title}</h1>
                                             {banner.subtitle && <p className="text-xs md:text-base text-white/90 font-medium mt-2 leading-relaxed drop-shadow-md">{banner.subtitle}</p>}
                                             <button
@@ -134,7 +174,7 @@ const Home = () => {
                                             >
                                                 立即查看
                                             </button>
-                                        </div>
+                                        </motion.div>
                                     </div>
                                 </motion.div>
                             );
@@ -148,13 +188,13 @@ const Home = () => {
                         <>
                             <button
                                 onClick={() => paginate(-1)}
-                                className="absolute left-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 bg-white/40 hover:bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-wooly-brown/80 border border-white/30 shadow-lg ring-1 ring-black/5 opacity-0 group-hover:opacity-100 transition-all duration-300 hidden md:flex hover:scale-110 active:scale-95"
+                                className="absolute left-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 bg-white/40 hover:bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-wooly-brown/80 border border-white/30 shadow-lg ring-1 ring-black/5 opacity-80 md:opacity-0 group-hover:opacity-100 transition-all duration-300 flex hover:scale-110 active:scale-95"
                             >
                                 <ChevronLeft className="w-6 h-6" />
                             </button>
                             <button
                                 onClick={() => paginate(1)}
-                                className="absolute right-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 bg-white/40 hover:bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-wooly-brown/80 border border-white/30 shadow-lg ring-1 ring-black/5 opacity-0 group-hover:opacity-100 transition-all duration-300 hidden md:flex hover:scale-110 active:scale-95"
+                                className="absolute right-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 bg-white/40 hover:bg-white/60 backdrop-blur-md rounded-full flex items-center justify-center text-wooly-brown/80 border border-white/30 shadow-lg ring-1 ring-black/5 opacity-80 md:opacity-0 group-hover:opacity-100 transition-all duration-300 flex hover:scale-110 active:scale-95"
                             >
                                 <ChevronRight className="w-6 h-6" />
                             </button>
@@ -169,9 +209,12 @@ const Home = () => {
                             {banners.map((_, idx) => (
                                 <button
                                     key={idx}
-                                    onClick={() => {
-                                        setDirection(idx > currentSlide ? 1 : -1);
-                                        setCurrentSlide(idx);
+                                    onClick={async () => {
+                                        if (idx === currentSlide || isAnimating) return;
+                                        const diff = idx - currentSlide;
+                                        // For simplicity, we just use paginate in the direction needed
+                                        // A full jump to distant slide with animation is complex, but this handles adjacent or simple steps
+                                        paginate(diff > 0 ? 1 : -1);
                                     }}
                                     className={`h-1.5 rounded-full transition-all duration-500 ease-out shadow-sm ${currentSlide === idx
                                         ? 'w-6 bg-wooly-pink-500 shadow-wooly-pink-300/40'
