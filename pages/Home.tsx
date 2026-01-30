@@ -116,7 +116,7 @@ const Home = () => {
                 <div className="absolute top-1/2 right-10 text-4xl opacity-20 animate-bounce">🧵</div>
             </div>
 
-            <div className="relative mt-4 md:mt-6 mx-4 rounded-[32px] overflow-hidden min-h-[296px] md:h-[420px] shadow-xl z-10 group bg-slate-100">
+            <div className="relative mt-4 md:mt-6 mx-4 rounded-[32px] overflow-hidden min-h-[296px] md:h-[420px] shadow-xl z-10 group bg-black">
                 <div ref={containerRef} className="absolute inset-0 overflow-hidden">
                     <motion.div
                         className="absolute inset-0 flex items-center justify-center cursor-grab active:cursor-grabbing"
