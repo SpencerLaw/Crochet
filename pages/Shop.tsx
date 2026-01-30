@@ -9,6 +9,17 @@ const Shop = () => {
     const [activeCategory, setActiveCategory] = useState<string>('全部');
     const [searchTerm, setSearchTerm] = useState("");
 
+    const filteredProducts = products.filter(p => {
+        const matchesCategory = activeCategory === '全部' || p.category === activeCategory;
+        const searchLower = searchTerm.toLowerCase();
+        return matchesCategory && (
+            p.title.toLowerCase().includes(searchLower) ||
+            (p.description && p.description.toLowerCase().includes(searchLower)) ||
+            p.category.toLowerCase().includes(searchLower) ||
+            (p.tags && p.tags.some(t => t.toLowerCase().includes(searchLower)))
+        );
+    });
+
     const sortedProducts = [...filteredProducts].sort((a, b) => {
         // Group by category sort_order
         const catA = categories.find(c => c.name === a.category);
