@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Package, Search } from 'lucide-react';
+import { Package, Search, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useStore } from '../store';
 import { CategoryBadge, ProductCard, SectionHeader } from '../components/Components';
@@ -40,16 +40,28 @@ const Shop = () => {
                 <h1 className="font-hand text-5xl font-bold text-wooly-brown shrink-0">全部商品</h1>
 
                 {/* Search Bar */}
-                <div className="flex-grow w-full md:w-auto relative">
+                <form
+                    onSubmit={(e) => e.preventDefault()}
+                    className="flex-grow w-full md:w-auto relative group"
+                >
                     <input
                         type="text"
                         placeholder="搜索温暖的好物..."
-                        className="w-full pl-12 pr-4 py-3 rounded-full border-none bg-white shadow-soft focus:ring-2 focus:ring-orange-300 outline-none"
+                        className="w-full pl-12 pr-12 py-3 rounded-full border border-transparent bg-white shadow-soft focus:ring-2 focus:ring-wooly-pink-200 outline-none transition-all"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
-                    <Search className="absolute left-4 top-3.5 text-gray-400 w-5 h-5" />
-                </div>
+                    <Search className="absolute left-4 top-3.5 text-gray-400 w-5 h-5 group-focus-within:text-wooly-pink-400 transition-colors" />
+                    {searchTerm && (
+                        <button
+                            type="button"
+                            onClick={() => setSearchTerm("")}
+                            className="absolute right-4 top-3 hover:bg-gray-100 p-1 rounded-full transition-colors"
+                        >
+                            <X className="w-5 h-5 text-gray-400" />
+                        </button>
+                    )}
+                </form>
             </div>
 
             {/* Categories */}
@@ -72,87 +84,114 @@ const Shop = () => {
             {/* Content Area */}
             {sortedProducts.length > 0 ? (
                 <>
-                    {activeCategory === '全部' ? (
-                        // Sectioned View for "All"
-                        <div className="space-y-16">
-                            {categories.map(cat => {
-                                // Filter products for this category
-                                const catProducts = sortedProducts.filter(p => p.category === cat.name);
-                                if (catProducts.length === 0) return null;
-
-                                return (
-                                    <div key={cat.id} className="space-y-6">
-                                        <SectionHeader title={cat.name} />
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                            {catProducts.map(p => (
-                                                <ProductCard
-                                                    key={p.id}
-                                                    product={p}
-                                                    onAddToCart={(prod) => {
-                                                        addToCart(prod);
-                                                        toast.success(
-                                                            <div className="flex items-center gap-2">
-                                                                <img src={prod.image} className="w-8 h-8 rounded-full object-cover" />
-                                                                <span>已加入选购清单!</span>
-                                                            </div>
-                                                        );
-                                                    }}
-                                                />
-                                            ))}
-                                        </div>
-                                    </div>
-                                );
-                            })}
-
-                            {/* Uncategorized / Others Section */}
-                            {(() => {
-                                const knownCategories = categories.map(c => c.name);
-                                const otherProducts = sortedProducts.filter(p => !knownCategories.includes(p.category));
-                                if (otherProducts.length === 0) return null;
-
-                                return (
-                                    <div className="space-y-6">
-                                        <SectionHeader title="未分类 / 其他" />
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                            {otherProducts.map(p => (
-                                                <ProductCard
-                                                    key={p.id}
-                                                    product={p}
-                                                    onAddToCart={(prod) => {
-                                                        addToCart(prod);
-                                                        toast.success(
-                                                            <div className="flex items-center gap-2">
-                                                                <img src={prod.image} className="w-8 h-8 rounded-full object-cover" />
-                                                                <span>已加入选购清单!</span>
-                                                            </div>
-                                                        );
-                                                    }}
-                                                />
-                                            ))}
-                                        </div>
-                                    </div>
-                                );
-                            })()}
+                    {searchTerm.length > 0 ? (
+                        // Search Results Grid (Flat)
+                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="flex items-center justify-between border-b border-wooly-cream pb-4">
+                                <h2 className="font-hand text-3xl font-bold text-wooly-brown">搜索结果 ({sortedProducts.length})</h2>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                {sortedProducts.map(p => (
+                                    <ProductCard
+                                        key={p.id}
+                                        product={p}
+                                        onAddToCart={(prod) => {
+                                            addToCart(prod);
+                                            toast.success(
+                                                <div className="flex items-center gap-2">
+                                                    <img src={prod.image} className="w-8 h-8 rounded-full object-cover" />
+                                                    <span>已加入选购清单!</span>
+                                                </div>
+                                            );
+                                        }}
+                                    />
+                                ))}
+                            </div>
                         </div>
                     ) : (
-                        // Simple Grid for Specific Category
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {sortedProducts.map(p => (
-                                <ProductCard
-                                    key={p.id}
-                                    product={p}
-                                    onAddToCart={(prod) => {
-                                        addToCart(prod);
-                                        toast.success(
-                                            <div className="flex items-center gap-2">
-                                                <img src={prod.image} className="w-8 h-8 rounded-full object-cover" />
-                                                <span>已加入选购清单!</span>
+                        // Standard Category View
+                        activeCategory === '全部' ? (
+                            // Sectioned View for "All"
+                            <div className="space-y-16">
+                                {categories.map(cat => {
+                                    // Filter products for this category
+                                    const catProducts = sortedProducts.filter(p => p.category === cat.name);
+                                    if (catProducts.length === 0) return null;
+
+                                    return (
+                                        <div key={cat.id} className="space-y-6">
+                                            <SectionHeader title={cat.name} />
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                                {catProducts.map(p => (
+                                                    <ProductCard
+                                                        key={p.id}
+                                                        product={p}
+                                                        onAddToCart={(prod) => {
+                                                            addToCart(prod);
+                                                            toast.success(
+                                                                <div className="flex items-center gap-2">
+                                                                    <img src={prod.image} className="w-8 h-8 rounded-full object-cover" />
+                                                                    <span>已加入选购清单!</span>
+                                                                </div>
+                                                            );
+                                                        }}
+                                                    />
+                                                ))}
                                             </div>
-                                        );
-                                    }}
-                                />
-                            ))}
-                        </div>
+                                        </div>
+                                    );
+                                })}
+
+                                {/* Uncategorized / Others Section */}
+                                {(() => {
+                                    const knownCategories = categories.map(c => c.name);
+                                    const otherProducts = sortedProducts.filter(p => !knownCategories.includes(p.category));
+                                    if (otherProducts.length === 0) return null;
+
+                                    return (
+                                        <div className="space-y-6">
+                                            <SectionHeader title="未分类 / 其他" />
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                                {otherProducts.map(p => (
+                                                    <ProductCard
+                                                        key={p.id}
+                                                        product={p}
+                                                        onAddToCart={(prod) => {
+                                                            addToCart(prod);
+                                                            toast.success(
+                                                                <div className="flex items-center gap-2">
+                                                                    <img src={prod.image} className="w-8 h-8 rounded-full object-cover" />
+                                                                    <span>已加入选购清单!</span>
+                                                                </div>
+                                                            );
+                                                        }}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
+                            </div>
+                        ) : (
+                            // Simple Grid for Specific Category
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                {sortedProducts.map(p => (
+                                    <ProductCard
+                                        key={p.id}
+                                        product={p}
+                                        onAddToCart={(prod) => {
+                                            addToCart(prod);
+                                            toast.success(
+                                                <div className="flex items-center gap-2">
+                                                    <img src={prod.image} className="w-8 h-8 rounded-full object-cover" />
+                                                    <span>已加入选购清单!</span>
+                                                </div>
+                                            );
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        )
                     )}
                 </>
             ) : (
