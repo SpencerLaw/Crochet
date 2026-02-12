@@ -210,7 +210,7 @@ const Home = () => {
                 {/* Banner Indicators - Cute Capsule Style */}
                 {
                     banners.length > 1 && (
-                        <div className="absolute bottom-6 right-8 z-30 flex gap-1.5 items-center px-3 py-2 bg-white/[0.03] backdrop-blur-md rounded-full">
+                        <div className="absolute bottom-6 right-8 z-30 flex gap-1.5 items-center px-3 py-2 bg-white/[0.02] backdrop-blur-md rounded-full">
                             {banners.map((_, idx) => (
                                 <button
                                     key={idx}
